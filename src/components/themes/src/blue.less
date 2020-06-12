@@ -1,0 +1,111 @@
+.theme-blue {
+  @bgColor: #ebf1f6; // 背景颜色
+  @fontColor: #606266; // 字体颜色
+  @activeFontColor: #2f74ff; // 激活字体颜色
+  background-color: #fff !important;
+  .aw-aside,
+  .aw-header {
+    background-color: @bgColor;
+    
+  }
+  .aw-aside {
+    &_brand-logo {
+      width: 80px;
+      height: 30px;
+      background-image: url("/static/images/login_logo.3.png");
+    }
+    &-menu-wrapper {
+      &:before {
+        content: "";
+        position: absolute;
+        width: 1px;
+        background-color: #dcdee2;
+        right: -1px;
+        top: 56px;
+        height: 100%;
+      }
+      &::-webkit-scrollbar {
+        width: 6px;
+        height: 4px;
+        border-radius: 4px;
+        transition: all 0.2s linear;
+      }
+      &::-webkit-scrollbar-track {
+        background-color: #ebf1f6;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: #ebf1f6;
+        border: none;
+        box-shadow: none;
+        border-radius: 4px;
+      }
+      &:hover::-webkit-scrollbar-thumb {
+        background-color: #d4d8dc;
+        &:hover {
+          background-color: #a0a4a9;
+        }
+      }
+    }
+    &_brand-tools-toggler {
+      span,
+      span:before,
+      span:after {
+        background-color: #484f66;
+      }
+    }
+    .mf-li {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+      .mf-a {
+        color: @fontColor;
+        &:hover {
+          color: @activeFontColor;
+        }
+      }
+      &.is-active {
+        background-color: rgba(255, 255, 255, 0.5);
+        .mf-a {
+          color: @activeFontColor;
+        }
+      }
+    }
+  }
+  .active_header.el-dropdown-menu {
+    margin-top: 0;
+    z-index: 97;
+  }
+  .aw-subheader {
+    box-shadow: 0 1px 5px 0 rgba(0,0,0,.1);
+  }
+  
+  //screenTab  
+  .aw-subscreens-tab {
+    line-height: 40px;
+    background: #f4f4f5;
+    border-radius: 4px;
+  }
+}
+
+.theme-blue.aw-header--fixed {
+  .aw-page-wrapper {
+    padding-top: 106px;
+  }
+}
+.theme-blue.aw-header-tab--active {
+  .aw-header {
+    border-bottom: none!important;
+  }
+  .aw-aside-menu-wrapper::before {
+    top: 96px;
+  }
+  .aw-subheader {
+    top: 96px;
+  }    
+
+}
+.theme-blue.aw-subheader--fixed.aw-header-tab--active {
+  .aw-page-wrapper {
+    padding-top: 146px;
+  }
+}

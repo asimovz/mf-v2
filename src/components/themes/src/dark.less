@@ -1,0 +1,48 @@
+.theme-dark {
+  @sideBg_Color: #242939;
+  @sideBg_ActiveColor: #2d8cf0;
+  @sideFont_Color: rgba(255, 255, 255, 0.7);
+  @sideFont_ActiveColor: rgba(255, 255, 255, 0.7);
+  .aw-aside {
+    background-color: @sideBg_Color;
+    &_brand-logo {
+      width: 88px;
+      height: 30px;
+      background-image: url("/static/images/login_logo.png");
+    }
+  }
+  .m-page-menu {
+    .el-submenu__title {
+      color: @sideFont_Color;
+      &:hover {
+        background: #1f2433;
+      }
+    }
+    .el-menu-item.is-active {
+      background-color: @sideBg_ActiveColor;
+    }
+    .mf-li {
+      color: @sideFont_Color;
+      &:not(.is-active):hover {
+        background: #1f2433;
+      }
+    }
+  }
+  .aw-aside-menu-wrapper {
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 1px;
+    }
+    &::-webkit-scrollbar-thumb {
+      border-right: 2px solid #242939;
+      box-shadow: inset 0 0 0 2px;
+      border-radius: 20px;
+    }
+    &::-webkit-scrollbar-track {
+      background: #242939;
+    }
+  }
+  .aw-header {
+    box-shadow: 0 0 40px 0 rgba(82, 63, 105, 0.1);
+  }
+}

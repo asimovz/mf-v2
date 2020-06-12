@@ -1,0 +1,65 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+.init {
+    height:100vh;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    flex-direction: column;
+    background:#0C0725;
+}
+
+.init .ball-beat {
+  width: 100%;
+  text-align: center;
+  margin-top: 20px
+}
+.init .ball-beat>div {
+  width: 12px;
+  height: 12px;
+  margin: 2px;
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: ball-beat .7s 0s infinite linear;
+  animation: ball-beat .7s 0s infinite linear;
+}
+.init .ball-beat .a {
+  background: #DE7165
+}
+.init .ball-beat .b {
+  background: #EFC465
+}
+.init .ball-beat .c {
+  background: #7CC363
+}
+.init .ball-beat>div:nth-child(2n-1) {
+  -webkit-animation-delay: -.35s!important;
+  animation-delay: -.35s!important
+}
+
+@-webkit-keyframes ball-beat {
+  50% {
+      opacity: .2;
+      -webkit-transform: scale(.75);
+      transform: scale(.75)
+  }
+  100% {
+      opacity: 1;
+      -webkit-transform: scale(1);
+      transform: scale(1)
+  }
+}
+@keyframes ball-beat {
+  50% {
+      opacity: .2;
+      -webkit-transform: scale(.75);
+      transform: scale(.75)
+  }
+  100% {
+      opacity: 1;
+      -webkit-transform: scale(1);
+      transform: scale(1)
+  }
+}
