@@ -77,8 +77,9 @@
                 var w = Math.floor(bodyWidth - l - 30)
                 this.styleSheet.top = t + 'px';
                 this.styleSheet.left = l + 'px';
+                if(pos.width < 360) pos.width = 360
                 this.styleSheet.width = pos.width + 'px';
-                //this.styleSheet.width = w + 'px';
+                // this.styleSheet.width = w + 'px';
                 this.lastCallerHeight = pos.height;
             },
             whole(e){
@@ -135,6 +136,8 @@
 
 <style lang="scss" scoped>
     div.v-dropdown-container{
+
+        min-width: 260px;
         border: 1px solid #D6D7D7;
         margin: 0;
         padding: 0;

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
+import 'static/element.css'
 import VueI18n from 'vue-i18n'
 Vue.use(ElementUI)
 Vue.use(VueI18n)

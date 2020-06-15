@@ -1,8 +1,8 @@
 import layout from './layout'
 import logins from './login'
-import './index.less'
-import './blue.less'
-import './dark.less'
+import './css/index.less'
+import './css/blue.less'
+import './css/dark.less'
 
 let themeList = {
 	dark: {

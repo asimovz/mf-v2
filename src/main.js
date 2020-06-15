@@ -1,32 +1,13 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
-// import router from './router'
 import axios from './axios'
-
-//ag样式
-import "../node_modules/@ag-grid-enterprise/all-modules/dist/styles/ag-grid.css";
-import "../node_modules/@ag-grid-enterprise/all-modules/dist/styles/ag-theme-balham.css";
-
-
-window['CKEDITOR_BASEPATH'] = process.env.NODE_ENV === 'production' ? __webpack_define_cdn__ + '/static/js/CKEditor/' : '/static/js/CKEditor/'
-console.log($THEME,"=-=-=-");
-
-// 字体icon
-// import "./assets/css/iconfont.css"
-// import "./assets/css/ionicons.less"
-
-// 公共样式
-
-import "./assets/css/main.less"
-// import "./assets/css/theme.less"
-// import "./assets/css/iview.css"
-
 import moquiComponents from './components'
 import moqui from './assets/js/moquiLibs'
 import _L from 'accredit'
 
+import "./assets/css/main.less"
+
+window['CKEDITOR_BASEPATH'] = process.env.NODE_ENV === 'production' ? __webpack_define_cdn__ + '/static/js/CKEditor/' : '/static/js/CKEditor/'
 Vue.use(moquiComponents)
 
 Vue.prototype.$http = axios

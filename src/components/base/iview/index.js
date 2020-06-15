@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
-import './iview.less'
 import VueI18n from 'vue-i18n'
 Vue.use(iView)
 Vue.use(VueI18n)

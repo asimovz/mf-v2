@@ -12,8 +12,6 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const baseThemeConfig = require('../config/theme.config')
 
-console.log(process.env,baseThemeConfig);
-
 var SSHWebpackPlugin = require('ssh-webpack-plugin');
 
 const env = process.env.NODE_ENV === 'testing'
