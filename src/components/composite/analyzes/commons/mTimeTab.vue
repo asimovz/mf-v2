@@ -1,10 +1,6 @@
 <template>
   <m-tabs v-model="activeTab" class="mTimeTab">
-    <m-tabPane label="今天" name="today"></m-tabPane>
-    <m-tabPane label="昨天" name="yesterday"></m-tabPane>
-    <m-tabPane label="近7天" name="7days"></m-tabPane>
-    <m-tabPane label="近30天" name="30days"></m-tabPane>
-    <m-tabPane label="自定义时间段" name="customDays"></m-tabPane>
+    <m-tabPane v-for="item in tabs" :key="item.name" :label="item.label" :name="item.name"></m-tabPane>
     <div slot="extra">
       <div v-show="activeTab === 'customDays'" style="float:left;margin-right:10px">
         <m-datePeriod v-model="rangeDate" placement="bottom-end" placeholder="选择时间范围"></m-datePeriod>
@@ -21,10 +17,21 @@ export default {
     id: {
       type: String,
       default: ''
+    },
+    activeTabIndex: {
+      type: Number,
+      default: 0
     }
   },
   data () {
     return {
+      tabs: [
+        {label: '今天', name: 'today'},
+        {label: '昨天', name: 'yesterday'},
+        {label: '近7天', name: '7days'},
+        {label: '近30天', name: '30days'},
+        {label: '自定义时间段', name: 'customDays'}
+      ],
       activeTab: 'today',
       rangeDate: ['', '']
     }
@@ -71,6 +78,10 @@ export default {
       this.broadcast()
     }
   },
+  created () {
+    const activeTabs = this.tabs.filter((item, index) => index === this.activeTabIndex)
+    this.activeTab = activeTabs.length > 0 ? activeTabs[0].name : this.tabs[0].name
+  },
   methods: {
     broadcast () {
       const eventNames = [
@@ -85,13 +96,8 @@ export default {
       })
     },
     getDay (days = 0) {
-      return this.moqui.dateFormat(this.getCurrentDay(days), 'yyyy-MM-dd')
-    },
-    getCurrentDay (days = 0) {
-      const date = new Date()
-      return new Date(date.setDate(date.getDate() + days))
-    },
-
+      return this.moqui.dateFormat(this.moqui.getDay(days), 'yyyy-MM-dd')
+    }
   }
 }
 </script>

@@ -1,9 +1,9 @@
 <template>
-  <ol class="mRankingList">
-    <li v-for="(item, index) in items" :key="index" @click="clickHandler(item)">
+  <ol class="mRankingList" :class="{'is-link': link !== undefined}">
+    <li v-for="(item, index) in items" :key="index" :class="{'active': activeIndex === index}" @click="clickHandler(item, index)">
       <i>{{index + 1}}</i>
-      <p class="bd"><strong>{{item.title}}</strong><span>{{item.desc}}</span></p>
-      <p>{{dataLabel}} <strong>{{item.data}}</strong></p>
+      <p class="bd"><strong>{{item.title}}</strong><span v-if="false">{{item.desc}}</span></p>
+      <p>{{dataLabel || item.desc}} <strong>{{item.data}}</strong></p>
     </li>
   </ol>
 </template>
@@ -14,9 +14,10 @@ export default {
   props: {
     dataLabel: {
       type: String,
-      default: '数据量'
+      default: ''
     },
-    resDataKey:String,
+    link: {},
+    resDataKey: String,
     id: {
       type: String,
       default: ''
@@ -32,6 +33,7 @@ export default {
   },
   data () {
     return {
+      activeIndex: '',
       items: [],
       params: {},
       searchForms: []
@@ -54,8 +56,9 @@ export default {
     }
   },
   methods: {
-    clickHandler(rowData){
-      if(!this.resDataKey) return
+    clickHandler (rowData, index) {
+      this.activeIndex = index
+      if (!this.resDataKey) return
 
       this.$root.eventBus.$emit(`${this.id}_value_change`, {
         [this.resDataKey]: rowData[this.resDataKey]
@@ -106,7 +109,7 @@ export default {
     color: #C0C4CC;
     display: flex;
     align-items: center;
-    padding: .5em 0;
+    padding: .5em 5px;
     & + li {
       border-top: 1px solid #EBEEF5;
     }
@@ -120,6 +123,19 @@ export default {
         color: #C0C4CC;
         display: block;
         font-size: 12px;
+      }
+    }
+  }
+  &.is-link{
+    li{
+      cursor: pointer;
+      &:hover,&.active{
+        background:#f5f7fa;
+        i{
+          &::after{
+            background: #f5f7fa;
+          }
+        }
       }
     }
   }
