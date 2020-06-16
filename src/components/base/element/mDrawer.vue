@@ -19,16 +19,12 @@
         <i class="el-icon-close" style="font-size:25px;color: #2d8cf0;font-weight: bold;"/>
       </div>
       <div class="menu">
-          <div v-for="(tab, i) in subscreens" :key="tab.name" @click.prevent="tabClick(tab, i)" class="menuItem">
-            <span :class="i === activeIndex?'blue':'pointer'">{{tab.title}}</span>
-          </div>
+          <div v-for="(tab, i) in subscreens" :key="tab.name" @click.prevent="tabClick(tab, i)" :class="['menuItem', {active: activeIndex === i}]">{{tab.title}}</div>
       </div>
     </div>
     <div v-if="showSider && menuPlacement ==='top'" class="topMenu">
       <div class="menu">
-        <div v-for="(tab, i) in subscreens" :key="tab.name" @click.prevent="tabClick(tab, i)" :class="['menuItem', i === activeIndex?'blue':'pointer']">
-          <span>{{tab.title}}</span>
-        </div>
+        <div v-for="(tab, i) in subscreens" :key="tab.name" @click.prevent="tabClick(tab, i)" :class="['menuItem', {active: activeIndex === i}]">{{tab.title}}</div>
       </div>
     </div>
     <slot v-if="isDynamic == false"></slot>
@@ -298,12 +294,9 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-
-      .blue {
+      cursor: pointer;
+      &.active{
         color:#2D8CF0;
-      }
-      .pointer:hover {
-        cursor: pointer;
       }
     }
   }

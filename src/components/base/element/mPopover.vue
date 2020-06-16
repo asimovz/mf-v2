@@ -1,5 +1,5 @@
 <template>
-  <el-popover class="aw-poptip"  placement="bottom" trigger="click" @on-popper-hide="hide">
+  <el-popover class="aw-poptip"  placement="bottom" trigger="click" @on-popper-hide="hide" :popper-class="popperClass">
     <slot slot="reference"></slot>
     <slot name="content"></slot>
   </el-popover>
@@ -8,6 +8,11 @@
 <script>
 export default {
   name: "m-popover",
+  props: {
+    popperClass: {
+      type: String
+    }
+  },
   methods: {
     hide() {
       this.$emit("on-hide")

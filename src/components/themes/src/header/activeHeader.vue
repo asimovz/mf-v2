@@ -3,13 +3,14 @@
     <el-tabs class="active-tabs-content" refs="tabs" v-if="loading" type="card" v-model="elTabIndex" @tab-remove="tabRemove" @tab-click="tabClick">
       <el-tab-pane v-for="(tab, index) in tabs" :key="index" :closable="index!=0" :label="tab.title" :name="index+''"></el-tab-pane>
     </el-tabs>
-
     <div class="tabs-control">
-      <m-tooltip transfer title="关闭全部">
+      <m-button size="medium" style="margin-right: 2px;" type="text" @click.native="dropClick('all')">全部关闭</m-button>
+      <!-- <m-tooltip v-else transfer title="关闭全部">
         <m-button size="medium" class="close" type="default" @click.native="dropClick('all')"><i class="el-icon-error"></i></m-button>
-      </m-tooltip>
+      </m-tooltip> -->
       <m-dropdown @on-command="dropClick" :options="contextmenuList">
-        <m-button size="medium" type="default" class="tabs-dropdown" icon="el-icon-arrow-down"></m-button>
+        <m-button type="text" style="height: 100%;"><i class="el-icon-arrow-down"></i></m-button>
+        <!-- <m-button v-else size="medium" type="default" class="tabs-dropdown" icon="el-icon-arrow-down"></m-button> -->
       </m-dropdown>
     </div>
     <ul ref="contextmenu1" v-show="contextVisible0" class="active_header el-dropdown-menu el-dropdown-menu--small" :style="contextStyle">
@@ -55,6 +56,7 @@ export default {
       }
     }
   },
+  inject: ['configData'],
   mounted() {
     document.body.classList.add("aw-header-tab--active")
     this.$root.eventBus.$on('active_header_nav', nav => {
@@ -194,32 +196,32 @@ export default {
 
       let shouldRequest = menuIndex !== -1
       switch (name) {
-      case 'left':
-        if (shouldRequest) {
-          shouldRequest = this.tabIndex < menuIndex
-        }
-        this.closeLeft(menuIndex);
-        break;
-      case 'right':
-        if (shouldRequest) {
-          shouldRequest = this.tabIndex > menuIndex
-        }
+        case 'left':
+          if (shouldRequest) {
+            shouldRequest = this.tabIndex < menuIndex
+          }
+          this.closeLeft(menuIndex);
+          break;
+        case 'right':
+          if (shouldRequest) {
+            shouldRequest = this.tabIndex > menuIndex
+          }
 
-        this.closeRight(menuIndex);
-        break;
-      case 'other':
-        if (shouldRequest) {
-          shouldRequest = this.tabIndex !== menuIndex
-        }
+          this.closeRight(menuIndex);
+          break;
+        case 'other':
+          if (shouldRequest) {
+            shouldRequest = this.tabIndex !== menuIndex
+          }
 
-        this.closeOther(menuIndex);
-        break;
-      case 'all':
-        shouldRequest = true
-        this.closeAll(menuIndex);
-        break;
-      default:
-        break;
+          this.closeOther(menuIndex);
+          break;
+        case 'all':
+          shouldRequest = true
+          this.closeAll(menuIndex);
+          break;
+        default:
+          break;
       }
 
       shouldRequest && this.setUrl()
@@ -272,87 +274,100 @@ export default {
 .active-tabs {
   position: relative;
   padding: 0 10px 0 0;
-    .active-tabs-content {
-      margin-right: 71px;
+
+  .active-tabs-content {
+    margin-right: 71px;
+  }
+
+  .el-tabs__nav-next,
+  .el-tabs__nav-prev {
+    line-height: 40px;
+    width: 20px;
+    text-align: center;
+  }
+
+  .el-tabs__nav {
+    border-color: #cfd7e5 !important;
+  }
+
+  .el-tabs__header {
+    margin-bottom: 0;
+    border-color: #cfd7e5;
+  }
+
+  .is-active {
+    background-color: #fff !important;
+  }
+
+  .el-tabs__header .el-tabs__item {
+    border-left: 1px solid #cfd7e5;
+    background-color: rgba(0, 0, 0, .03);
+    user-select: none;
+  }
+
+  .el-tabs__item:first-child {
+    border-left: none;
+    border-top-left-radius: 4px;
+  }
+
+  .el-tabs__item:last-child {
+    border-top-right-radius: 4px;
+  }
+
+  .tabs-control {
+    position: absolute;
+    top: 1px;
+    bottom: 0;
+    right: 10px;
+    display: inline-flex;
+
+    .close {
+      width: 46px;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      margin-right: -1px;
+      border-radius: 4px 0 0 0;
+      padding: 12px;
+
+      &:hover {
+        z-index: 2
+      }
     }
 
-    .el-tabs__nav-next,
-    .el-tabs__nav-prev {
-      line-height: 40px;
-      width: 20px;
-      text-align: center;
-    }
-
-    .el-tabs__nav {
-      border-color: #cfd7e5 !important;
-    }
-    .el-tabs__header {
-      margin-bottom: 0;
-      border-color: #cfd7e5;
-    }
-    .is-active {
-      background-color: #fff !important;
-    }
-    .el-tabs__header .el-tabs__item {
-      border-left: 1px solid #cfd7e5;
-      background-color: rgba(0, 0, 0, .03);
-      user-select: none;
-    }
-    .el-tabs__item:first-child {
+    .tabs-dropdown {
+      position: relative;
+      z-index: 1;
+      width: 26px;
+      height: 100%;
+      padding-left: 0;
+      padding-right: 0;
+      border-radius: 0 4px 0 0;
       border-left: none;
-      border-top-left-radius: 4px;
-    }
-    .el-tabs__item:last-child {
-      border-top-right-radius: 4px;
-    }
 
-    .tabs-control {
-      position: absolute;
-      top: 1px;
-      bottom: 0;
-      right: 10px;
-      display: inline-flex;
-
-      .close {
-        width: 46px;
-        flex: 1;
-        position: relative;
-        z-index: 1;
-        margin-right: -1px;
-        border-radius: 4px 0 0 0;
-        padding: 12px;
-        &:hover {
-          z-index: 2
-        }
+      &:before {
+        content: "";
+        position: absolute;
+        display: block;
+        width: 1px;
+        top: 5px;
+        bottom: 5px;
+        left: 0;
+        background: rgba(220, 223, 230, .5)
       }
 
-      .tabs-dropdown {
-        position: relative;
-        z-index: 1;
-        width: 26px;
-        height: 100%;
-        padding-left: 0;
-        padding-right: 0;
-        border-radius: 0 4px 0 0;
-        border-left: none;
-        &:before {
-          content: "";
-          position: absolute;
-          display: block;
-          width: 1px;
-          top: 5px;
-          bottom: 5px;
-          left: 0;
-          background: rgba(220, 223, 230, .5)
-        }
-        &:hover:before {
-          top: 0;
-          bottom: 0;
-          background-color: #c6e2ff
-        }
+      &:hover:before {
+        top: 0;
+        bottom: 0;
+        background-color: #c6e2ff
       }
-
     }
+
+  }
+}
+
+.active_header {
+  z-index: 999
 }
 
 </style>

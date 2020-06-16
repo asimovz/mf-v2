@@ -163,6 +163,7 @@
   };
 </script>
 <style scoped lang="less">
+
 .operation_box {
   display: flex;
   /* justify-content: space-around; */

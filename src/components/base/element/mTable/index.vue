@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="table-wrap">
     <div class="eleTable-wrapper" :class="{'show-custom': customColsVisible}">
 
       <!-- 自定义列设置 -->
@@ -229,7 +229,7 @@ export default {
       // 默认配置
       defaults: {
         align: '',
-        size: 'mini',
+        size: '',
         autoHeight: false,
         stripe: false,
         border: true,
