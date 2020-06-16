@@ -1,7 +1,7 @@
 
 <script>
 export default {
-  name: 'mCard',
+  name: 'm-card',
   render (h) {
     return h('el-card', {
       props: this.$attrs,
@@ -31,9 +31,7 @@ export default {
 .m-el-card {
   box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.12)!important;
   .el-card__header{
-    padding: 13px 20px;
-  }
-  .m-card__header{
+    padding: 8px 20px;
     position: relative;
   }
   .extra{

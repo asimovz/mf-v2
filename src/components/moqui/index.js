@@ -1,4 +1,5 @@
 import boxBody from './boxBody'
+import containerCard from './containerCard'
 import containerDialog from './containerDialog'
 import containerDrawer from './containerDrawer'
 import datePeriod from './datePeriod'
@@ -31,6 +32,7 @@ import workspace from './workspace/'
 
 export default [
   boxBody,
+  containerCard,
   containerDialog,
   containerDrawer,
   datePeriod,
