@@ -2,7 +2,9 @@
   <m-card>
     <div class="container-card-header"  slot="header">
         <span>{{title}}</span>
-        <slot name="toolbar"></slot>
+        <div style="flex:1">
+           <slot name="toolbar" ></slot>
+        </div>
     </div>
     <slot></slot>
   </m-card>
@@ -24,5 +26,9 @@ export default {
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
+  .form-link,.aw-form {
+    margin: 0;
+    padding:0
+  }
 }
 </style>
