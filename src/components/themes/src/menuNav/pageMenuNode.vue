@@ -2,7 +2,7 @@
   <m-menu-item class="mf-li" :index="menuData.path" :key="menuData.name" v-if="deepNumber>=maxDeep || !menuData.children || menuData.children.length == 0 ">
   <m-link class="mf-a" :href="menuData.path" @click.native="menuClick(menuData.path)">
     <!-- <Icon type="android-remove" size="12" style="margin-right: 2px"></Icon> -->
-    <i class="el-icon-document-remove"></i>
+    <!-- <i class="el-icon-document-remove"></i> -->
     <span class="menu-title">{{menuData.title}}</span>
   </m-link>
   </m-menu-item>
@@ -10,7 +10,7 @@
     <template slot="title">
       <!-- <Icon :type="menuData.image" v-if="deepNumber == 1" size="18"></Icon>
       <Icon type="android-list" v-else size="12"></Icon> -->
-      <i class="el-icon-folder"></i>
+      <i :class="['m-icon', `m-icon-${menuData.name}`]"></i>
       <span class="menu-title">{{menuData.title}}</span>
     </template>
     <m-page-menu-node :menuData="child" v-for="(child,index) in menuData.children" :key="index" :title="crumb" :deep="deepNumber"></m-page-menu-node>

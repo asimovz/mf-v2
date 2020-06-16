@@ -11,7 +11,7 @@
       ></CustomColumn>
 
       <!-- 数据表格 -->
-      <el-table :ref="`eleTable_${id}`"
+      <el-table :ref="`eleTable_${id}`" :style="{'border-radius': showPage ? '8px' : ''}"
         v-loading="isLoading"
         :size="allConfig.size"
         :border="allConfig.border"
