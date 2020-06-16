@@ -320,16 +320,16 @@ var moqui = {
 
     this.heartCheck = {
       classObj: this,
-      timeout: 50*1000,//50s
+      timeout: 50 * 1000, //50s
       timeoutObj: null,
-      reset: function(){
+      reset: function() {
         clearInterval(this.timeoutObj);
         this.start();
       },
-      start: function(){
-          this.timeoutObj = setInterval(()=>{
-            this.classObj.webSocket.send("HeartBeat");
-          }, this.timeout)
+      start: function() {
+        this.timeoutObj = setInterval(() => {
+          this.classObj.webSocket.send("HeartBeat");
+        }, this.timeout)
       }
     }
 
@@ -360,11 +360,11 @@ var moqui = {
         }, this);
       };
       this.webSocket.onclose = function(event) {
-        console.log(event,"websocket断开");
+        console.log(event, "websocket断开");
         setTimeout(this.clientObj.tryReopen, 30 * 1000, this.clientObj);
       };
       this.webSocket.onerror = function(event) {
-        console.log(event,"websocket发生错误");
+        console.log(event, "websocket发生错误");
       };
     };
     this.tryReopen = function(clientObj) {
@@ -444,6 +444,15 @@ var moqui = {
       }
       lruList.unshift(key);
     };
+  },
+  /**
+   * 获取几天前，或几天后的日期
+   * @param {number} days 偏移天数，支持负数, 默认值0，返回当前日期
+   * @returns {Date}
+   */
+  getDay(days = 0) {
+    const date = new Date()
+    return new Date(date.setDate(date.getDate() + days))
   },
   dateFormat: function(value, fmt) { //author: meizz 
     if (value == "") return
@@ -806,7 +815,7 @@ moqui.clones = function(value, deep) {
   return value
 }
 
-moqui.clone = function(val1){
+moqui.clone = function(val1) {
   return JSON.parse(JSON.stringify(val1))
 }
 
@@ -820,12 +829,14 @@ moqui.merges = function(obj1, obj2) {
   return obj1;
 }
 
-moqui.merge = function(obj1, obj2){
+moqui.merge = function(obj1, obj2) {
   return Object.assign({}, obj1, obj2)
 }
 
 moqui.startsWith = function(string, target, position) {
-  const { length } = string
+  const {
+    length
+  } = string
   position = position == null ? 0 : position
   if (position < 0) {
     position = 0
@@ -836,10 +847,10 @@ moqui.startsWith = function(string, target, position) {
   return string.slice(position, position + target.length) == target
 }
 
-moqui.trimStart = function(str, spa = ''){
-  if(!str.split(spa).length){
+moqui.trimStart = function(str, spa = '') {
+  if (!str.split(spa).length) {
     return str
-  }else{
+  } else {
     let str_arr = str.split('')
     let _i = spa.split('').findIndex(el => {
       return str_arr.indexOf(el) > -1
@@ -849,8 +860,6 @@ moqui.trimStart = function(str, spa = ''){
 }
 
 /*---- 20190806 edit end ----*/
-
-
 
 
 
