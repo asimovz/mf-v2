@@ -1,12 +1,16 @@
 <template>
   <div class="mKpiCard">
-    <div class="item" v-for="item in kpis" :key="item.label" :style="{visibility: item.label ? 'visible' : 'hidden', 'background': background }">
-      <strong class="title">{{item.label}}</strong>
-      <div class="main-wrap">
-        <div class="main">
-          {{item.data}}
-        </div>
-      </div>
+    <div class="item"
+      v-for="(item, index) in kpis" :key="item.label"
+      :style="{
+        visibility: item.label !== undefined ? 'visible' : 'hidden',
+        flex: `0 0 ${100 / colNum}%`
+      }"
+      :class="{'no-border': (index + 1) % colNum === 0}"
+    >
+      <div class="title">{{item.label}}</div>
+      <div class="data">{{item.data === '' || isNaN(item.data) ? '--' : item.data}}</div>
+      <div class="desc">{{item.desc || '&nbsp;'}}</div>
     </div>
   </div>
 </template>
@@ -19,11 +23,11 @@ export default {
       type: String,
       default: ''
     },
-    background: {
-      type: String,
-      default: ''
-    },
     searchForm: [String, Array],
+    colNum: {
+      type: Number,
+      default: 4
+    },
     initQueryParams: {
       type: Object,
       default () {
@@ -31,7 +35,12 @@ export default {
       }
     },
     kpiCustomId: String,
-    defaultChecked: Array,
+    defaultChecked: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
     data: [Array, String]
   },
   data () {
@@ -44,11 +53,14 @@ export default {
   },
   computed: {
     kpis () {
-      const kpis = this.allKpis.filter(item => this.checked.indexOf(item.label) >= 0)
+      const kpis =
+      this.checked.length === 0 && this.defaultChecked.length === 0
+      ? this.allKpis
+      : this.allKpis.filter(item => this.checked.indexOf(item.label) >= 0)
 
       // 补空位
-      let surplus = 4 - kpis.length % 4
-      while (surplus > 0 && surplus < 4) {
+      let surplus = this.colNum - kpis.length % this.colNum
+      while (surplus > 0 && surplus < this.colNum) {
         kpis.push({})
         surplus--
       }
@@ -139,57 +151,44 @@ export default {
 
 <style lang="scss">
 .mKpiCard {
+  -webkit-font-smoothing: antialiased; 
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   .item{
     flex: 0 0 23%;
-    font-size: .8em;
-    padding: 0 1em;
-    text-align: center;
-    margin:10px 0;
-    line-height: 1.75;
-    border-radius: 0 15px 0 15px;
-    color:#909399;
-    background:rgba(64, 160, 255, 0.08);
-    box-shadow: 0 0 8px 0 rgba(0,0,0,.1);
+    padding: 0 15px;
+    margin:8px 0;
     position: relative;
-    &:hover{
-      box-shadow: 0 2px 10px 0 rgba(0,0,0,.1);
-    }
-    .title{
-      color: #fff;
-      font-weight: normal;
-      font-size: 1em;
+    &::before{
+      content: '';
       position: absolute;
       top:0;
-      left: 0;
-      background:rgba(99, 108, 145,.5);
-      padding: 0 10px;
-      line-height: 30px;
-      border-radius: 0 0 8px 0;
-      box-shadow: 1px 1px 3px rgba(0,0,0,.1);
+      right: 20px;
+      bottom:0;
+      border-right: 1px solid #DCDFE6;
     }
-    .main-wrap{
-      padding:40px 1.5em 10px;
-      text-align: center;
-      .main{
-        color: #40b1e3;
-        font-size: 2em;
+    &.no-border{
+      &::before{
+        display: none;
       }
-      p{
-        margin:0;
-      }
-      .footer{
-        display: flex;
-        & > * {
-          flex:1
-        }
-      }
-      strong{
-        color: #2f74ff;
-        font-size: 1.2em;
-      }
+    }
+    .title{
+      line-height: 22px;
+    }
+    .data{
+      color: #3C64B9;
+      font-size: 30px;
+      line-height: 38px;
+      padding:4px 0;
+      position: relative;
+      left: 0;
+      font-weight: 500;
+    }
+    .desc{
+      color: #C0C4CC;
+      font-size: 12px;
+      line-height: 20px;
     }
   }
 }

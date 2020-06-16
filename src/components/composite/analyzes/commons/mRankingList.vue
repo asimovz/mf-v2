@@ -1,23 +1,41 @@
 <template>
-  <ol class="mRankingList" :class="{'is-link': link !== undefined}">
-    <li v-for="(item, index) in items" :key="index" :class="{'active': activeIndex === index}" @click="clickHandler(item, index)">
-      <i>{{index + 1}}</i>
-      <p class="bd"><strong>{{item.title}}</strong><span v-if="false">{{item.desc}}</span></p>
-      <p>{{dataLabel || item.desc}} <strong>{{item.data}}</strong></p>
-    </li>
-  </ol>
+  <div class="mRankingList"
+  :class="{
+    'is-link': link !== undefined,
+    'divider-right': dividerRight !== undefined
+  }"
+  :style="{padding: padding}"
+  >
+    <div class="title" v-if="title">{{title}}</div>
+    <ol>
+      <li v-for="(item, index) in items" :key="index" :class="{'active': activeIndex === index}" @click="clickHandler(item, index)">
+        <i :class="{pro: index < 3}">{{index + 1}}</i>
+        <p class="bd">{{item.title}}<span v-if="false">{{item.desc}}</span></p>
+        <p class="ft">{{dataLabel || item.desc}}<span class="data">{{item.data}}</span></p>
+      </li>
+    </ol>
+  </div>
 </template>
 
 <script>
 export default {
   name: 'mRankingList',
   props: {
+    title:{
+      type: String,
+      default: ''
+    },
     dataLabel: {
       type: String,
       default: ''
     },
     link: {},
+    dividerRight: {},
     resDataKey: String,
+    padding:{
+      type:String,
+      default: '0'
+    },
     id: {
       type: String,
       default: ''
@@ -101,29 +119,47 @@ export default {
 
 <style lang="scss">
 .mRankingList{
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 14px;
+  position: relative;
+  .title{
+    padding: 0 0 10px 10px;
+  }
+  ol{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+  }
+  
   li{
-    color: #C0C4CC;
     display: flex;
     align-items: center;
-    padding: .5em 5px;
-    & + li {
-      border-top: 1px solid #EBEEF5;
-    }
-    strong{
-      color:#606266;
-    }
+    padding: 9px 10px;
+    margin: 1px 0;
+    border-radius: 5px;
     .bd{
       flex:1;
-      padding: 0 1em;
-      span{
-        color: #C0C4CC;
-        display: block;
-        font-size: 12px;
+      padding: 0 .6em;
+      color:rgba(48, 49, 51, 0.85);
+    }
+    .ft{
+      color: #C0C4CC;
+      .data{
+        color: #3C64B9;
+        padding-left: .5em;
       }
+    }
+  }
+  &.divider-right{
+    ol{
+      &::after{
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        top: 2.5em;
+        border-right: 1px solid #dcdfe6;
+      }
+      
     }
   }
   &.is-link{
@@ -141,23 +177,15 @@ export default {
   }
   i{
     color: #fff;
-    background: #40b1e3;
-    padding: .5em 1.8em .5em .7em;
-    border-radius: 3px;
-    line-height: 1;
-    position: relative;
-    font-size: 1.2em;
-    font-weight: 500;
-    overflow: hidden;
-    &::after{
-      width:50px;
-      height: 30px;
-      content: "";
-      position: absolute;
-      background: #fff;
-      top:-5px;
-      right:-25px;
-      transform: rotate(60deg);
+    width: 18px;
+    line-height: 18px;
+    text-align: center;
+    background: #DCDFE6;
+    border-radius: 100%;
+    font-size: 12px;
+    font-style: normal;
+    &.pro{
+      background: #3C64B9;
     }
   }
 }

@@ -29,6 +29,10 @@ export default {
 </script>
 <style lang="scss">
 .m-el-card {
+  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.12)!important;
+  .el-card__header{
+    padding: 13px 20px;
+  }
   .m-card__header{
     position: relative;
   }
