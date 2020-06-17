@@ -222,8 +222,10 @@ export default {
 			if(resp.type === 'confirm'){
 				this.submitConfirm(resp)
 			}else if(resp.type == "write"){
-				let el = document.getElementById(resp.id).querySelector(resp.target)
-				// $(el).val(resp.results)
+				let el = document.getElementById(resp.id)
+				if(el.tagName != "TEXTAREA" && el.tagName != "INPUT") {
+					el = el.querySelector(resp.target)
+				}
 				el.value = resp.results
 			}
 			if(resp.type !== 'confirm'){

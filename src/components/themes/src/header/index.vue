@@ -37,19 +37,19 @@
             </div>
             <ul class="topbar-user_setting" slot="content">
               <li @click="showPwdModal">
-                <Icon type="gear-a" size="18"></Icon> <span>账号设置</span>
+                <!-- <Icon type="gear-a" size="18"></Icon> --> <span>账号设置</span>
               </li>
               <li @click="changeGroupHidden=!changeGroupHidden" v-if="currentUserGroup!=''">
-                <Icon type="android-people" size="18"></Icon> <span>切换用户组</span>
+                <!-- <Icon type="android-people" size="18"></Icon>  --><span>切换用户组</span>
               </li>
               <div v-if="currentUserGroup!=''" :class="['change-user-group',{'change-user-group--hidden':changeGroupHidden}]">
                 <li v-for="group in userGroup" :key="group.userGroupId" @click="changeGroupMenu(group.userGroupId)">
-                  <Icon v-show="currentUserGroup == group.userGroupId" type="checkmark-round"></Icon>
+                  <!-- <Icon v-show="currentUserGroup == group.userGroupId" type="checkmark-round"></Icon> -->
                   <span>{{group.description}}</span>
                 </li>
               </div>
               <li @click="logout">
-                <Icon type="power" size="16"></Icon> <span>退出登陆</span>
+                <!-- <Icon type="power" size="16"></Icon>  --><span>退出登陆</span>
               </li>
             </ul>
           </m-popover>

@@ -6,9 +6,7 @@
            <slot name="toolbar"></slot>
         </div>
     </div>
-    <div :style="style">
-      <slot></slot>
-    </div>
+    <slot></slot>
   </m-card>
 </template>
 
@@ -18,9 +16,10 @@ export default {
   props: {
     title: {
       type: String
-    },
-    style: {
-      type: String
+    }
+  },
+  data() {
+    return {
     }
   }
 }
