@@ -71,7 +71,7 @@ export default {
   font-size: 12px;
   border-radius: 3px;
   margin-right: 10px;
-  &:hover, &:focus {
+  &:hover, &:active {
     color: #409EFF;
     border-color: #c6e2ff;
     background-color: #ecf5ff;
@@ -80,7 +80,7 @@ export default {
     color: #FFF;
     background-color: #409EFF;
     border-color: #409EFF;
-    &:hover, &:focus{
+    &:hover, &:active{
       background: #66b1ff;
       border-color: #66b1ff;
       color: #FFF;
@@ -90,7 +90,7 @@ export default {
     color: #FFF;
     background-color: #F56C6C;
     border-color: #F56C6C;
-    &:hover, &:focus{
+    &:hover, &:active{
       background: #f78989;
       border-color: #f78989;
       color: #FFF;
@@ -100,7 +100,7 @@ export default {
     color: #FFF;
     background-color: #67C23A;
     border-color: #67C23A;
-    &:hover, &:focus{
+    &:hover, &:active{
       background: #85ce61;
       border-color: #85ce61;
       color: #FFF;
@@ -110,7 +110,7 @@ export default {
     color: #fff;
     background-color: #909399;
     border-color: #909399;
-    &:hover, &:focus{
+    &:hover, &:active{
       background: #a6a9ad;
       border-color: #a6a9ad;
       color: #fff;
