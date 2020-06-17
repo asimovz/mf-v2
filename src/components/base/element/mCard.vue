@@ -31,8 +31,11 @@ export default {
 .m-el-card {
   box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.12)!important;
   .el-card__header{
-    padding: 8px 20px;
+    height: 48px;
+    line-height: 48px;
+    padding: 0 20px;
     position: relative;
+    background: #f3f6fe;
   }
   .extra{
     position: absolute;

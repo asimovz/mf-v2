@@ -43,6 +43,8 @@
       :name="name"
       :value="currentValue"
       :number="number"
+      :depends="depends"
+      :transition="transition"
       :autofocus="autofocus"
       :rows="rows"
       @input="handleInput"
@@ -195,15 +197,6 @@ export default {
       });
     }
 
-    // if(this.validate){
-    //   //监听form的验证消息
-    //   if(this.form){
-
-    //     root.eventBus.$on('form_validate'+this.form,()=>{
-    //       this.$validator.validate()
-    //     })
-    //   }
-    // }
 
     //绑定提交的form属性，用于表单字段提交
     if(this.form) {
@@ -339,13 +332,7 @@ export default {
         that.$root.eventBus.$off(value+'_value_change')
       });
     }
-    // if(this.validate){
-    //   if(this.form){
-    //     this.$root.eventBus.$off('form_validate'+this.form)
-    //   }else{
-    //     this.$root.eventBus.$off('form_validate'+this.id.split('_')[0])
-    //   }
-    // }
+
   },
 
   directives: {

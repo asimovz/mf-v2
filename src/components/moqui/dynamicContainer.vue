@@ -13,6 +13,7 @@ export default {
     url: {
       type: String
     },
+    dependsOn: Object,
     renderModes: {
       type: String,
       default: "covt"
@@ -87,6 +88,22 @@ export default {
     }
   },
   mounted: function() {
+    let self = this;
+    let root = this.$root;
+    if (JSON.stringify(this.dependsOn) != "{}") {
+      let dependsOnMap = this.dependsOn
+      for (let doParm in dependsOnMap) {
+        root.eventBus.$on(dependsOnMap[doParm]+'_value_change', result => {
+          let param = {}
+          if (typeof result == "string") {
+            param[doParm] = result
+          } else {
+            param[doParm] = result[dependsOnMap[doParm]]
+          }
+          this.curUrl = self.url+'&'+ new URLSearchParams(param).toString()
+        })
+      }
+    }
     this.$root.addContainer(this.id, this);
     this.curUrl = this.url;
   }

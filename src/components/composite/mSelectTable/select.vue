@@ -59,7 +59,10 @@ pageSize    每页显示条数 默认10
 // 		});
 // 	}
 // });
-import vSelectPage from "./vSelectPage"
+
+
+import vSelectPage from './vSelectPage';
+
 export default {
 	name:'m-select-table', //m-select-page
 	components: {
@@ -130,27 +133,7 @@ export default {
 	},
 	mounted: function() {
 		let root = this.$root
-		if(this.validate){
-      //监听form的验证消息
-     	if(this.form){
-        root.eventBus.$on('form_validate'+this.form,()=>{
-          this.$validator.validate()
-        })
-      }else{
-				let idInfoArray = this.id.split('_')
-        let formId = null
-        if(idInfoArray.length>2){
-          formId = idInfoArray[0]+'_'+idInfoArray[1]
-        }
-        else{
-          formId = idInfoArray[0]
-        }
-        root.eventBus.$on('form_validate'+formId,()=>{
-          this.$validator.validate()
-        })
-      }
-		}
-		
+
 		if (typeof this.dependsOn != "undefined") {
       let depends = this.dependsOn.split(",");
       let that = this;
