@@ -314,4 +314,46 @@
 		&-setup{background-image: url('../images/setup.png')}
 	}
 
+
+	.m-link-button{
+		background-color: @color-primary;border-color: @color-primary;color: #fff;
+		&:hover{background-color: @color-primary--hover;border-color: @color-primary--hover;color: #fff;}
+		&:focus{background-color: darken(@color-primary, 10%);border-color: darken(@color-primary, 10%);}
+	}
+
+	.m-link-button{
+		&-parmary, &-default{
+			.m-link-button()
+		}
+		&-success{
+			background-color: @color-success;border-color: @color-success;
+			&:hover{background-color: @color-success--hover;border-color: @color-success--hover;}
+			&:focus{background-color: darken(@color-success, 10%);border-color: darken(@color-success, 10%);}
+		}
+		&-warning{
+			background-color: @color-warning;border-color: @color-warning;
+			&:hover{background-color: @color-warning--hover;border-color: @color-warning--hover;}
+			&:focus{background-color: darken(@color-warning, 10%);border-color: darken(@color-warning, 10%);}
+		}
+		&-danger{
+			background-color: @color-danger;border-color: @color-danger;
+			&:hover{background-color: @color-danger--hover;border-color: @color-danger--hover;}
+			&:focus{background-color: darken(@color-danger, 10%);border-color: darken(@color-danger, 10%);}
+		}
+	}
+	
+
+	.aw-subscreens-tab{
+		.subscreens-tab_nav li{
+			.m-link:hover:before{border-color: @main-color-primary;}
+			&.active .m-link{color: @main-color-primary;&:hover:before, &:before{border-color: @main-color-primary;}}
+			
+			
+		}
+	}
+
+	.aw-tabs{
+		&-nav .aw-tabs-tab-active, &-nav .aw-tabs-tab:hover, &.aw-tabs-card > .aw-tabs-bar .aw-tabs-tab-active{color:  @main-color-primary}
+		&-ink-bar{background-color: @main-color-primary;}
+	}
 }
