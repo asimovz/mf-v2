@@ -286,6 +286,12 @@
 			color: @table-tr_color;
 		}
 
+		.el-table td, .el-table th{
+			height: 48px;
+			line-height: 48px;
+			padding: 0;
+		}
+
 		.el-table__body {
 			color: @table-td_color;
 
@@ -293,27 +299,22 @@
 				color: @table-link_color
 			}
 
-			&-wrapper {
-				&::-webkit-scrollbar {
-					width: 6px;
-					height: 10px;
-				}
-
-				&::-webkit-scrollbar-thumb {
-					background: #dcdfe6;
-					border-radius: 4px;
-
-					&:hover {
-						background-color: darken(#dcdfe6, 5%)
-					}
-
-				}
-
-				&::-webkit-scrollbar-track {
-					background: #ebeef5;
-				}
-
-			}
+			// &-wrapper {
+			// 	&::-webkit-scrollbar {
+			// 		width: 6px;
+			// 		height: 10px;
+			// 	}
+			// 	&::-webkit-scrollbar-thumb {
+			// 		background: #dcdfe6;
+			// 		border-radius: 4px;
+			// 		&:hover {
+			// 			background-color: darken(#dcdfe6, 5%)
+			// 		}
+			// 	}
+			// 	&::-webkit-scrollbar-track {
+			// 		background: #ebeef5;
+			// 	}
+			// }
 
 		}
 
