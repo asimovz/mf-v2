@@ -44,12 +44,9 @@
       </div>
     </div>
     <template v-else>
-      <div class="el-form-item">
-        <label :class="'el-form-item__label el-col-'+radioLayout[0]">{{title}}</label>
-        <div :class="'el-form-item__content iel-col-'+radioLayout[1]">
-          <m-radio :value="activeKey" :options="radioList" @on-change="radioChange"></m-radio>
-        </div>
-      </div>
+      <m-form-item :label="title" :span="radioLayout[0]" align="right" content-align="left">
+        <m-radio :value="activeKey" :options="radioList" @on-change="radioChange"></m-radio>
+      </m-form-item>
     </template>
 
     <div :class="contentClasses" :style="contentStyle">

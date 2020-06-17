@@ -124,26 +124,6 @@ export default {
   mounted: function() {
     let root = this.$root;
     this.loadData()
-    if(this.validate){
-      //监听form的验证消息
-      if(this.form){
-        root.eventBus.$on('form_validate'+this.form,()=>{
-          this.$validator.validate()
-        })
-      }else{
-        let idInfoArray = this.id.split('_')
-        let formId = null
-        if(idInfoArray.length>2){
-          formId = idInfoArray[0]+'_'+idInfoArray[1]
-        }
-        else{
-          formId = idInfoArray[0]
-        }
-        root.eventBus.$on('form_validate'+formId,()=>{
-          this.$validator.validate()
-        })
-      }
-    }
   },
   methods: {
     disposeData(param) {
@@ -173,16 +153,6 @@ export default {
     },
     handleChange (value, selectedData) {
       this.currentValue = value
-    }
-  },
-
-  beforeDestroy: function() {
-    if(this.validate){
-      if(this.form){
-        this.$root.eventBus.$off('form_validate'+this.form)
-      }else{
-        this.$root.eventBus.$off('form_validate'+this.id.split('_')[0])
-      }
     }
   }
 }

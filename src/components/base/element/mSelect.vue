@@ -203,14 +203,12 @@ export default {
       let dependsOnMap = this.dependsOn
       for (let doParm in dependsOnMap) {
           root.eventBus.$on(dependsOnMap[doParm]+'_value_change', result => {
-
             let param = {}
             if (typeof result == "string") {
               param[doParm] = result
             } else {
               param[doParm] = result[dependsOnMap[doParm]]
             }
-
             root.$http.post(this.optionsUrl,param).then(response => {
               setTimeout(()=>{
                 this.disposeData(response.data)
@@ -218,19 +216,6 @@ export default {
             },error => {
               console.log("error")
             })
-
-            // if(param[doParm] != ''){
-            //   root.$http.post(this.optionsUrl,param).then(response => {
-            //     setTimeout(()=>{
-            //       this.disposeData(response.data)
-            //     },0)
-            //   },error => {
-            //     console.log("error")
-            //   })
-            // }else{
-            //   this.disposeData('')
-            // }
-
           })
       }
     }
@@ -270,13 +255,10 @@ export default {
     },
     handleChange: function (value) {
       this.$emit('on-change', value)
-      
-      this.$nextTick(() => {
         this.selectValue = value
         let data = {}
         data[this.id] = value
         this.$root.eventBus.$emit(this.id+'_value_change',data)
-      })
     },
 
     queryChange: function () {
