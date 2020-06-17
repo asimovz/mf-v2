@@ -48,6 +48,7 @@ export default {
     .aw-form{
       padding:0;
       margin: 0;
+      background: none;
       .aw-form-item{
         vertical-align: bottom;
         width: auto;

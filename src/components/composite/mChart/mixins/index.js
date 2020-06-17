@@ -65,8 +65,13 @@ export default {
     },
     chartDataStr: {
       async handler (v) {
-        const settings = merge({}, this.settings, this.innerSettings)
-        const [extend, data] = [this.extend, this.chartData]
+        const [extend, originData] = [this.extend, this.chartData]
+
+        const data = this.extract(originData, ['columns', 'rows'])
+        const originSetting = this.extract(originData, ['settings'])
+
+        const settings = merge({}, this.settings, this.innerSettings, originSetting.settings)
+
         this.options = await this.dataHandler({ extend, settings, data })
       }
     }
