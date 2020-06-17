@@ -1,44 +1,61 @@
-@body-bg_color: #f0f0f0;
+// body(内容区) 背景色
+@body-bg_color: #f0f0f0; 
 
+// 主背景色
 @main-bg_color: #1c2a34;
+// 主字体色
 @main-font_color: #606266;
+// 主字体色 - primary
 @main-color-primary: #3c64b9;
 
+// 导航背景色
 @nav-bg_color: #29363f;
+// 导航背景色 - active
 @nav-bg_color--active: @main-color-primary;
-
+// 导航字体色
 @nav-font_color: #fff;
-@nav-font_size: 14px;
 
+// 颜色 - default
 @color-default: #ecf0f8;
 @color-default--hover: #DCDFE6;
 
+// 颜色 - primary
 @color-primary: @main-color-primary;
 @color-primary--hover: #6383c7;
 
+// 颜色 - success
 @color-success: #52BB90;
 @color-success--hover: #75c9a6;
 
+// 颜色 - danger
 @color-danger: #D35656;
 @color-danger--hover: #dc7878;
 
+// 颜色 - warning
 @color-warning: #E6A23C;
 @color-warning--hover: #ebb563;
 
+// 颜色 - info
 @color-info: #3c64b9;
 @color-info--hover: lighten(@color-info, 10%);
 
+// 颜色 - text
 @color-text: #909399;
 @color-text--hover: #6383c7;
 
-@table-tr_color: #303133;
+// 表格 - 行 - 背景色
 @table-tr_bg: #ffffff;
+// 表格 - 行 - 背景色 - hover
 @table-tr_bg--hover: #f0f0f0;
+// 表格 - 表头 - 字体色
+@table-th_color: #303133;
+// 表格 - 单元格 - 字体色
 @table-td_color: @main-font_color;
-
+// 表格 - 按钮色
 @table-btn_color: @main-color-primary;
+// 表格 - 按钮色 - hover
 @table-btn_color--hover: lighten(@table-btn_color, 42%);
-
+// table - 链接色
 @table-link_color: @main-color-primary;
 
 .theme-imos {
@@ -283,7 +300,7 @@
 		}
 
 		.el-table__header th {
-			color: @table-tr_color;
+			color: @table-th_color;
 		}
 
 		.el-table td, .el-table th{
