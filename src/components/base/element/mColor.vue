@@ -62,8 +62,4 @@ export default {
 }
 
 </script>
-<style>
-.ivu-color-picker-transfer {
-  z-index: 1111
-}
-</style>
+

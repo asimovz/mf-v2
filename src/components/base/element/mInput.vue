@@ -183,16 +183,18 @@ export default {
       let url = self.transition;
       depends.forEach(function(value, key) {
         root.eventBus.$on(value+'_value_change', result => {
-          let param = self.getTransition();
-          Object.assign(param, self.addParam);
-          //先去localStorage中对应url作为key的缓存中检查，是否存在自己的数据；如果没有则去请求，如果有直接去取，并清除掉自己的信息
-          //localStorage的value只能为字符串，这里需要注意进行转换
-          if(store.get(url)){
-            setTimeout(function(){self.setDataFromStore(url)},382)
-          }else{
-            store.set(url,{})
-            self.getRemoteDataByDepandsOn(url, param)
-          }
+          self.$nextTick(function(){
+            let param = self.getTransition();
+            Object.assign(param, self.addParam);
+            //先去localStorage中对应url作为key的缓存中检查，是否存在自己的数据；如果没有则去请求，如果有直接去取，并清除掉自己的信息
+            //localStorage的value只能为字符串，这里需要注意进行转换
+            if(store.get(url)){
+              setTimeout(function(){self.setDataFromStore(url)},382)
+            }else{
+              store.set(url,{})
+              self.getRemoteDataByDepandsOn(url, param)
+            }
+          })
         });
       });
     }
@@ -252,7 +254,8 @@ export default {
         let depends = self.depends.split(",");
         let param = {};
         depends.forEach(function(value, key) {
-          let obj = document.getElementById(value).getElementsByTagName("input")[0];
+          let itemName = value.split("_")[1]
+          let obj = document.querySelector(`input[name='${itemName}']`)
           param[value.split("_")[1]] = obj.value;
         });
         param["moquiSessionToken"] = this.$root.moquiSessionToken;

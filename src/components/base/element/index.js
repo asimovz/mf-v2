@@ -56,7 +56,6 @@ import mCard from './mCard'
 import mDropDown from './mDropDown'
 import mDropDownItem from './mDropDownItem'
 import containerBox from './containerBox'
-console.log(mTable);
 
 
 //反馈组件
