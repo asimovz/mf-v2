@@ -442,7 +442,6 @@
                 }
             },
             populate(dynamicParams,depend){
-
                 if(this.data){
                     if(depend) this.search = "" //depend 依赖重新载入数据的话，清空搜索
                     this.dynamicParams = dynamicParams ? dynamicParams : this.dynamicParams
@@ -468,8 +467,15 @@
                 }
                 this.inputFocus();
             },
-            remote(init,dynamicParams){
+            dataLoad: function(vue, data, params){
+                return new Promise((resolve, reject)=>{
+                    this.$http.post(data, params)
+                        .then(resp=>resolve(resp))
+                        .then(resp=>reject(resp));
+                });
+            },
 
+            remote(init,dynamicParams){
                 if(typeof(this.data) === 'string' && this.dataLoad && typeof(this.dataLoad === 'function')){
                     let that = this,
                     queryParams = this.params && Object.keys(this.params).length?JSON.parse(JSON.stringify(this.params)):{};
@@ -495,6 +501,7 @@
                             queryParams[field] = this.search;
                         }
                     }
+                    console.log(queryParams,"-=-=-=");
                     this.dataLoad(this, this.data, queryParams).then(resp=>{
                         if(resp){
                             if(!that.resultFormat || typeof(that.resultFormat) !== 'function'){

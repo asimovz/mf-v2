@@ -1,12 +1,14 @@
 <template>
   <m-card>
-    <div class="container-card-header"  slot="header">
+    <div class="container-card-header" v-if="title" slot="header">
         <span>{{title}}</span>
         <div style="flex:1">
-           <slot name="toolbar" ></slot>
+           <slot name="toolbar"></slot>
         </div>
     </div>
-    <slot></slot>
+    <div :style="style">
+      <slot></slot>
+    </div>
   </m-card>
 </template>
 
@@ -15,6 +17,9 @@ export default {
   name: "container-card",
   props: {
     title: {
+      type: String
+    },
+    style: {
       type: String
     }
   }
@@ -26,9 +31,17 @@ export default {
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
+  .el-row {
+    background-color: transparent!important;
+  }
   .form-link,.aw-form {
     margin: 0;
-    padding:0
+    padding:0;
+    background-color: transparent;
+    .aw-form-item{
+      margin: 0;
+      display: block;
+    }
   }
 }
 </style>
