@@ -51,10 +51,10 @@
 @table-th_color: #303133;
 // 表格 - 单元格 - 字体色
 @table-td_color: @main-font_color;
+// 表格字体尺寸
+@table-font_size: 14px;
 // 表格 - 按钮色
 @table-btn_color: @main-color-primary;
-// 表格 - 按钮色 - hover
-@table-btn_color--hover: lighten(@table-btn_color, 42%);
 // table - 链接色
 @table-link_color: @main-color-primary;
 
@@ -219,7 +219,7 @@
 			transition: all .2s linear;
 
 			&:hover {
-				background: fade(#3c64b9, 20%);
+				background: fade(@main-color-primary, 10%);
 				border-radius: 4px;
 
 				> .el-button--text:first-child {
@@ -289,6 +289,10 @@
 	}
 
 	.eleTable-wrapper {
+
+		.custom-columns .close-close{
+			color: @main-color-primary
+		}
 		th,
 		.tableHeader {
 			background-color: @table-tr_bg
@@ -307,6 +311,7 @@
 			height: 48px;
 			line-height: 48px;
 			padding: 0;
+			font-size: @table-font_size;
 		}
 
 		.el-table__body {
@@ -359,9 +364,10 @@
 
 		.operation_box .operation_element .ag-handle-button {
 			color: @table-btn_color;
+			font-size: @table-font_size;
 
 			&:hover {
-				background-color: @table-btn_color--hover;
+				background-color: fade(@table-btn_color, 10%);
 			}
 
 		}
