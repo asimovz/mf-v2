@@ -1,5 +1,5 @@
 <template>
-  <drop-down 
+  <m-select 
     :options="optionsList"
     size="small"
     placeholder="请选择"
@@ -8,6 +8,7 @@
     :id="id"
     :name="id"
     v-model="selectValue"
+    
     :allowEmpty="allowEmpty"
     :optionsUrl="optionsUrl"
     :valueField="valueField"

@@ -502,12 +502,17 @@ h4 {
 		}
 		.aw-form-item_content {
 			float: left;
-			line-height: 32px;
+            line-height: 32px;
+            min-height: 32px;
 			display: flex;
             flex-direction: row;
+            align-items: center;
             padding-right: 10px;
             >div, >span {
                 flex:1
+            }
+            .aw-switch {
+                flex:none
             }
 		}
 	}
