@@ -45,9 +45,15 @@ export default {
     top: 50%;
     transform: translate(0, -50%);
     right: 0;
+    width: 100%;
+    text-align: right;
+    .el-row {
+      background-color: transparent!important;
+    }
     .aw-form{
       padding:0;
       margin: 0;
+      background-color: transparent;
       .aw-form-item{
         vertical-align: bottom;
         width: auto;
