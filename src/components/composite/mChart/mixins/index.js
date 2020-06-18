@@ -1,6 +1,7 @@
 import merge from 'lodash/merge'
 import baseChart from '../base'
 import methodMixins from './methods'
+import { noData } from '../config'
 
 const methodNames = [
   'mergeOptions',
@@ -72,7 +73,9 @@ export default {
 
         const settings = merge({}, this.settings, this.innerSettings, originSetting.settings)
 
-        this.options = await this.dataHandler({ extend, settings, data })
+        this.options = data.rows.length === 0
+          ? noData
+          : await this.dataHandler({ extend, settings, data })
       }
     }
   },

@@ -13,6 +13,7 @@ import 'echarts/lib/component/legend'
 import 'echarts/lib/component/legendScroll'
 import 'echarts/lib/component/visualMap'
 import 'echarts/lib/component/visualMapContinuous'
+import 'echarts/lib/component/graphic'
 
 export default {
   name: 'mCharts',
