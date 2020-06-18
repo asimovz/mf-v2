@@ -1,23 +1,5 @@
 <template>
       <component :is="activeComponent"></component>
-      <!-- <div>
-        <mCharts type="line" :data="line"></mCharts>
-        <m-card>
-          <m-ranking-list
-            title="某排行"
-            id="rank1"
-            link
-            dividerRight
-            padding="0 10px"
-            res-data-key="title"
-            search-form="mTimeTab"
-            :init-query-params="{a:1}"
-            :data="[]">
-          </m-ranking-list>
-        </m-card>
-        
-      </div> -->
-      
 </template>
 
 <script>
@@ -33,11 +15,7 @@ export default {
     return {
       activeComponent: emptyComponent,
       pathIndex: -1,
-      pathName: null,
-      line: {
-        columns: ['日期', '发送量', '退定量', '接收量'],
-        rows: []
-      }
+      pathName: null
     }
   },
 
