@@ -45,7 +45,11 @@ export default {
       drawerTitle: this.title
     };
   },
-
+  provide() {
+    return {
+      BoxInstance:this
+    }
+  },
   watch: {
     openDrawer: function (val) {
       this.visible = val;
@@ -67,6 +71,9 @@ export default {
   },
 
   methods: {
+    close() {
+      this.visible = false
+    },
     change: function (val) {
       this.visible = val;
     },

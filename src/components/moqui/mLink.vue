@@ -13,10 +13,24 @@ export default {
     targetList: {
       type: String,
       default: ""
+    },
+    toggle: {
+      type: String
+    }
+  },
+  inject: {
+    BoxInstance: {
+      default: null
     }
   },
   methods: {
     go: function (event) {
+
+      if (this.toggle == "close") {
+        this.BoxInstance && this.BoxInstance.close();
+        return
+      }
+
       if (event.button !== 0) { return }
       if (this.loadId && this.loadId.length > 0) {
         this.$root.loadContainer(this.loadId, this.href)
