@@ -1,5 +1,6 @@
 <template>
   <div class="mRankingList"
+  ref="mRankingList"
   :class="{
     'is-link': link !== undefined,
     'divider-right': dividerRight !== undefined
@@ -7,7 +8,10 @@
   :style="{padding: padding}"
   >
     <div class="title" v-if="title">{{title}}</div>
-    <ol>
+    <div class="no-data" v-show="noData">
+      <img :src="noDataImg" />
+    </div>
+    <ol v-show="!noData">
       <li v-for="(item, index) in items" :key="index" :class="{'active': activeIndex === index}" @click="clickHandler(item, index)">
         <i :class="{pro: index < 3}">{{index + 1}}</i>
         <p class="bd">{{item.title}}<span v-if="false">{{item.desc}}</span></p>
@@ -18,6 +22,8 @@
 </template>
 
 <script>
+import noDataImg from '@/assets/no-data.png'
+
 export default {
   name: 'mRankingList',
   props: {
@@ -51,10 +57,12 @@ export default {
   },
   data () {
     return {
+      noDataImg: noDataImg,
       activeIndex: '',
       items: [],
       params: {},
-      searchForms: []
+      searchForms: [],
+      noData: false
     }
   },
   watch: {
@@ -73,7 +81,38 @@ export default {
       })
     }
   },
+  mounted () {
+    this.dividerHandler()
+  },
   methods: {
+    /**
+     * 从目标节点开始向上查找父元素
+     * @param {NODE} targetNode - 目标节点
+     * @param {String} select - css选择器名称(不含.、#)
+     * @returns {DOM}
+     */
+    parents (targetNode, select) {
+      const parentNode = targetNode.parentNode
+      if (parentNode.className === undefined || parentNode.className.indexOf(select) >= 0) {
+        return parentNode
+      }
+      return this.parents(parentNode, select)
+    },
+    addClass (elem, className) {
+      const defClass = elem.className
+      if (defClass.indexOf(className) >= 0) return
+      elem.className += ` ${className}`
+    },
+    /**
+     * 当多个rank出现在一个card中时，为栅格组件修改为flex布局，增加特殊类名
+     */
+    dividerHandler () {
+      const parentNode = this.parents(this.$refs.mRankingList, 'el-row')
+      const rankCount = parentNode.getElementsByClassName('mRankingList').length
+      if (rankCount < 2) return
+
+      this.addClass(parentNode, 'rank-wrap-row')
+    },
     clickHandler (rowData, index) {
       this.activeIndex = index
       if (!this.resDataKey) return
@@ -107,6 +146,7 @@ export default {
       } else {
         this.items = this.data
       }
+      this.noData = this.items.length === 0
     }
   },
   beforeDestroy () {
@@ -118,10 +158,47 @@ export default {
 </script>
 
 <style lang="scss">
+/**::before 多个rank在同一个card中时，处理高度问题*/
+.rank-wrap-row{
+  display: flex;
+  align-items: stretch;
+  .mRankingList{
+    position: static;
+    ol{
+      &::after{
+        display: none!important;
+      }
+    }
+  }
+  .el-col{
+    position: relative;
+    &::after{
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      top: 2.5em;
+      border-right: 1px solid #dcdfe6;
+    }
+    &:last-child{
+      &::after{
+        display: none;
+      }
+    }
+  }
+}
+/**::end 多个rank在同一个card中时，处理高度问题 */
 .mRankingList{
   position: relative;
   .title{
     padding: 0 0 10px 10px;
+  }
+  .no-data{
+    text-align: center;
+    img{
+      max-width: 194px;
+      max-height:203px;
+    }
   }
   ol{
     list-style: none;
@@ -159,7 +236,6 @@ export default {
         top: 2.5em;
         border-right: 1px solid #dcdfe6;
       }
-      
     }
   }
   &.is-link{

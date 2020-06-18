@@ -1,4 +1,4 @@
-import noDataImg from '../theme/no-data.png'
+import noDataImg from '@/assets/no-data.png'
 
 export default {
   backgroundColor: '#fff',
@@ -34,8 +34,8 @@ export default {
       z: 10,
       style: {
         image: noDataImg,
-        width: 195,
-        height: 204
+        width: 194,
+        height: 203
       }
     }
   ]
