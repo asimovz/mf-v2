@@ -140,7 +140,8 @@ export default {
           [`${prefixCls}-card`]: this.type === 'card',
           [`${prefixCls}-border-card`]: this.type === 'border-card',
           [`${prefixCls}-mini`]: this.size === 'small' && this.type === 'line',
-          [`${prefixCls}-no-animation`]: !this.animated
+          [`${prefixCls}-no-animation`]: !this.animated,
+          [`${prefixCls}-radio`]: this.isRadio
         }
       ]
     },
@@ -690,6 +691,12 @@ export default {
   transition: opacity 0.3s;
   opacity: 1;
   outline: 0;
+}
+
+.aw-tabs .aw-tabs-radio {
+  .aw-tabs-tabpane {
+    padding:0!important;
+  }
 }
 
 .aw-tabs .aw-tabs-tabpane-inactive {

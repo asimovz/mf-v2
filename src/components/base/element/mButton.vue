@@ -103,6 +103,9 @@ export default {
   inject: {
     FormInstance: {
       default: null
+    },
+    BoxInstance: {
+      default: null
     }
   },
   computed: {
@@ -131,9 +134,12 @@ export default {
       let self = this;
       if (this.toggle == "resetForm") {
         this.FormInstance.resetForm();
-        return;
+        return
       }
-
+      if (this.toggle == "close") {
+        this.BoxInstance && this.BoxInstance.close();
+        return
+      }
       //关联表格的multi操作
       if (this.targetList) {
         let params = {
@@ -178,4 +184,5 @@ export default {
 .el-button {
   font-weight: 400;
 }
+.el-button+.el-button{margin-left:0!important}
 </style>

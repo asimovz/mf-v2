@@ -36,6 +36,16 @@ export default {
       visible: this.openDialog
     }
   },
+  provide() {
+    return {
+      BoxInstance:this
+    }
+  },
+  methods: {
+    close() {
+      this.visible = false
+    }
+  },
   mounted: function() {
     this.$root.eventBus.$on("dynamic_visible_change_" + this.id, () => {
       this.visible = true
