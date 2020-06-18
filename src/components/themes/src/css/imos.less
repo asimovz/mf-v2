@@ -37,7 +37,7 @@
 @table-td_color: @main-font_color;
 
 @table-btn_color: @main-color-primary;
-@table-btn_color--hover: lighten(@table-btn_color, 42%);
+@table-btn_color--hover: fade(@table-btn_color, 10%);
 
 @table-link_color: @main-color-primary;
 
@@ -202,7 +202,7 @@
 			transition: all .2s linear;
 
 			&:hover {
-				background: fade(#3c64b9, 20%);
+				background: fade(@main-color-primary, 10%);
 				border-radius: 4px;
 
 				> .el-button--text:first-child {
@@ -342,6 +342,7 @@
 
 		.operation_box .operation_element .ag-handle-button {
 			color: @table-btn_color;
+			font-size: 14px;
 
 			&:hover {
 				background-color: @table-btn_color--hover;
