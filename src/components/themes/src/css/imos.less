@@ -1,5 +1,5 @@
 // body(内容区) 背景色
-@body-bg_color: #f0f0f0; 
+@body-bg_color: #EBEEF5; 
 
 // 主背景色
 @main-bg_color: #1c2a34;
@@ -36,7 +36,7 @@
 @color-warning--hover: #ebb563;
 
 // 颜色 - info
-@color-info: #3c64b9;
+@color-info: @color-primary;
 @color-info--hover: lighten(@color-info, 10%);
 
 // 颜色 - text
@@ -46,7 +46,7 @@
 // 表格 - 行 - 背景色
 @table-tr_bg: #ffffff;
 // 表格 - 行 - 背景色 - hover
-@table-tr_bg--hover: #f0f0f0;
+@table-tr_bg--hover: fade(@main-color-primary, 10%);
 // 表格 - 表头 - 字体色
 @table-th_color: #303133;
 // 表格 - 单元格 - 字体色
@@ -171,6 +171,7 @@
 				line-height: 48px;
 				background-color: #fff;
 				color: #c0c4cc;
+				font-weight: normal;
 				transition: all .3s cubic-bezier(.645, .045, .355, 1);
 
 				&:hover,
@@ -310,7 +311,7 @@
 		.el-table td, .el-table th{
 			height: 48px;
 			line-height: 48px;
-			padding: 0;
+			padding: 4px 0;
 			font-size: @table-font_size;
 		}
 
@@ -429,6 +430,10 @@
 		background-color: #fff;
 		border: 1px solid #d9d9d9;
 		border-radius: 6px;
+	}
+
+	.el-pagination.is-background .el-pager li.active{
+		border-color: @main-color-primary;
 	}
 
 	.el-pagination__total {
@@ -631,5 +636,7 @@
 		}
 
 	}
+
+	.aw-form-item_label{color: @main-color-primary}
 
 }

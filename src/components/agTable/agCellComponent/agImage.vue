@@ -66,10 +66,10 @@ export default {
       //设置图片宽高
       let imgWidth,imgHeight
       if(imgOriginWidth >= imgOriginHeight) {
-       imgWidth = imgOriginWidth > bodyWidth/2 ? 500 : imgOriginWidth;
+       imgWidth = imgOriginWidth > 500 ? 500 : imgOriginWidth;
        imgHeight = parseInt(imgOriginHeight * imgWidth / imgOriginWidth) ;
       } else {
-       imgHeight = imgOriginHeight > bodyHeight/2 ? 400 : imgOriginHeight
+       imgHeight = imgOriginHeight > 400 ? 400 : imgOriginHeight
        imgWidth = parseInt(imgOriginHeight * imgHeight / imgOriginHeight) ;
       }
 

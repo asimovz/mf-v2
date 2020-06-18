@@ -80,6 +80,7 @@
   width: 140px;
   border: 1px solid #efefef;
   border-radius: 3px;
+  z-index: 99;
   .cols-body {
     flex: 1;
     border-top: 1px solid #eee;
