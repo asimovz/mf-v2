@@ -302,7 +302,9 @@
 		.el-table--border {
 			border-top-left-radius: 8px;
 			border-top-right-radius: 8px;
+			border-left: 0;
 		}
+
 
 		.el-table__header th {
 			color: @table-th_color;
@@ -313,6 +315,8 @@
 			line-height: 48px;
 			padding: 4px 0;
 			font-size: @table-font_size;
+
+			&:last-child{border-right: none;}
 		}
 
 		.el-table__body {
@@ -512,6 +516,7 @@
 
 	}
 
+	.m-link{color: @main-color-primary}
 
 	.m-link-button, .m-link-button-primary, .m-link-button-info{
 		background-color: @color-primary;
@@ -621,8 +626,8 @@
 			}
 
 		}
-
 	}
+
 
 	.aw-tabs {
 		&-nav .aw-tabs-tab-active,

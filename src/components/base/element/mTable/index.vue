@@ -1,5 +1,7 @@
 <template>
-  <div class="eleTable-wrapper">
+  <div class="table-wrap">
+     <!-- :class="{'show-custom': customColsVisible}" -->
+    <div class="eleTable-wrapper">
 
       <!-- 自定义列设置 -->
       <!-- <CustomColumn v-show="customColsVisible"
@@ -9,42 +11,43 @@
         @on-close="customColsColse"
       ></CustomColumn> -->
 
-    <!-- 数据表格 -->
-    <!-- @header-contextmenu="showCustomCols" :class="{'show-custom': customColsVisible}" -->
-    <el-table :ref="`eleTable_${id}`" :style="{'border-radius': showPage ? '8px' : ''}" 
-      v-loading="isLoading"
-      :size="allConfig.size"
-      :border="allConfig.border"
-      :highlight-current-row="allConfig.highlightCurrentRow"
-      :data="tableData"
-      header-row-class-name="m-eleTable-wrapper"
-      cell-class-name="cell-word-break"
-      @row-click="rowClick"
-      @selection-change="selectionChange"
-      @sort-change="sortChange"
-    >
-      <!-- 显示多选框 -->
-      <el-table-column v-if="isShowCheckbox" type="selection" fixed="left"></el-table-column>
-      <el-table-column v-for="(col, index) in columnData" :key="col.field" v-bind="col" :prop="col.field" :label="col.title" :width="col.width">
-        <template #default="{row, column, $index}">
-          <template v-if="col.cellRender">
-            <cell-render :params="{...col.props,
-                data: row,
-                node: {
-                  data: row
-                },
-                value: row[col.field],
-                setValue: (val) => col.props.setValue(val, row, col)
-              }">
-            </cell-render>
+      <!-- 数据表格 -->
+       <!-- @header-contextmenu="showCustomCols" :class="{'show-custom': customColsVisible}" -->
+      <el-table :ref="`eleTable_${id}`" :style="{'border-radius': showPage ? '8px' : ''}"
+        v-loading="isLoading"
+        :size="allConfig.size"
+        :border="allConfig.border"
+        :highlight-current-row="allConfig.highlightCurrentRow"
+        :data="tableData"
+        header-row-class-name="m-eleTable-wrapper"
+        cell-class-name="cell-word-break"
+        @row-click="rowClick"
+        @selection-change="selectionChange"
+        @sort-change="sortChange"
+      >
+        <!-- 显示多选框 -->
+        <el-table-column v-if="isShowCheckbox" type="selection" fixed="left"></el-table-column>
+        <el-table-column v-for="(col, index) in columnData" :key="col.field" v-bind="col" :prop="col.field" :label="col.title" :width="col.width">
+          <template #default="{row, column, $index}">
+            <template v-if="col.cellRender">
+              <cell-render :params="{...col.props,
+                  data: row,
+                  node: {
+                    data: row
+                  },
+                  value: row[col.field],
+                  setValue: (val) => col.props.setValue(val, row, col)
+                }">
+              </cell-render>
+            </template>
+            <template v-else>
+              {{col.valueGetter ? col.valueGetter({...col.props, data: row}) : data[col.field]}}
+              <!-- {{valueGetter(col, col.props, row)}} -->
+            </template>
           </template>
-          <template v-else>
-            {{col.valueGetter ? col.valueGetter({...col.props, data: row}) : data[col.field]}}
-            <!-- {{valueGetter(col, col.props, row)}} -->
-          </template>
-        </template>
-      </el-table-column>
-    </el-table>
+        </el-table-column>
+      </el-table>
+    </div>
 
     <!-- 分页 -->
     <div class="pagination_box" v-if="!showPage">
@@ -660,7 +663,7 @@ export default {
 <style scoped lang="less">
 .eleTable-wrapper {
   position: relative;
-  .show-custom:before {
+  &.show-custom:before {
     content: '';
     position: absolute;
     top: 0;
@@ -677,11 +680,11 @@ export default {
 <style lang="less">
 .eleTable-wrapper {
 
-.el-table__body {
-  // 使表格兼容safari，不错位
-  width: 100%;
-  table-layout: fixed !important;
-}
+  .el-table__body {
+    // 使表格兼容safari，不错位
+    width: 100%;
+    table-layout: fixed !important;
+  }
   .el-table-column--selection .cell {
     text-align: center !important;
   }
