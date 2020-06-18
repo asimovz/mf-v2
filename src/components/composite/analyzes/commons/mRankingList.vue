@@ -21,7 +21,7 @@
 export default {
   name: 'mRankingList',
   props: {
-    title:{
+    title: {
       type: String,
       default: ''
     },
@@ -32,8 +32,8 @@ export default {
     link: {},
     dividerRight: {},
     resDataKey: String,
-    padding:{
-      type:String,
+    padding: {
+      type: String,
       default: '0'
     },
     id: {

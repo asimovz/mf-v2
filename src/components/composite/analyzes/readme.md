@@ -62,7 +62,10 @@
 ### m-ranking-list 分析页面排行榜组件
 
 - id 组件标识
+- title 排行榜名称
 - link 是否为链接类型
+- dividerRight 显示右侧分割线
+- padding 当前排行榜的style.padding配置
 - res-data-key 点击每行数据时，需要将哪个字段的数据广播出去？广播的数据格式为对象类型 {key: value}
 - search-form 指定自身从那个form组件收集参数，支持传入数组，当需要收集多个表单元素的数据时
 - init-query-params 初始化携带的请求参数，如页面顶部的筛选项，可以保存在这里
@@ -70,7 +73,11 @@
 
 ```
   <m-ranking-list
+    title="某排行"
     id="rank1"
+    link
+    dividerRight
+    padding="0 10px"
     res-data-key="title"
     search-form="mTimeTab"
     :init-query-params="{a:1}"

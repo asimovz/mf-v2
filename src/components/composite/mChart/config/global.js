@@ -1,7 +1,7 @@
 export default {
   grid: {
     containLabel: true,
-    top: 10,
+    top: 20,
     left: '1.5%',
     right: '3%'
   },

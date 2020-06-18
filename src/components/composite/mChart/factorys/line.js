@@ -1,7 +1,7 @@
 import merge from 'lodash/merge'
 import isArray from 'lodash/isArray'
 import { globalOptions } from '../config'
-import { getStackMap } from '../utils'
+import { getStackMap, clone } from '../utils'
 
 function getLegend (args) {
   const { metrics, legendName, labelMap } = args
@@ -86,7 +86,9 @@ function getLineYAxis (args) {
  */
 
 function getGrid (args) {
+  const grid = clone(globalOptions.grid)
   const {
+    yAxisName,
     legendVisible,
     xAxis,
     series
@@ -139,13 +141,17 @@ function getGrid (args) {
   //   right: gridRight
   // }
 
-  if (legendVisible) {
-    return {}
-  } else {
-    return {
-      bottom: 10
-    }
+  // 去除图例空间
+  if (!legendVisible) {
+    grid.bottom = 10
   }
+
+  // 增加轴线名称空间
+  if (yAxisName && yAxisName.length !== 0) {
+    grid.top = 35
+  }
+
+  return grid
 }
 
 function getLineSeries (args) {
@@ -269,6 +275,7 @@ export default async ({ extend = {}, data = {}, settings = {} }) => {
   })
 
   const grid = getGrid({
+    yAxisName,
     legendVisible,
     xAxis,
     series

@@ -27,8 +27,15 @@ export default {
       options: []
     }
   },
+  computed: {
+    // 存储自定位维度的storage标记，地址+id保证唯一性
+    storageKey () {
+      return `custom_kpis_${this.id}_checked_by_${encodeURIComponent(location.href)}`
+    }
+  },
   watch: {
     checked (v) {
+      localStorage.setItem(this.storageKey, JSON.stringify(v))
       this.broadcast()
     }
   },
@@ -41,9 +48,18 @@ export default {
     broadcast () {
       this.$root.eventBus.$emit(`custom_kpi_data_${this.id}`, this.checked)
     },
+    /**
+     * 所有选项中是否包含本地已选数据？
+     */
+    diff (localChecked, options) {
+      return localChecked.length !== 0 && localChecked.every(item => JSON.stringify(options).indexOf(item) >= 0)
+    },
     listener () {
       this.$root.eventBus.$on(`kpi_change_${this.kpiCardId}`, e => {
-        this.checked = e.checked
+        const storage = localStorage.getItem(this.storageKey)
+        const localChecked = /^\[.*\]$/.test(storage) ? JSON.parse(storage) : []
+
+        this.checked = this.diff(localChecked, e.data) ? localChecked : e.checked
         this.options = e.data
       })
     }

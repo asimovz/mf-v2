@@ -689,8 +689,7 @@ export default {
   transition: opacity 0.3s;
   opacity: 1;
   outline: 0;
-  padding:15px;
-  background-color: #fff;
+
 }
 
 .aw-tabs .aw-tabs-tabpane-inactive {

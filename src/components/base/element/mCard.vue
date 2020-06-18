@@ -7,22 +7,26 @@ export default {
       props: this.$attrs,
       class: 'm-el-card'
     }, [
-      this.$slots.header || this.$attrs.header ? h('div', {
+      this.$slots.header || this.$attrs.title || this.$slots.header ? h('div', {
         slot: 'header',
         class: 'm-card__header'
       }, [
         h('div', {
           class: 'title'
         }, [
-          this.$slots.header || h('span', this.$attrs.header)
+          this.$attrs.title || this.$slots.header || h('span', this.$attrs.header)
         ]),
         h('div', {
           class: 'extra'
         }, [
-          this.$slots.extra
+          this.$slots.toolbar
         ])
       ]) : '',
-      this.$slots.default
+      h('div', {
+        style: this.$attrs.style
+      }, [
+        this.$slots.default
+      ])
     ])
   }
 }
@@ -31,20 +35,25 @@ export default {
 .m-el-card {
   box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.12)!important;
   .el-card__header{
-    height: 48px;
-    line-height: 48px;
-    padding: 0 20px;
+    padding: 13px 20px;
+  }
+  .m-card__header{
     position: relative;
-    background: #f3f6fe;
   }
   .extra{
     position: absolute;
     top: 50%;
     transform: translate(0, -50%);
     right: 0;
+    width: 100%;
+    text-align: right;
+    .el-row {
+      background-color: transparent!important;
+    }
     .aw-form{
       padding:0;
       margin: 0;
+      background-color: transparent;
       .aw-form-item{
         vertical-align: bottom;
         width: auto;
@@ -53,7 +62,6 @@ export default {
           padding:0;
         }
       }
-      
     }
   }
 }

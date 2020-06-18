@@ -52,14 +52,26 @@ export default {
   methods: {
     show(evt) {
       if (!this.hover) return;
+
       //原始宽高
-      let imgHeight = this.$refs.img.naturalHeight;
-      let imgWidth = this.$refs.img.naturalWidth;
+      let imgOriginHeight = this.$refs.img.naturalHeight
+      let imgOriginWidth = this.$refs.img.naturalWidth
+
       //屏幕宽高
       let bodyRect = document.body.getBoundingClientRect();
       let bodyHeight = bodyRect.height;
       let bodyWidth = bodyRect.width;
       let scrollHeight = document.documentElement.scrollTop;
+
+      //设置图片宽高
+      let imgWidth,imgHeight
+      if(imgOriginWidth >= imgOriginHeight) {
+       imgWidth = imgOriginWidth > bodyWidth/2 ? 500 : imgOriginWidth;
+       imgHeight = parseInt(imgOriginHeight * imgWidth / imgOriginWidth) ;
+      } else {
+       imgHeight = imgOriginHeight > bodyHeight/2 ? 400 : imgOriginHeight
+       imgWidth = parseInt(imgOriginHeight * imgHeight / imgOriginHeight) ;
+      }
 
       let el = evt.target;
       let pos = el.getBoundingClientRect();
@@ -68,6 +80,8 @@ export default {
       let offsetX = parentWidth > pos.width ? pos.width + 10 : parentWidth;
       offsetX = offsetX + pos.x;
       let offsetY = pos.top + scrollHeight;
+
+
       if (offsetX + imgWidth > bodyWidth) {
         offsetX = pos.x - imgWidth - 10;
       }
@@ -76,9 +90,8 @@ export default {
       }
 
       this.imgDiv = document.createElement("div");
-      this.imgDiv.classList.add('m-table-preview-img')
-      this.imgDiv.style.cssText = `left:${offsetX}px;top:${offsetY}px;`;
-      this.imgDiv.innerHTML = `<img src='${this.imgUrl}' />`;
+      this.imgDiv.style.cssText = `position: absolute;left:${offsetX}px;top:${offsetY}px;z-index:999;background: #ffffff;border-radius: 8px;box-shadow: 0px 0px 16px 0px rgba(0,0,0,.15);padding:16px`;
+      this.imgDiv.innerHTML = `<img src='${this.imgUrl}' width="${imgWidth}" />`;
       document.body.appendChild(this.imgDiv);
     },
     hide() {
@@ -87,6 +100,3 @@ export default {
   }
 };
 </script>
-<style >
-  .m-table-preview-img{position: absolute;padding:16px;background-color: #fff;border-radius: 8px;box-shadow: 0px 0px 16px 0px rgba(0,0,0,0.16);z-index: 99;}
-</style>

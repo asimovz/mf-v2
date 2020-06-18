@@ -43,6 +43,16 @@ export default {
       dialogTitle: this.title
     };
   },
+  provide() {
+    return {
+      BoxInstance:this
+    }
+  },
+  methods: {
+    close() {
+      this.visible = false
+    }
+  },
   mounted: function() {
     this.$root.eventBus.$on("dynamic_visible_change_" + this.id, resp => {
       if( resp && resp.href && resp.href != "") {

@@ -1,3 +1,4 @@
+import { clone } from '../utils'
 export default {
   methods: {
     async getData () {
@@ -13,6 +14,13 @@ export default {
       } else {
         this.chartData = this.data
       }
+    },
+    extract (source, keys) {
+      const res = {}
+      keys.forEach(key => {
+        source[key] && (res[key] = clone(source[key]))
+      })
+      return res
     },
     listenerMetrics () {
       this.$root.eventBus.$on(`${this.metricsForm}_value_change`, data => {

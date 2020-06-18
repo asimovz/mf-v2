@@ -160,7 +160,7 @@ export default async ({ extend = {}, data = {}, settings = {} }) => {
     legendVisible = true
   } = settings
 
-  if (limitShowNum) innerRows.sort((a, b) => b[metrics] - a[metrics])
+  innerRows.sort((a, b) => b[metrics] - a[metrics])
   const seriesParams = {
     innerRows,
     percentShow,
