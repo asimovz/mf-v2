@@ -237,13 +237,4 @@ export default {
   padding: 0 10px;
   margin: 0 5px;
 }
-.ivu-tag.small {
-  height: 22px;
-  line-height: 22px;
-  padding: 0 8px;
-}
-.ivu-tag.large {
-  height: 34px;
-  line-height: 34px;
-}
 </style>
