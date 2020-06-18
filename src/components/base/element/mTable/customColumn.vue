@@ -23,37 +23,37 @@
         default: () => []
       }
     },
-    data(){
+    data () {
       return {
         columnList: this.columns
       }
     },
     computed: {
-      colVis(){
+      colVis () {
         return this.columnList.map(col => col.visible)
       },
       // 半选
-      indeterminate() {
+      indeterminate () {
         return this.colVis.some(col => col) && !this.colVis.every(col => col)
       },
 
       // 全选
-      checked() {
+      checked () {
         return this.colVis.every(col => col)
-      },
+      }
     },
     methods: {
-      reset(){
+      reset () {
         this.$emit('on-reset')
       },
-      confirm(){
+      confirm () {
         this.$emit('on-confirm', this.colVis)
       },
-      close(){
+      close () {
         this.$emit('on-close')
       },
       // 自定义列全选
-      allChange(visible) {
+      allChange (visible) {
         if (this.columnsChecked) {
           this.columnList.forEach(col => {
             col.visible = visible
@@ -63,8 +63,8 @@
             col.visible = visible
           })
         }
-      },
-    },
+      }
+    }
   }
 </script>
 
@@ -97,7 +97,7 @@
   .close-close {
     padding: 0 5px;
     margin: 0 -5px 0 20px;
-    color: #2d8cf0;
+    color: #3c64b9;
     font-weight: bold;
     cursor: pointer;
   }
