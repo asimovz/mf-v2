@@ -76,7 +76,8 @@ export default {
       }
 
       this.imgDiv = document.createElement("div");
-      this.imgDiv.style.cssText = `position: absolute;left:${offsetX}px;top:${offsetY}px`;
+      this.imgDiv.classList.add('m-table-preview-img')
+      this.imgDiv.style.cssText = `left:${offsetX}px;top:${offsetY}px;`;
       this.imgDiv.innerHTML = `<img src='${this.imgUrl}' />`;
       document.body.appendChild(this.imgDiv);
     },
@@ -86,3 +87,6 @@ export default {
   }
 };
 </script>
+<style >
+  .m-table-preview-img{position: absolute;padding:16px;background-color: #fff;border-radius: 8px;box-shadow: 0px 0px 16px 0px rgba(0,0,0,0.16);z-index: 99;}
+</style>

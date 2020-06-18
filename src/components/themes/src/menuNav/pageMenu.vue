@@ -143,8 +143,3 @@ export default {
 }
 
 </script>
-<style lang="less">
-.m-page-menu{
-
-}
-</style>
