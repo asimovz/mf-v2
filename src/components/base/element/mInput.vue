@@ -355,8 +355,8 @@ export default {
 <style lang="less">
 .aw-textarea,
 .aw-input {
-  input {padding:0 8px;}
-  textarea { padding: 5px 8px}
+  // input {padding:0 8px;}
+  // textarea { padding: 5px 8px}
 }
 .is-error {
   input,textarea {
