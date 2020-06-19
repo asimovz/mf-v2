@@ -3,7 +3,11 @@ import logins from './login'
 import './css/index.less'
 import './css/blue.less'
 import './css/dark.less'
-import './css/imos.less'
+
+let theme = $THEME['theme']
+if(theme === 'imos'){
+	require('./css/imos.less')
+}
 
 let themeList = {
 	dark: {

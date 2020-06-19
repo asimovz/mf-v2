@@ -38,8 +38,10 @@ export default {
 @primary: #e2f1f9;
 @primary-border: #b8d9ec;
 .aw-collapse {
-  margin:0 10px 10px 10px ;
+  margin-bottom: 10px;
   border-top: none;
+  .el-collapse-item__header{padding: 15px;}
+  .el-collapse-item__content{padding: 15px 25px 25px;}
 }
 .aw-collapse-default {
   border-color: @default-border;
@@ -56,4 +58,6 @@ export default {
     background-color: @primary;
   }
 }
+
+
 </style>

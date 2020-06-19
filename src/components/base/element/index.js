@@ -1,6 +1,13 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
-import 'static/element.css'
+
+const theme = $THEME['theme']
+if(theme == "imos") {
+  require('static/element.css')
+} else {
+  require('element-ui/lib/theme-chalk/index.css')
+}
+
 import VueI18n from 'vue-i18n'
 Vue.use(ElementUI)
 Vue.use(VueI18n)
