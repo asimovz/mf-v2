@@ -88,7 +88,7 @@ export default {
 			let validateField = async function f(data,isValue=[]) {
 				for (const field of data) {
 					if(field.$children && field.$children.length > 0 && field.$el.tagName != "FORM") await f(field.$children,isValue)
-					if(field.$props.hasOwnProperty("form")&&field.validate != undefined) {
+					if(field.$props && field.$props.hasOwnProperty("form") && field.validate != undefined) {
 						let resp = await field.$validator.validate()
 						isValue.push(resp)
 					}
