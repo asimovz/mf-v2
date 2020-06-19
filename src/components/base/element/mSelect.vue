@@ -203,18 +203,15 @@ export default {
       let dependsOnMap = this.dependsOn
       for (let doParm in dependsOnMap) {
           root.eventBus.$on(dependsOnMap[doParm]+'_value_change', result => {
-            let param = {}
-            if (typeof result == "string") {
-              param[doParm] = result
-            } else {
-              param[doParm] = result[dependsOnMap[doParm]]
-            }
-            root.$http.post(this.optionsUrl,param).then(response => {
-              setTimeout(()=>{
-                this.disposeData(response.data)
-              },0)
-            },error => {
-              console.log("error")
+            this.$nextTick(function(){
+              let respParam = this.getDependParam()
+              root.$http.post(this.optionsUrl,respParam).then(response => {
+                setTimeout(()=>{
+                  this.disposeData(response.data)
+                },0)
+              },error => {
+                console.log("error")
+              })
             })
           })
       }
@@ -250,6 +247,18 @@ export default {
   },
 
   methods: {
+    getDependParam() {
+        let param = {};
+        for (const key in this.dependsOn) {
+          let value = this.dependsOn[key]
+          let itemName = value.split("_")[1]
+          let obj = document.querySelector(`input[name='${itemName}']`)
+          param[value.split("_")[1]] = obj.value;
+
+        }
+        param["moquiSessionToken"] = this.$root.moquiSessionToken;
+        return param;
+    },
     resetValue() {
       this.selectValue = this.initValue
     },

@@ -84,7 +84,6 @@ export default {
   padding: 9px 15px;
   font-size: 12px;
   border-radius: 3px;
-  margin-right: 10px;
   &:hover, &:active {
     color: #409EFF;
     border-color: #c6e2ff;
@@ -131,6 +130,13 @@ export default {
     }
   }
 }
-
-
+.m-link-button+.m-link-button {
+  margin-left:10px;
+}
+.m-link-button+.m-link-button {
+  margin-left:10px;
+}
+.m-link-button+button {
+  margin-left:10px;
+}
 </style>
