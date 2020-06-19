@@ -1,5 +1,5 @@
 <template>
-  <div style="text-align: center;">
+  <div class="aw-table-image">
     <img
       ref="img"
       @mouseenter="show"
@@ -104,5 +104,13 @@ export default {
 };
 </script>
 
+<style lang="less">
+.aw-table-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 
+}
+</style>
 

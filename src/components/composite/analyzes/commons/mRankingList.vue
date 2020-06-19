@@ -196,8 +196,8 @@ export default {
   .no-data{
     text-align: center;
     img{
-      max-width: 194px;
-      max-height:203px;
+      width: 40%;
+      margin:20px 0
     }
   }
   ol{
