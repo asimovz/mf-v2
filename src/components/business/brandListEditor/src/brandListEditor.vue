@@ -4,16 +4,16 @@
       <template v-for="(item, index) in menuListData">
         <div class="content" :key="index">
           <Preview :data="item.menu" :headTitle="item.headTitle" :icon="item.icon" />
-          <m-link  :href="editUrl + '?mId=' + item.menuId">
-            <Button class="edit" type="primary">编辑</Button>
+          <m-link :href="editUrlItem(item.menuId)">
+            <button class="btnClass btn-primary edit" type="button">编辑</button>
           </m-link>
-          <Button class="delete" type="primary" @click="deleteMenu(index)">删除</Button>
+          <button class="btnClass btn-primary delete" type="button" @click="deleteMenu(index)">删除</button>
           <div class="menu-name">{{item.menuName}}</div>
         </div>
       </template>
       <div>
-        <m-link class="add-menu" :href="addUrl + '?pId=' + pubId">
-          <Icon color="#2d8cf0" type="android-add-circle" size="40"/>
+        <m-link class="add-menu" :href="addUrlItem">
+          <i class="el-icon-circle-plus" style="color:#2d8cf0;font-size:40px;"></i>
           <div style="font-size:16px;font-weight:bold;">添加菜单项</div>
         </m-link>
       </div>
@@ -23,10 +23,10 @@
 </template>
 
 <script>
-import Preview from "./preview";
+import Preview from './preview'
 
 export default {
-  name: "m-brandList-editor",
+  name: 'm-brandList-editor',
   components: {
     Preview
   },
@@ -43,40 +43,57 @@ export default {
     addUrl: String
   },
 
-  data() {
+  data () {
     return {
       menuListData: this.data,
       uploadData: JSON.stringify(this.data)
-    };
+    }
   },
 
   watch: {
-    menuListData() {
+    menuListData () {
       this.uploadData = JSON.stringify(this.menuListData)
     }
   },
 
-  computed: {},
+  computed: {
+    editUrlItem() {
+      return function(menuId) {
+        if(this.editUrl.indexOf("?") != -1) {
+          return this.editUrl + '&mId=' + menuId
+        } else {
+          return this.editUrl + '?mId=' + menuId
+        }
+      }
+    },
+    addUrlItem() {
+      if(this.addUrl.indexOf("?") != -1) {
+        return this.addUrl + '&pId=' + this.pubId
+      } else {
+        return this.addUrl + '?pId=' + this.pubId
+      }
+    }
+  },
 
-  created() {},
+  created () {},
 
-  mounted: function() {
+  mounted: function () {
     JSON.stringify
     if (this.form) {
-      this.$root.eventBus.$on("form_validate" + this.form, () => {
-        this.$validator.validate();
-      });
+      this.$root.eventBus.$on('form_validate' + this.form, () => {
+        this.$validator.validate()
+      })
     }
   },
 
   methods: {
-    deleteMenu(index) {
+    deleteMenu (index) {
       this.menuListData.splice(index, 1)
     }
   },
 
-  beforeDestroy: function() {}
-};
+  beforeDestroy: function () {}
+}
 </script>
 <style lang="scss" scoped>
 .brandList {
@@ -107,7 +124,7 @@ export default {
         left: 40%;
 
       }
-      
+
       .delete {
         width: 80px;
         position: absolute;
@@ -151,4 +168,39 @@ export default {
     }
   }
 }
+  .btnClass {
+    display: inline-block;
+    margin-bottom: 0;
+    outline: 0;
+    font-weight: 500;
+    text-align: center;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    line-height: 1.5;
+    user-select: none;
+    padding: 5px 15px 6px;
+    font-size: 12px;
+    border-radius: 4px;
+    background-color: #fff;
+    border-color: #dcdee2;
+  }
+  .btnClass:hover {
+    color: #747b8b;
+    background-color: #fff;
+    border-color: #e3e5e8;
+  }
+  .btn-primary {
+    color: #fff;
+    background-color: #2d8cf0;
+    border-color: #2d8cf0;
+  }
+  .btn-primary:hover {
+    color: #fff;
+    background-color: #57a3f3;
+    border-color: #57a3f3;
+  }
 </style>

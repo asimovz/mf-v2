@@ -4,18 +4,18 @@
       <div v-for="(item, index) in options" :key="index + '-' + item.name + '_' + index" :class="['extend-val', {'text-require': item.required}]" :style="{'flex-basis': ((item.type === 'select' && item.r_type === '0') || item.type === 'textarea') ? '100%' : '50%'}">
 
         <template v-if="(item.type === 'select' && item.r_type === '0') || item.type === 'selectTable'">
-          <m-select :name="item.name" :data="item.value" :keyField="keyField" :valueField="keyField" :placeholder="item.name" searchField="searchField" :fieldTitle="`选择${item.name}`" :value="currentData[item.name]" @change="e => onChange(e, item, index)" :column="columns" :page-size="20" :max-select="10" pagination></m-select>
+          <m-select-table :name="item.name" :data="item.value" :keyField="keyField" :valueField="keyField" :placeholder="item.name" searchField="searchField" :fieldTitle="`选择${item.name}`" :value="currentData[item.name]" @change="e => onChange(e, item, index)" :column="columns" :page-size="20" :max-select="10" pagination></m-select-table>
           <m-input v-show="readonlys[`name_${index}`]" diabled style="margin-top: 10px;" readonly :value="readonlys[`name_${index}`]" placeholder="只读" />
         </template>
 
         <template v-else-if="item.type === 'select'">
-          <drop-down :name="item.name"
+          <m-select :name="item.name"
             v-model="currentData[item.name]"
             :filterable="false"
             :options="handler(item.value)"
             :placeholder="item.name"
           >
-          </drop-down>
+          </m-select>
         </template>
 
         <!-- 其他属性配置 -->
@@ -50,6 +50,7 @@ export default {
   },
   inject: [ 'customParams' ],
   data(){
+
     let columns = COLUMNS
     let keyField = 'indicatorName'
     let readonlyField = 'bizServiceAppPackage'

@@ -37,7 +37,8 @@
 
           <template v-if="!readonly">
             <div :class="['add', {more: menu.length}]" @click="add">
-              <Icon type="plus-circled" style="vertical-align: text-bottom;" /> 添加菜单
+              <i class="el-icon-circle-plus"></i> 添加菜单
+              <!-- <Icon type="plus-circled" style="vertical-align: text-bottom;" /> 添加菜单 -->
             </div>
           </template>
         </div>
@@ -148,7 +149,7 @@ export default {
   methods: {
     remove(i) {
       if (this.menu.length <= 1) {
-        this.handleMessage("删除失败，父菜单不能少于一个","warning")
+        this.handleMessage('删除失败，父菜单不能少于一个','warning')
       } else {
         this.menu.splice(i, 1)
 
@@ -161,8 +162,9 @@ export default {
         v.order = i + 1
       })
     },
+
     add() {
-      if (!this.canAdd()) return this.handleMessage("同一时间段最多仅支持3个一级菜单！","warning")
+      if (!this.canAdd()) return this.handleMessage('同一时间段最多仅支持3个一级菜单！','warning') 
       this.menu.push({
         order: this.menu.length + 1,
         itemName: '',
@@ -177,7 +179,7 @@ export default {
     // 验证必填项(通过 .text-require 类名)
     valid() {
       if (!this.desc.trim().length) {
-        this.handleMessage("请输入菜单描述","warning")
+        this.handleMessage('请输入菜单描述','warning') 
         return false
       }
       let box = document.querySelector('.content-menu-item')
@@ -188,7 +190,7 @@ export default {
 
       return Array.from(inputs).every(v => {
         if (!v.value.trim().length) {
-          this.handleMessage(`请输入${v.getAttribute('placeholder') || '动作类型'}`,"warning")
+          this.handleMessage(`请输入${v.getAttribute('placeholder') || '动作类型'}`,'warning') 
           return false
         } else {
           return true
@@ -243,7 +245,7 @@ export default {
     submit(params) {
       this.$http.post(this.remoteUrl, params).then(res => {
         if(res.status === 200){
-          this.handleMessage("保存成功","success")
+          this.handleMessage( `保存成功`,'success') 
           setTimeout(() => {
             this.goBack(res.data.screenUrl)
           }, 1200)

@@ -3,7 +3,7 @@
     <div class="header-item">
       <span>厂商</span>
       <div style="flex: 1">
-        <drop-down v-model="value.firm" placeholder="请选择厂商" name="firm" :options="value.firmList"></drop-down>
+        <m-select v-model="value.firm" placeholder="请选择厂商" name="firm" :options="value.firmList"></m-select>
       </div>
     </div>
     <div class="header-item">
@@ -27,7 +27,7 @@
         <div v-if="!fileUrl" style="opacity: .7">(若需区分通道号配置菜单，请上传通道号文件)</div>
         <template v-else>
           <m-tooltip style="line-height: 1" title="点击下载"><a :href="fileUrl || value.channel" target="_blank" :download="filename">{{filename}}</a></m-tooltip>
-          <Icon type="ios-close-circle" @click="remove" />
+          <i class="el-icon-error" @click="remove"></i>
         </template>
       </div>
     </div>

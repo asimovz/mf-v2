@@ -2,7 +2,7 @@
   <div class="box-wrapper">
     <div class="box-content">
       <Item ref="item" :data="currentData" @add="add" @remove="remove" />
-      <span class="remove" @click="remove(-1)"><Icon type="ios-close-circle" /></span>
+      <span class="remove" @click="remove(-1)"><i class="el-icon-error"></i></span>
     </div>
   </div>
 </template>
@@ -80,7 +80,7 @@ export default {
         })
       } else {
         if (this.currentData.submenu.length < 2) {
-          this.handleMessage("菜单类型为MENU，至少包含一个无时间限制的子菜单","warning")
+          this.handleMessage('菜单类型为MENU，至少包含一个无时间限制的子菜单','warning')
         }
       }
       this.updateOrder(this.currentData.submenu)
@@ -92,15 +92,15 @@ export default {
     },
     canAddFn() {
       if (!this.currentData.itemName.trim().length || !this.currentData.submenu.length) {
-        this.handleMessage('菜单名称为空，不能添加新的子菜单！',"warning")
+        this.handleMessage('菜单名称为空，不能添加新的子菜单！','warning')
         return false
       } else {
         return !this.currentData.submenu.some(v => {
           if (!v.itemName.trim().length) {
-            this.handleMessage('菜单名称为空，不能添加新的子菜单！',"warning")
+            this.handleMessage('菜单名称为空，不能添加新的子菜单！','warning')
             return true
           } else if (!v.itemType.length) {
-            this.handleMessage('动作类型为空，不能添加新的子菜单！',"warning")
+            this.handleMessage('动作类型为空，不能添加新的子菜单！','warning')
             return true
           } else {
             return false

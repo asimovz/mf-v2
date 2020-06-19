@@ -1,6 +1,6 @@
 <template>
   <div class="opt-wrapper">
-    <Button type="primary" @click="add">添加</Button>
+    <m-button type="primary" size="small" @click.native="add">添加</m-button>
     <input type="hidden" :name="name" :value="value" />
     <div class="opt-list">
       <div class="item" v-for="(item, index) in currentData" :key="index">
@@ -8,24 +8,24 @@
           <!-- 参数名 -->
           <m-input class="label text-required" :id="`${id}input${index}`" :name="`un_name_input${index}`" :validate="{required:true}" validate-msg="参数名称不能为空" v-model="item.name" placeholder="参数名称" />
           <!-- 是否必填 -->
-          <Checkbox style="line-height: 32px;margin-left: 20px;" v-model="item.required">是否必填</Checkbox>
+          <m-checkbox style="margin-left: 20px;" :options="[{id: 1, value: false, label: '是否必填'}]" v-model="item.required" />
           <!-- 参数类型 -->
            <!-- :class="['flex-1', {types: (item.type === 'select' || item.type === 'selectTable')}]" -->
           <div class="flex-1">
-            <drop-down :filterable="false" placeholder="参数类型" :options="optTypes" v-model="item.type" @input="selectChange(item)"></drop-down>
+            <m-select :filterable="false" placeholder="参数类型" :options="optTypes" v-model="item.type" @on-change="selectChange(item)"></m-select>
           </div>
-          <!-- <i class="remove el-icon-error" @click="remove(index)"></i> -->
-          <Icon class="remove" type="ios-close-circle" size="22" @click="remove(index)" />
+          <i class="remove el-icon-error" @click="remove(index)"></i>
+          <!-- <Icon class="remove" type="ios-close-circle" size="22" @click="remove(index)" /> -->
         </div>
         <div class="extend-opts flex" v-if="item.type === 'select' || item.type === 'selectTable'">
           <!-- 远程接口、静态数据 -->
-          <m-radio v-if="item.type === 'select'" :options="[{id: 0, value: '0', label: '远程接口'}, {id: 1, value: '1', label: '静态数据'}]" v-model="item.r_type" @on-change="type => radioChange(type, item)"></m-radio>
+          <m-radio v-if="item.type === 'select'" :options="[{id: 0, value: '0', label: '远程接口'}, {id: 1, value: '1', label: '静态数据'}]" v-model="item.r_type" @on-change="radioChange(item)"></m-radio>
           <div class="flex-1 text-required">
             <!-- 静态数据 -->
             <m-input v-show="item.r_type === '1'" key="inputt" :name="`un_name_inputt${index}`" v-model="item.value" :id="`${id}inputt${index}`" :validate="{required: true}" validate-msg="选项不能为空" placeholder="选项(英文逗号分隔)" />
             <!-- 原生接口 -->
-            <drop-down v-show="item.r_type === '0'" :key="item.type === 'select' ? 'select' : 'selectTable'" :filterable="false" :options="urlList" :id="`${id}select${index}`" :validate="{required: true}" v-model="item.value" :name="`un_name_select${index}`" validate-msg="接口不能为空" placeholder="请选择接口">
-            </drop-down>
+            <m-select v-show="item.r_type === '0'" :key="item.type === 'select' ? 'select' : 'selectTable'" :filterable="false" :options="urlList" :id="`${id}select${index}`" :validate="{required: true}" v-model="item.value" :name="`un_name_select${index}`" validate-msg="接口不能为空" placeholder="请选择接口">
+            </m-select>
           </div>
         </div>
       </div>
@@ -89,8 +89,7 @@ export default {
       item.value = ''
       item.r_type = (item.type === 'select' || item.type === 'selectTable') ? '0' : '1'
     },
-    radioChange(type, item) {
-      item.r_type = type
+    radioChange(item) {
       item.value = ''
       // this.forceUpdate()
     },
@@ -161,8 +160,7 @@ export default {
     margin-left: 20px;
   }
   .remove {
-    align-self: normal;
-    margin: 5px 0 0 5px;
+    margin-left: 5px;
     padding: 0 5px;
     font-size: 18px;
     cursor: pointer;
@@ -174,6 +172,7 @@ export default {
   }
   .extend-opts {
     margin: 10px 30px 0 170px;
+    align-items: center;
   }
 
   /deep/ .el-select{width: 100%;}

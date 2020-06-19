@@ -7,7 +7,8 @@
       <div class="menu-list">
         <div class="item" v-for="(v, i) in currentData[dateIndex]" :key="v.order" :style="{width: 100/currentData[dateIndex].length + '%'}">
           <div class="item_title" :title="formatDate(v.startTime || '0') + ' ~ ' + formatDate(v.endTime || '1')">
-            <Icon v-show="v.submenu && v.submenu.length" type="navicon" size="20" style="vertical-align: sub"></Icon>
+            <!-- <Icon type="navicon" size="20" style="vertical-align: sub"></Icon> -->
+            <i v-show="v.submenu && v.submenu.length" class="el-icon-menu"></i>
             {{v.itemName || `父菜单${i + 1}`}}
           </div>
           <ul class="submenu" v-if="v.submenu && v.submenu.length">
@@ -20,7 +21,7 @@
     </div>
     <div class="time-view">
       <span @click="arrow(-1)" title="从前" :class="{disabled: dateIndex === 0}">
-        <Icon type="ios-arrow-back" size="18" style="vertical-align: -2px;"></Icon> 从前
+        <i class="el-icon-arrow-left"></i> 从前
       </span>
       <div v-if="dateAxis.length" class="preview-date-axis axis">
         <div class="axis-wrapper" :style="axisStyle">
@@ -29,7 +30,7 @@
       </div>
       <div v-else>从前 ~ 往后</div>
       <span @click="arrow(1)" title="往后" :class="{disabled: dateIndex === (dateAxis.length - 1)}">
-        往后 <Icon type="ios-arrow-forward" size="18" style="vertical-align: -2px;"></Icon>
+        往后 <i class="el-icon-arrow-right"></i>
       </span>
     </div>
   </div>

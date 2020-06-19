@@ -9,9 +9,9 @@
       </div>
       <div class="footer">
         <div class="menus">
-          <div class="item" v-for="v in data" :key="v.order" :style="{width: 100/data.length + '%'}">
+          <div class="item" v-for="(index, v) in data" :key="v.itemName" :style="{width: 100/data.length + '%'}">
             <div class="item_title">
-              <Icon v-show="v.submenu && v.submenu.length" type="navicon" size="20" style="vertical-align: sub"></Icon>
+              <i v-show="v.submenu && v.submenu.length" class="ivu-icon ivu-icon-navicon" style="vertical-align: sub;font-size:20px;"></i>
               {{v.itemName}}
             </div>
             <ul class="submenu" v-if="v.submenu && v.submenu.length">

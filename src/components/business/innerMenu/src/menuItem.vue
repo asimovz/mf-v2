@@ -10,12 +10,12 @@
       </div>
       <div class="menu_inline text-require">
         <span>动作类型</span>
-        <drop-down v-model="currentData.itemType" placeholder="请选择动作类型" name="itemType"
+        <m-select v-model="currentData.itemType" placeholder="请选择动作类型" name="itemType"
           :filterable="false"
           :options="actions"
-          @input="actionChange"
+          @on-change="actionChange"
         >
-        </drop-down>
+        </m-select>
       </div>
 
       <div class="valid-time">
@@ -27,7 +27,7 @@
         <div class="valid-time">
           <span>生效时间</span>
           <m-dateTime size="default" class="time-input" name="validTime" type="datetimerange" beforeDisabled
-            format="yyyy-MM-dd HH:mm" placeholder="请选择生失效时间"
+            format="yyyy-MM-dd HH:mm" :placeholder="['生效时间', '失效时间']"
             :initValue="validTime"
             @on-change="dateTimeChange"
           >
@@ -35,7 +35,8 @@
         </div>
         <div class="more-ops">
           <div v-show="!(currentData.itemType === 'MENU' && currentData.submenu.length) && extendFields.length" :class="['more', {'active': isMore}]" @click="isMore = isMore ? false : true" :title="`${isMore ? '隐藏' : '显示'}全部参数`">
-            <Icon size="18" :class="{'active': isMore}" type="ios-arrow-down" />
+            <i class="el-icon-arrow-down"></i>
+            <!-- <Icon size="18" :class="{'active': isMore}" type="ios-arrow-down" /> -->
           </div>
           <!-- <el-collapse-transition> // 依赖 element 不适合后期更换 UI 库，so 舍弃动画 -->
             <div class="infos" v-show="isMore">
@@ -48,7 +49,7 @@
         </div>
       </template>
 
-      <span v-if="level !== 1" class="remove" @click="remove(-1)"><!-- <i class="el-icon-error"></i> --><Icon type="ios-close-circle" /></span>
+      <span v-if="level !== 1" class="remove" @click="remove(-1)"><i class="el-icon-error"></i></span>
     </div>
 
     <!-- 二级菜单 -->
@@ -63,8 +64,11 @@
     <!-- 添加二级菜单 -->
     <template v-if="level === 1 && !readonly">
       <div v-show="currentData.itemType === 'MENU'" class="menu_add sub-add" @click="add">
-        <Icon type="plus-circled" style="vertical-align: baseline" /> 添加子菜单
+        <i class="el-icon-circle-plus-outline"></i> 添加子菜单
       </div>
+      <!-- <div v-if="level === 1" :class="['menu_add', {disabled: !canAdd}]" @click="add()">
+        + 添加一级菜单
+      </div> -->
     </template>
   </div>
 </template>
@@ -353,9 +357,7 @@ export default {
 
   .time-input {
     flex: 1;
-    /deep/ .ivu-date-picker,
-    /deep/ .el-date-editor--datetimerange.el-input,
-    /deep/ .el-date-editor--datetimerange.el-input__inner{width: 100%;}
+    /deep/ .el-date-editor--datetimerange.el-input, /deep/ .el-date-editor--datetimerange.el-input__inner{width: 100%;}
     /deep/ .el-date-editor .el-range-input{width: 45%}
   }
 }

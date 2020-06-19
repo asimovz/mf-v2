@@ -19,7 +19,7 @@
           <label class="item-label">
             <span class="text-require">{{brandTypeLabel}}</span>
           </label>
-          <drop-down
+          <m-select
             class="item-form"
             :form="form"
             :name="data.brandTypeName"
@@ -29,7 +29,7 @@
             v-model="brandTypeVal"
             validate-msg="不能为空"
             placeholder="请选择"
-          ></drop-down>
+          ></m-select>
         </div>
         <div class="list-item">
           <label class="item-label">
@@ -288,7 +288,15 @@ export default {
   }
 }
 .text-require:before {
-  top: 10px;
-  left: -12px;
+  top: -3px;
+  left: -10px;
+}
+</style>
+<style lang="scss">
+.m-brand-editor {
+  // 信了el的邪 input知道设100%，select就没有
+  .el-select {
+    width: 100%;
+  }
 }
 </style>
