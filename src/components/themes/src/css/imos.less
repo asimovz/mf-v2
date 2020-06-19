@@ -302,7 +302,7 @@
 		.el-table--border {
 			border-top-left-radius: 8px;
 			border-top-right-radius: 8px;
-			border-left: 0;
+			border-left: none;
 		}
 
 
@@ -632,4 +632,14 @@
 
 	.aw-form-item_label{color: #303133}
 
+	.el-card__body{
+		.eleTable-wrapper .el-table--border{
+			border-left: 1px solid #EBEEF5
+		}
+		.aw-tabs{
+			&-nav-container{height: 48px;}
+			&-tab{padding: 14px 16px;}
+			&-nav-right{margin: 8px 10px;}
+		}
+	}
 }
