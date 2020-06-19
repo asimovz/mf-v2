@@ -312,7 +312,6 @@
 
 		.el-table td, .el-table th{
 			height: 48px;
-			line-height: 48px;
 			padding: 4px 0;
 			font-size: @table-font_size;
 
@@ -325,23 +324,6 @@
 			.cell > a {
 				color: @table-link_color
 			}
-
-			// &-wrapper {
-			// 	&::-webkit-scrollbar {
-			// 		width: 6px;
-			// 		height: 10px;
-			// 	}
-			// 	&::-webkit-scrollbar-thumb {
-			// 		background: #dcdfe6;
-			// 		border-radius: 4px;
-			// 		&:hover {
-			// 			background-color: darken(#dcdfe6, 5%)
-			// 		}
-			// 	}
-			// 	&::-webkit-scrollbar-track {
-			// 		background: #ebeef5;
-			// 	}
-			// }
 
 		}
 
@@ -490,28 +472,34 @@
 		display: inline-block;
 		width: 16px;
 		height: 16px;
-		margin-right: 5px;
-		background-repeat: no-repeat;
-		background-size: cover;
+		
+		&-nav{
+			margin-right: 5px;
+			background-repeat: no-repeat;
+			background-size: cover;
+			&-marketing {
+				background-image: url('../images/marketing.png')
+			}
 
-		&-marketing {
-			background-image: url('../images/marketing.png')
-		}
+			&-analysis {
+				background-image: url('../images/analysis.png')
+			}
 
-		&-analysis {
-			background-image: url('../images/analysis.png')
-		}
+			&-scenes {
+				background-image: url('../images/scenes.png')
+			}
 
-		&-scenes {
-			background-image: url('../images/scenes.png')
-		}
+			&-service {
+				background-image: url('../images/service.png')
+			}
 
-		&-service {
-			background-image: url('../images/service.png')
-		}
+			&-setup {
+				background-image: url('../images/setup.png')
+			}
 
-		&-setup {
-			background-image: url('../images/setup.png')
+			&-execution{
+				background-image: url('../images/execution.png');
+			}
 		}
 
 	}

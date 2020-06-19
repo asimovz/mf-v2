@@ -10,7 +10,7 @@
     <template slot="title">
       <!-- <Icon :type="menuData.image" v-if="deepNumber == 1" size="18"></Icon>
       <Icon type="android-list" v-else size="12"></Icon> -->
-      <i :class="['m-icon', `m-icon-${menuData.name}`]"></i>
+      <i :class="['m-icon', 'm-icon-nav', `m-icon-nav-${menuData.name}`]"></i>
       <span class="menu-title">{{menuData.title}}</span>
     </template>
     <m-page-menu-node :menuData="child" v-for="(child,index) in menuData.children" :key="index" :title="crumb" :deep="deepNumber"></m-page-menu-node>
