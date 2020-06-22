@@ -215,29 +215,43 @@
 			right: 56px;
 			top: 8px;
 			height: 32px;
-			padding: 0 5px 0 8px;
+			padding: 0 6px 0 8px;
 			bottom: initial;
-			transition: all .2s linear;
+			transition: all .1s;
 
 			&:hover {
 				background: fade(@main-color-primary, 10%);
 				border-radius: 4px;
 
-				> .el-button--text:first-child {
-					border-right: 1px solid #ccc;
-					border-radius: 0
+				.close {
+					background-color: transparent;
+					border-color: lighten(#c0c4cc, 10%);
+				}
+				.tabs-dropdown{
+					background-color: transparent;
+					&:before{
+						display: none;
+					}
 				}
 
 			}
 
-			.el-button--text {
-				padding: 0;
+			.close {
+				width: initial;
+				padding: 0 6px 0 0;
+				margin: 4px 4px 4px 0;
+				border: none;
 				color: #c0c4cc;
+				border-right: 1px solid transparent;
+				& >  span > i {display:  none;}
+				&:after{content: '关闭全部';}
 			}
-
-			> .el-button--text:first-child {
-				padding-right: 6px;
-				margin: 4px 0;
+			.tabs-dropdown{
+				width: initial;
+				border: none;
+				padding: 0;
+				color: rgba(0,0,0,.25);
+				&:before{display: none;}
 			}
 
 		}

@@ -4,13 +4,11 @@
       <el-tab-pane v-for="(tab, index) in tabs" :key="index" :closable="index!=0" :label="tab.title" :name="index+''"></el-tab-pane>
     </el-tabs>
     <div class="tabs-control">
-      <m-button size="medium" style="margin-right: 2px;" type="text" @click.native="dropClick('all')">全部关闭</m-button>
-      <!-- <m-tooltip v-else transfer title="关闭全部">
+      <!-- <m-tooltip transfer title="关闭全部"> -->
         <m-button size="medium" class="close" type="default" @click.native="dropClick('all')"><i class="el-icon-error"></i></m-button>
-      </m-tooltip> -->
+      <!-- </m-tooltip> -->
       <m-dropdown @on-command="dropClick" :options="contextmenuList">
-        <m-button type="text" style="height: 100%;"><i class="el-icon-arrow-down"></i></m-button>
-        <!-- <m-button v-else size="medium" type="default" class="tabs-dropdown" icon="el-icon-arrow-down"></m-button> -->
+        <m-button size="medium" type="default" style="height: 100%;" class="tabs-dropdown"><i class="el-icon-arrow-down"></i></m-button>
       </m-dropdown>
     </div>
     <ul ref="contextmenu1" v-show="contextVisible0" class="active_header el-dropdown-menu el-dropdown-menu--small" :style="contextStyle">
