@@ -215,7 +215,7 @@
 			right: 56px;
 			top: 8px;
 			height: 32px;
-			padding: 0 6px 0 8px;
+			padding: 0 2px 0 8px;
 			bottom: initial;
 			transition: all .1s;
 
@@ -236,10 +236,14 @@
 
 			}
 
+			.close, .tabs-dropdown{
+				&:focus{background-color: transparent;}
+			}
+
 			.close {
 				width: initial;
 				padding: 0 6px 0 0;
-				margin: 4px 4px 4px 0;
+				margin: 4px 0;
 				border: none;
 				color: #c0c4cc;
 				border-right: 1px solid transparent;
@@ -249,7 +253,7 @@
 			.tabs-dropdown{
 				width: initial;
 				border: none;
-				padding: 0;
+				padding: 0 4px;
 				color: rgba(0,0,0,.25);
 				&:before{display: none;}
 			}
@@ -637,7 +641,7 @@
 		&.aw-tabs-card > .aw-tabs-bar .aw-tabs-tab-active {
 			color: @main-color-primary
 		}
-
+		.aw-tabs-nav .aw-tabs-tab{padding: 14px 15px;}
 		&-ink-bar {
 			background-color: @main-color-primary;
 		}
