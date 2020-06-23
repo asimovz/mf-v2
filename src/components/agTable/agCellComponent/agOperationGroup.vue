@@ -77,7 +77,7 @@
           if (responseData.screenUrl && responseData.screenUrl.length > 0) {
             this.handleNotice(responseData.messages || "操作成功!", responseData.type || 'success')
 						this.thisParent.$root.setUrl(responseData.screenUrl);
-            this.thisParent.$root.eventBus.$emit("updateAsideMenu")
+            this.thisParent.$root.eventBus.$emit("updateAsideMenu",true,responseData.screenUrl)
 					} else if (responseData.redirectUrl && responseData.redirectUrl.length > 0) {
 						window.location.href = responseData.redirectUrl;
 					}else{
