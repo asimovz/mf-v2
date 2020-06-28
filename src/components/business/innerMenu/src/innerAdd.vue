@@ -241,9 +241,11 @@ export default {
     submit(params) {
       this.$http.post(this.remoteUrl, params).then(res => {
         let { data } = res
-        
+
         if(data.hasOwnProperty('status') && data.status === -1){
-          this.handleMessage( `保存成功`,'success') 
+          this.handleMessage(data.messages, 'error')
+        }else{
+          this.handleMessage('保存成功', 'success') 
           setTimeout(() => {
             let bacnBtn = this.$refs.back
             bacnBtn.href = data.screenUrl
