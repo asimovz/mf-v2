@@ -13,7 +13,7 @@
       </div>
 
       <div style="display: inline-block; margin-left: 50px;">
-        <m-button class="act-btn" type="default" @click.native="goBack(backUrl)" text="取消" />
+        <m-link class="act-btn m-link-button m-link-button-default" :href="backUrl">取消</m-link>
         <m-button v-if="!readonly" class="act-btn" type="primary" toggle="linkFormLink" @click.native="save" text="保存" />
       </div>
     </div>
@@ -238,16 +238,16 @@ export default {
       }
     },
 
-    goBack(url){
-      this.$root.setUrl(url)
-    },
-
     submit(params) {
       this.$http.post(this.remoteUrl, params).then(res => {
-        if(res.status === 200){
+        let { data } = res
+        
+        if(data.hasOwnProperty('status') && data.status === -1){
           this.handleMessage( `保存成功`,'success') 
           setTimeout(() => {
-            this.goBack(res.data.screenUrl)
+            let bacnBtn = this.$refs.back
+            bacnBtn.href = data.screenUrl
+            bacnBtn.$el.click()
           }, 1200)
         }
       }).catch(err => {
