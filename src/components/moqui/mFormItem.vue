@@ -1,6 +1,6 @@
 <template>
   <div class="aw-form-item">
-    <label class="aw-form-item_label" :style="{'text-align':align,'width':labelWidth}">{{label}}</label>
+    <label class="aw-form-item_label" :style="{'text-align':align,'width':labelWidth}" v-if="span !== '0'">{{label}}</label>
     <div class="aw-form-item_content" :style="{'justify-content':contentAlign,'width':contentWidth}">
       <slot></slot>
     </div>
