@@ -3,7 +3,7 @@
         <ul class="subscreens-tab_nav" role="tablist">
             <li v-for="tab in subscreens" @click.prevent="tabClick" :class="{active:tab.active,disabled:tab.disableLink}">
                 <span v-if="tab.disabled">{{tab.title}}</span>
-                <m-link v-else :href="tab.path">{{tab.title}}</m-link>
+                <m-link v-else :href="tab.pathWithParams">{{tab.title}}</m-link>
             </li>
         </ul> 
     </div>
