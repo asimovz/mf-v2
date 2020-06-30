@@ -198,6 +198,7 @@ export default {
         dynamicParams[this.keyField] = this.selectValue
 				this.$root.eventBus.$emit(this.id+'_value_change',dynamicParams)
 			})
+			this.$emit('on-change', data)
 		}
 	},
 

@@ -13,8 +13,9 @@
       </div>
 
       <div style="display: inline-block; margin-left: 50px;">
-        <m-link class="act-btn m-link-button m-link-button-default" :href="backUrl">取消</m-link>
-        <m-button v-if="!readonly" class="act-btn" type="primary" toggle="linkFormLink" @click.native="save" text="保存" />
+        <m-link ref="mLink" :href="mLinkHref" style="display: none"></m-link>
+        <m-button class="act-btn" type="default" @click.native="goBack(backUrl)">取消</m-button>
+        <m-button v-if="!readonly" class="act-btn" toggle="linkFormLink" @click.native="save">保存</m-button>
       </div>
     </div>
 
@@ -127,7 +128,9 @@ export default {
 
     return {
       desc: this.description,
-      menu: _menus
+      menu: _menus,
+
+      mLinkHref: ''
     }
   },
   mounted(){
@@ -238,6 +241,14 @@ export default {
       }
     },
 
+    goBack(url){
+      this.mLinkHref = url
+
+      this.$nextTick(() => {
+        this.$refs.mLink.$el.click()
+      })
+    },
+
     submit(params) {
       this.$http.post(this.remoteUrl, params).then(res => {
         let { data } = res
@@ -247,9 +258,7 @@ export default {
         }else{
           this.handleMessage('保存成功', 'success') 
           setTimeout(() => {
-            let bacnBtn = this.$refs.back
-            bacnBtn.href = data.screenUrl
-            bacnBtn.$el.click()
+            this.goBack(data.screenUrl)
           }, 1200)
         }
       }).catch(err => {
