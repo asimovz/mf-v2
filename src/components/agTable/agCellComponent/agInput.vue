@@ -5,8 +5,9 @@
     :id="id"
     :name="id"
     :type="text"
+    :placeholder="placeholder"
     v-model="value"
-    v-if="isShow" 
+    v-if="isShow"
     size="small"/>
 </template>
 
@@ -19,12 +20,14 @@
         id: new Date().getTime() + '',
         text: 'text',
         value: '',
-        isShow: true
+        isShow: true,
+        placeholder:""
       };
     },
     beforeMount() {
       if(this.params.hasOwnProperty("data")){
         this.value = this.params.value
+        this.placeholder = this.params.placeholder
         this.params.setValue(this.value) //防止表达式字段为空
       }else{
 			  this.isShow = false
