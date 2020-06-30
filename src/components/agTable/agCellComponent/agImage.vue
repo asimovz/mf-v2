@@ -1,6 +1,7 @@
 <template>
   <div class="aw-table-image">
   <img
+    v-show="!!imgUrl"
     ref="img"
     @mouseenter="show"
     @mouseleave="hide"

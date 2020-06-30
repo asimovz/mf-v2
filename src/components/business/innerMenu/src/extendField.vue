@@ -4,7 +4,7 @@
       <div v-for="(item, index) in options" :key="index + '-' + item.name + '_' + index" :class="['extend-val', {'text-require': item.required}]" :style="{'flex-basis': ((item.type === 'select' && item.r_type === '0') || item.type === 'textarea' || item.type === 'selectTable') ? '100%' : '50%'}">
 
         <template v-if="(item.type === 'select' && item.r_type === '0') || item.type === 'selectTable'">
-          <m-select-table :name="item.name" :data="item.value" :keyField="keyField" :valueField="keyField" :placeholder="item.name" searchField="searchField" :fieldTitle="`选择${item.name}`" :value="currentData[item.name]" @on-change="e => onChange(e, item, index)" :column="columns" :page-size="20" :max-select="10" pagination></m-select-table>
+          <m-select-table :name="item.name" :data="item.value" :valueField="keyField" :keyField="valueField" :placeholder="item.name" searchField="searchField" :fieldTitle="`选择${item.name}`" :value="currentData[item.name]" @on-change="e => onChange(e, item, index)" :column="columns" :page-size="20" :max-select="10" pagination></m-select-table>
           <m-input v-show="readonlys[`name_${index}`]" diabled style="margin-top: 10px;" readonly :value="readonlys[`name_${index}`]" placeholder="只读" />
         </template>
 
@@ -53,6 +53,7 @@ export default {
 
     let columns = COLUMNS
     let keyField = 'indicatorName'
+    let valueField = 'indicatorName'
     let readonlyField = 'bizServiceAppPackage'
 
     if(this.customParams && this.customParams.tableParams){
@@ -60,6 +61,7 @@ export default {
         {
           columns = COLUMNS,
           keyField = 'indicatorName',
+          valueField = 'indicatorName',
           readonlyField = 'bizServiceAppPackage'
         } = this.customParams.tableParams
       )
@@ -69,6 +71,7 @@ export default {
       currentData: {},
       columns,
       keyField,
+      valueField,
       readonlyField,
       readonlys: {},
     }
@@ -140,15 +143,9 @@ export default {
     },
     onChange(data, item, index){
       let choiced = data.length ? data[0] : {}
-      this.currentData[item.name] = choiced[this.keyField] || ''
-
-      // this.$refs[`readonlyInput_${index}`][0].value = choiced.bizServiceAppPackage || ''
-
-      // this.packageName[`_${index}`] = choiced.bizServiceAppPackage || ''
+      this.currentData[item.name] = choiced[this.valueField] || ''
 
       this.$set(this.readonlys, `name_${index}`, choiced[this.readonlyField] || '')
-
-      // this.packageName = choiced.bizServiceAppPackage || ''
 
       this.$forceUpdate()   // fix: mSelect 组件的无法更新
     },
