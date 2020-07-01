@@ -20,9 +20,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less">
-.el-popover {
-  padding:10px 0;
-}
-</style>
