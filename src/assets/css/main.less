@@ -2019,6 +2019,9 @@ a{
       margin-left: 16px;
       width: 580px !important;
     }
+    .el-input.el-input--small.aw-input{
+      width: 590px !important;
+    }
     .el-radio-group{
       margin-left: 16px;
     }
@@ -2076,7 +2079,15 @@ body .el-table th.gutter{
 body .el-table colgroup.gutter{
   display: table-cell!important;
 }
-
+.el-drawer__container.el-drawer__open{
+  .aw-form.form-horizontal{
+    .aw-form-item:last-child{
+      .aw-form-item_content{
+        padding-left: 0 !important;
+      }
+    }
+  }
+}
 .el-col.el-col-11{
   width: 240px;
   border-right: 1px solid #dcdfe6;
@@ -2112,6 +2123,24 @@ h5.text-inline{
    text-align: right !important;
    margin-right: 16px;
  }
+}
+
+.el-dialog[aria-label *= '申请'],
+.el-dialog[aria-label *= '审批']{
+  width: 640px !important;
+  .aw-form.form-horizontal{
+    padding-top: 14px;
+  }
+  .aw-form-item_label{
+    display: none;
+  }
+  .el-radio-group{
+    margin-left: 0 !important;
+  }
+  .el-textarea.aw-textarea{
+    margin-left: 0 !important;
+    width: 576px !important;
+  }
 }
 
 /*首页样式*/
