@@ -14,7 +14,7 @@
       <div>
         <m-link class="add-menu" :href="addUrlItem">
           <i class="el-icon-circle-plus" style="color:#2d8cf0;font-size:40px;"></i>
-          <div style="font-size:16px;font-weight:bold;">添加菜单项</div>
+          <div style="font-size:16px;font-weight:bold;">添加菜单方案</div>
         </m-link>
       </div>
     </div>
