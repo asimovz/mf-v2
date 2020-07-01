@@ -116,7 +116,7 @@ export default {
       return this.deep
     },
     updateMenu(isOut) {
-      // this.activeName = this.filterPath(this.activeName, this.deep + 1)
+      this.activeName = this.filterPath(this.activeName, this.deep + 1)
       this.activeName = this.activeName.split("?")[0]
       let menu = this.$refs.menu
       if (this.activeName != "/") {
