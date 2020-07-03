@@ -39,7 +39,7 @@ export default {
        * 二级菜单与一级菜单需要与外层数据响应
        * 模板中可直接使用 data，此处为方便数据追踪与不直接修改 props 原则，进行一个对象的赋值
        */
-      if(val.options !== undefined && Object.keys(val.options).length){
+      if(val.options !== null && val.options !== undefined && Object.keys(val.options).length){
         val.options = JSON.parse(
           decodeURIComponent(
             escape(

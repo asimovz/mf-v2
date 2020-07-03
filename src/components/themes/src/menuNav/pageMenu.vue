@@ -106,7 +106,7 @@ export default {
       let names = urlpath.split("/")
       names.shift()
       let openArr = []
-      for (var i = 1; i <= names.length - 1; i++) {
+      for (var i = 1; i <= names.length; i++) {
         let item = names.slice(0, i)
         openArr.push("/" + item.join("/"))
       }

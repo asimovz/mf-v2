@@ -114,7 +114,7 @@ export default {
 
       let _options
 
-      if(typeof val.options === 'object'){
+      if(val.options !== null && typeof val.options === 'object'){
         _options = val.options
       }
       if(typeof val.options === 'string'){
