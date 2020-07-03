@@ -45,8 +45,8 @@ export default {
           this.$root.setUrl(this.linkHref)
           if(this.toggle != "menu") {
             this.$root.eventBus.$emit("updateAsideMenu", true, this.linkHref)
-            window.history.pushState(null, 'title', this.linkHref)
           }
+          window.history.pushState(null, 'title', this.linkHref)
           //页面跳转，取消之前的请求
           this.$root.axiosRequest.map((ax,index) => {
             ax.cancel()
