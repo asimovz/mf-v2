@@ -1,5 +1,7 @@
 ## 模板使用说明 ##
 
+快捷按钮和设置中的固定按钮总和不能超过10个
+
 在HTML中引用：
 <add-shortcutbutton :data="addBTNData" />
 
