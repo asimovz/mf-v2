@@ -511,12 +511,13 @@ h4 {
       flex-direction: row;
       align-items: center;
       padding-right: 10px;
-            >div, >span {
-                flex:1
-            }
-            .aw-switch {
-                flex:none
-            }
+      margin-left: 0 !important;
+      >div, >span {
+          flex:1
+      }
+      .aw-switch {
+          flex:none
+      }
 		}
 	}
 	.search-form-flex {
@@ -2038,7 +2039,7 @@ a{
   .aw-form > .aw-form-item:last-child{
     .aw-form-item_content{
       justify-content: center !important;
-      padding: 0;
+      padding: 0 !important;
     }
   }
   .aw-form-item[data-for='submit'],
@@ -2049,7 +2050,9 @@ a{
       display: none !important;
     }
     .aw-form-item_content{
+      width: 100% !important;
       justify-content: center !important;
+      padding-left: 0 !important;
     }
     .el-button{
       margin-left: 16px;
@@ -2153,5 +2156,23 @@ h5.text-inline{
 /*首页样式*/
 #SearchForm .el-row .el-col.el-col-4{
   width: auto;
+}
+
+.childSelect{
+  width: 200px !important;
+  .el-input.el-input--mini.el-input--suffix{
+    width: 200px !important;
+  }
+}
+
+.btnMatch{
+  width: 100% !important;
+  margin: 8px 0;
+  .matchInput, input{
+    width: 496px !important;
+  }
+  .matchInput{
+    margin: 8px 0 0 0;
+  }
 }
 
