@@ -11,7 +11,7 @@
     <div @click="add" v-if="items.length<10" class="addButton">
       + 添加快捷按钮
     </div>
-    <div v-if="items.length==10" class="addButton gray">
+    <div v-if="items.length==10" class="addButton grayBTN">
       + 快捷按钮和设置中的固定按钮总和不能超过10个
     </div>
     <input type="hidden" name="addshortcutbutton" :value="data"/>
@@ -76,7 +76,7 @@ export default {
   align-items: center;
   border-top: 1px solid #DCDFE6;
 }
-.gray{
+.grayBTN{
   cursor: default;
   color: #a9aab1;
 }
