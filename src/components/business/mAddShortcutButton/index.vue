@@ -8,8 +8,11 @@
                   @deleteIndex="del"
                   @uploadData="getData">
     </childContent>
-    <div @click="add" class="addButton">
+    <div @click="add" v-if="items.length<10" class="addButton">
       + 添加快捷按钮
+    </div>
+    <div v-if="items.length==10" class="addButton gray">
+      + 快捷按钮和设置中的固定按钮总和不能超过10个
     </div>
     <input type="hidden" name="addshortcutbutton" :value="data"/>
   </div>
@@ -72,6 +75,10 @@ export default {
   justify-content: center;
   align-items: center;
   border-top: 1px solid #DCDFE6;
+}
+.gray{
+  cursor: default;
+  color: #a9aab1;
 }
 .SceneConfig {
   display: flex;
