@@ -1,0 +1,25 @@
+.video-js{
+  button{
+    outline: none;
+  }
+  .vjs-big-play-button{
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid #fff;
+    border-radius: 100%;
+    width: 50px;
+    height: 50px;
+    line-height: 46px;
+  }
+  .el-icon-refresh-right,.el-icon-refresh-left{
+    cursor: pointer;
+    i{
+      font-style: normal;
+      font-size: .75em;
+      font-weight: bold;
+      position: relative;
+      top:-1px;
+    }
+  }
+} 

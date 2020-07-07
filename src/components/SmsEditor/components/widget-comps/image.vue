@@ -1,0 +1,19 @@
+<template>
+	<div class="widget-image--wrapper">
+  	<img class="image" :src="data.uri">
+  </div>
+</template>
+
+<script>
+export default {
+  name:"widget-video",
+  props: {
+    data:Object
+  },
+}
+</script>
+<style lang="less">
+.widget-image--wrapper{
+	img{width: 100%;}
+}
+</style>
