@@ -2,55 +2,55 @@
   <div class="childContent">
     <div class="defaultContent">
       <m-select :options="btnList" @on-change="handleChange" v-model="btn.type" size="small" class="childSelect"></m-select>
-      <m-input class="childInput text-required" v-model="btn.description" size="small" placeholder="按钮文案（必填）" :maxlength="10" name="_NA_" :validate="'required'" validate-msg="请输入按钮文案" />
+      <m-input class="childInput" v-model="btn.description" size="small" placeholder="按钮文案" />
       <i class="el-icon-delete" @click="deleteBtn"></i>
     </div>
 
     <div class="btnMatch" v-if="btn.type=='url'">
-      <m-input class="matchInput" v-model="btn.content" size="small" placeholder="链接需以http(s)://开头（必填）" name="_NA_" :validate="{regex:/^(http[s]{0,1}:\/\/)/i}" validate-msg="请输入正确链接" />
+      <m-input class="matchInput" v-model="btn.url" size="small" placeholder="链接需以http(s)://开头" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='openApp'">
-      <m-input class="matchInput" v-model="btn.openAppAndroid" size="small" placeholder="[Android]请输入正确调起地址（必填）" name="_NA_" :validate="'required'" validate-msg="请输入正确调起地址" />
+      <m-input class="matchInput" v-model="btn.openAppAndroid" size="small" placeholder="[Android]请输入正确调起地址" />
+      <m-input class="matchInput" v-model="btn.openAppIos" size="small" placeholder="[ios]请输入正确调起地址" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='call'">
-      <m-input class="matchInput" v-model="btn.callPhone" size="small" placeholder="请输入电话号码（必填）" name="_NA_" :validate="{regex:/^[\d\-\s\+]+$/}" validate-msg="请输入正确电话号码" />
+      <m-input class="matchInput" v-model="btn.phoneNum" size="small" placeholder="请输入电话号码" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='addressLocation'">
-      <m-input class="matchInput" data-name="longInput" v-model="btn.sendAddressPlaceName" size="small" placeholder="位置名称（必填）" name="_NA_" :maxlength="20" :validate="'required'" validate-msg="请输入位置名称" />
-      <m-input class="matchInput" v-model="btn.sendAddressLongitude" size="small" placeholder="经度（必填）" name="_NA_" :validate="'required'" validate-msg="请输入经度" />
-      <m-input class="matchInput" v-model="btn.sendAddressLatitude" size="small" placeholder="纬度（必填）" name="_NA_" :validate="'required'" validate-msg="请输入纬度" />
+      <m-input class="matchInput" v-model="btn.sendAddressPlaceName" size="small" placeholder="地点名称" />
+      <m-input class="matchInput" v-model="btn.sendAddressLongitude" size="small" placeholder="经度" />
+      <m-input class="matchInput" v-model="btn.sendAddressLatitude" size="small" placeholder="纬度" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='screen'">
-      <m-input class="matchInput" v-model="btn.targetContact" size="small" placeholder="目标联系人（必填）" name="_NA_" :validate="'required'" validate-msg="请输入目标联系人" />
+      <m-input class="matchInput" v-model="btn.targetContact" size="small" placeholder="目标联系人" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='bringUp'">
-      <m-input class="matchInput" v-model="btn.targetContact" size="small" placeholder="目标联系人（必填）" name="_NA_" :validate="'required'" validate-msg="请输入目标联系人" />
-      <m-input class="matchInput" data-name="longInput" v-model="btn.presendContent" size="small" name="_NA_" placeholder="预发送内容" :maxlength="100" />
+      <m-input class="matchInput" v-model="btn.targetContact" size="small" placeholder="目标联系人" />
+      <m-input class="matchInput" v-model="btn.presendContent" size="small" placeholder="预发送内容" />
     </div>
+    <input type="hidden" name="addshortcutbutton" :value="data"/>
   </div>
 </template>
 <script>
 export default {
   props: {
-    data:{
-      type: Object,
-      default(){
-        return {}
-      }
-    },
+    data:{},
     index: {
       type: Number,
       required: true
     },
+    items: {
+      type: Array,
+      default: Array
+    }
   },
   data(){
     return {
-      required:true,
       btnList: [
         {
           value: 'reply',
@@ -88,10 +88,10 @@ export default {
       btn:{
         type:'reply',
         description:'',
-        content:'',
+        url:'',
         openAppAndroid:'',
         openAppIos:'',
-        callPhone:'',
+        phoneNum:'',
         sendAddressPlaceName:'',
         sendAddressLongitude:'',
         sendAddressLatitude:'',
@@ -102,6 +102,8 @@ export default {
   },
   created(){
     this.btn = this.data
+    console.log('最里面6:', JSON.stringify(this.data))
+    console.log('最里面66:', JSON.stringify(this.items))
   },
   computed: {
 
@@ -109,7 +111,19 @@ export default {
   watch: {
     btn: {
       handler (newV, oldV) {
+        if (newV.description.length === 0) {
+          return false
+        }
+
         this.$emit('uploadData', {index: this.index, data: newV})
+      },
+      deep: true
+    },
+    items: {
+      handler (newV, oldV) {
+        if (newV.length !== 0) {
+          this.student = {...newV[this.index]}
+        }
       },
       deep: true
     }
@@ -140,10 +154,11 @@ export default {
     flex-direction: row;
   }
   .childInput{
-    margin: 0 10px;
+    margin-left: 10px;
+    width: 300px !important;
   }
   .el-icon-delete{
-    margin: 10px 0 0 0;
+    margin: 8px 0 0 0;
     cursor: pointer;
   }
 </style>
