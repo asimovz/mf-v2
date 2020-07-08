@@ -52,7 +52,7 @@ const defaultOpts = {
   type: 'text',
   text: '',
   img: '',
-  fontFamily: '',
+  fontFamily: 'Microsoft YaHei',
   fontSize: 14,
   fontColor: '#333333'
 }
