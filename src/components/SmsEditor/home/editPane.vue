@@ -127,14 +127,13 @@
 			},
 
 			onSave({ newData, imgConf = {} }){
-				let _newD = {}
-				if(newData.poster){
-					_newD.poster = newData.poster
-				}
+				// let _newD = {}
+				// if(newData.poster){
+				// 	_newD.poster = newData.poster
+				// }
+				// _newD.uri = newData.uri
 
-				_newD.uri = newData.uri
-
-				this.currentData = Object.assign(this.currentData, {..._newD})
+				this.currentData = Object.assign(this.currentData, newData)
 				this.currentData.imgConf = imgConf
 			},
 		},

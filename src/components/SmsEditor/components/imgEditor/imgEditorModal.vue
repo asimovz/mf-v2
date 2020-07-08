@@ -199,7 +199,7 @@
           </div>
         </div>
       </div>
-      <div  slot="footer" class="footer">
+      <div  slot="footer" class="footer" style="padding: 10px 0 20px">
         <span>
           <el-button size="small" @click="closeEditorModal">取 消</el-button>
           <el-button size="small" type="primary" @click="saveImage">保 存</el-button>

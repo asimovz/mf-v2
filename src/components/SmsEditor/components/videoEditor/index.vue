@@ -49,7 +49,7 @@
       </el-tabs>
     </el-col>
   </el-row>
-  <div slot="footer" class="dialog-footer">
+  <div slot="footer" class="dialog-footer" style="padding: 10px 0 20px">
     <el-button size="small" @click="close">取消</el-button>
     <el-button size="small" type="primary" @click="save">保存</el-button>
   </div>

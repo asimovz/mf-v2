@@ -654,7 +654,7 @@ export default {
   watch: {
     rect:throttle(function(v){
       this.$emit('rectChange', v)
-    }, 1000),
+    }, 100),
     rawLeft(newLeft) {
       const limits = this.limits;
       const stickAxis = this.stickAxis;

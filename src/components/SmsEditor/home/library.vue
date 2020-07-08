@@ -24,7 +24,7 @@
       <!-- 图片/视频 -->
       <div class="lib-list" :class="{'isCheckable': isCheckAble}">
         <template>
-          <div v-for="(item, index) in dataList" :key="item.id" :class="[
+          <div v-for="(item, index) in dataList" :key="item.resourceId" :class="[
               'lib-item',
               {
                 'lib-item--checked': item.checked,
@@ -32,9 +32,9 @@
               },
             ]"
 
-            @click="libAdd(item, index)"
+            @click="libAdd(item, index, $event)"
           >
-            <span class="lib-remove el-icon-error" @click.stop="libRemove(item.id)"></span>
+            <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
             <div class="lib-preview">
               <img :src="item.uri" v-if="type['type'] === 'image'" />
               <template v-else-if="type['type'] === 'video'">
@@ -51,7 +51,7 @@
             <div class="lib-name" v-if="item.name" :title="isCheckAble || !isEditAble ? '' : '双击可编辑'">
                <!-- @dblclick="nameEdit" -->
               <div class="lib-name-word">{{ item.name }}</div>
-              <!-- <span class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span> -->
+              <span class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
               <input class="lib-name-input" :value="item.name" @blur="(evt) => nameEdited(evt, item)" />
             </div>
           </div>
@@ -94,7 +94,6 @@ function getRandomId() {
   return Math.ceil(Math.random() * 100000)
 }
 
-
 export default {
   components: {
     widgetVideo,
@@ -125,10 +124,6 @@ export default {
     }
   },
   computed: {
-    // 当前 type
-    // currentType(){
-    //  return TITLES.find(type => type.type === this.type) || {}
-    // },
     // 当前 type 对应的 label
     typeLabel() {
       // return this.currentType['label']
@@ -145,7 +140,7 @@ export default {
     },
     // 选中的 id
     checkedId() {
-      return this.dataList.filter(item => item.checked).map(item => item.id)
+      return this.dataList.filter(item => item.checked).map(item => item.resourceId)
     },
     // 半选
     isIndeterminate() {
@@ -214,45 +209,33 @@ export default {
       this.$confirm(`确定删除此${this.typeLabel}?`, '提示', {
         type: 'warning'
       }).then(async () => {
-        await this.updateLib(id)
-        this.dataList = this.dataList.filter(item => {
-          return Array.isArray(id) ? !id.includes(item.id) : item.id !== id
-        })
+        await this.updateLib({ type: 'delete', id })
+
+        if(Array.isArray(id)){
+          for(let i = 0; i < id.length; i ++){
+            let index = this.dataList.findIndex(item => item.resourceId === id)
+            if(index !== undefined) this.dataList.splice(index, 1)
+          }
+        }else{
+          let _index = this.dataList.findIndex(item => item.resourceId === id)
+          this.dataList.splice(_index, 1)
+        }
+
+        // this.dataList = this.dataList.filter(item => 
+        //   Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
+        // )
+
         this.$message.success('删除成功');
       })
     },
-
-    // // 聚焦修改文件名
-    // libNameFocus(evt, lib){
-    //  if(this.isCheckAble) return
-
-    //  this.isEditAble = true
-
-    //  this.$nextTick(() => {
-    //    // evt.target.focus()
-    //       selectText(evt.target)
-    //  })
-    // },
-
-    // // 失焦保存文件名
-    // libNameBlur(evt, lib){
-    //  this.isEditAble = false
-    //  let val = evt.target.innerHTML
-
-    //  // 文件名更改过
-    //  if(val.trim() !== lib.name){
-    //    this.updateLib(lib.id, val)
-
-    //    lib.name = val
-    //  }
-    // },
-
-
+    // 处理点击音频
     audioClick(event){
       if(!this.isCheckAble) event.stopPropagation()
     },
     // 选中/选择
-    libAdd(item, index) {
+    libAdd(item, index, evt) {
+      if(evt.target.tagName === 'INPUT') return
+
       if (this.isCheckAble) {
         item.checked = !item.checked
       } else {
@@ -290,7 +273,7 @@ export default {
       let value = target.value
       if (value !== item.name) {
         console.log('名称修改过')
-        this.updateLib(item.id, value)
+        this.updateLib({type: 'rename', id: item.resourceId, name: value})
         item.name = value
       }
     },
@@ -301,17 +284,16 @@ export default {
      * @param  {[string]} name [素材名]
      * 没有 name 则删除素材
      */
-    updateLib(id, name) {
+    updateLib({ type, id, name }) {
       let fd = new FormData()
-      fd.append('actionType', 'delete')
-
-      this.uploadFile(fd, id)
+      fd.append('actionType', type)
+      name && fd.append('filename', name)
+      
+      this.beforeUpload(fd, id)
     },
 
     // 选择文件
     fileChanged(evt) {
-      
-
       let input = evt.target
       let { files } = input
       let file = [...files][0]
@@ -337,24 +319,27 @@ export default {
       return this.type['size'] * 1024 * 1024 > size
     },
 
-    beforeUpload(fd, id = ''){
+    beforeUpload(fd, id){
       fd.append('type', this.type['type'])
+      
       if(this.type['type'] === 'video'){
         fd.append('thumbnailGenratedUrl', this.mmsConfig.nodeUrl + this.mmsConfig.videoThumbnail)
       }
 
-      id && fd.append('resourceId', id)
+      id && fd.append('resourceIds', id)
 
-      this.upload(fd)
+      this.handleUpload(fd)
     },
     // 上传、删除
-    upload(fd) {
+    handleUpload(fd) {
       this._http(this.mmsConfig.file, fd)
       .then(res => {
-        // if(res.error === 0){
+        let _data = {...res}
+        delete _data.resourceId
+
         this.dataList.unshift({
-          ...res.data,
-          id: getRandomId(),
+          ..._data,
+          id: res.resourceId
         })
         // }
 
@@ -362,7 +347,7 @@ export default {
 
       }).finally(cb => {
         this.isUpLoading = false
-        this.$refs.file.value = ''
+        if(this.$refs.file) this.$refs.file.value = ''
       })
 
     },
@@ -374,10 +359,10 @@ export default {
 
       let {pageIndex, pageSize} = this.pager
 
-      this._http(this.mmsConfig.library, { type, pageIndex, pageSize })
+      this._http(this.mmsConfig.library, { type, pageIndex: pageIndex - 1, pageSize })
       .then(res => {
         if(res.error === 0){
-          this.dataList = res.data.map((item, idx) => ({...item, id: getRandomId(), name: item.name || `文件${idx + 1}` }))
+          this.dataList = [...res.data]
         }
         this.fetchLoading = false
       }).catch(err => {
