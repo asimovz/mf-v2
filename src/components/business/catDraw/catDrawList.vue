@@ -39,10 +39,11 @@
 				<cat-draw-list-multiple-card :reply="item.reply"  v-if="item.replyType == 'manyCards'" :currentIndex="index" :nodeList="nodeList" :otherNodeList="otherNodeList" :nowNode="eventList" :pageParameters="pageParameters" :acceptUrl="acceptUrl" ></cat-draw-list-multiple-card>
 
 			</div>
-
+			
 			<!--新增底部添加按钮-->
 			<catDrawListAddMenu v-if="!hiddenAddMenuBottom" @addMenu="addMenu" :showMaxMenus="showMaxMenus"></catDrawListAddMenu>
 		</div>
+		<catChoose ref="catChooseMedia" :id="catChooseId" :materialList="materialList"></catChoose>
 	</div>
 </template>
 <script>
@@ -60,7 +61,9 @@
 
 	import catDrawListData from './catRobotNew/cardType/catDrawListData' //添加节点对象
 	
-	import {emojiCharStringLen, emojiCharStringSubstr} from './util'  //新增处理emoji表情等
+	import {emojiCharStringLen, emojiCharStringSubstr, getUUID} from './util'  //新增处理emoji表情等
+	import catChoose from './catChoose/catChoose'  //素材的弹窗
+	import { AboutMaterial } from './catChoose/aboutMaterial.js' //选择素材的弹窗
 
 	//初始化数据
 	class Reply {
@@ -74,6 +77,7 @@
 		name: 'catDrawList',
 		props: {
 			//0528修改上传的地址
+			// 素材上传接口
 			acceptUrl: {
 				type: Object,
 				default: function() {
@@ -85,12 +89,14 @@
 			listStyle: {
 				width: '350px'
 			},
-			eventList: {
+			//  随机和发送所有
+			eventArray: {
 				type: Object,
 				default: function() {
 					return {
 						onceReplyModeLabel: '随机发送一条',
 						onceReplyMode: 1,
+						// 所有数据，传递给后端
 						inputContents: [{
 							"replyType": "text",
 							originalMessage: '',
@@ -98,10 +104,13 @@
 					}
 				},
 			},
+			// 群发用 
 			nodeList: Array, //新增nodeList
+
 			otherNodeList: Array,
 			
 			//页面传递过去的参数
+			// 待定
 			pageParameters: {
 				type: Object,
 				default: function() {
@@ -109,19 +118,23 @@
 				}, 
 			},
 			//0515新增_是否隐藏顶部的发送默认方式
+			// 隐藏群发和随机
 			hiddenModeLabel: {
 				type: Boolean,
 				default: false,  //默认值是false
 			},
+			// 总共条数
 			drawListMaxNumber: {
 				type: Number,
 				default: 10,  //上限一般是10个
 			},
+			// 群发按钮 隐藏
 			//0527新增_是否隐藏顶部的新增按钮
 			hiddenAddMenuBottom: {
 				type: Boolean,
 				default: false,  //默认值是false
 			},
+			// 条数只能为1
 			//0527新增是否值选择一个，默认是可以选择多个的
 			selectOnlyOne: {
 				type: Boolean,
@@ -137,6 +150,7 @@
 			catDrawListSimpleCard,
 			catDrawListMultipleCard,
 			catDrawListAddMenu,
+			catChoose
 			// catDrawListAddMenuTop,
 		},
 		data: function() {
@@ -145,6 +159,7 @@
 				// 	1: '随机发送一条',
 				// 	2: '发送所有',
 				// },
+				eventList: this.eventArray,
 				replysList: [
 					{value:1,label:'随机发送一条'},
 					{value:2,label:'发送所有'}
@@ -152,6 +167,12 @@
 				maxlength: 600,
 				
 				showMaxMenus: false, //不显示上限
+				catChooseId: getUUID(),
+				materialList: {
+					picList: [],
+					voiceList: [],
+					videoList: [],
+				},
 			}
 		},
 		computed:{
@@ -253,11 +274,15 @@
 				var that = this
 				var type = obj.addMenuType
 				if(this.selectOnlyOne) {
+					// this.$set(this.eventList.inputContents, 0, new catDrawListData[type]())
 					this.eventList.inputContents.splice(0,1,new catDrawListData[type]())
 				} else {
 					//添加到数组里去
+					// this.$set(this.eventList.inputContents, this.eventList.inputContents.length, new catDrawListData[type]())
 					this.eventList.inputContents.push(new catDrawListData[type]())  
 				}
+				
+				this.$forceUpdate()
 			},
 			//新增监听input改变值
 			onChangeInput(val, index) {
@@ -265,17 +290,37 @@
 				var result = emojiCharStringSubstr(value, 0, this.maxlength) //截取实际的长度
 				
 				//延时去设置,否则不能设置成功
-				setTimeout(() => {
-					this.eventList.inputContents[index].originalMessage = result // 赋值给表单中的的字段
-		    }, 0)	
+				// setTimeout(() => {
+					// this.$nextTick(()=>{
+						this.eventList.inputContents[index].originalMessage = result
+						this.$forceUpdate()
+					// })
+					 // 赋值给表单中的的字段
+		    // }, 20)
 			},
 			//新增添加emoji表情
 			addCatEmoji(data) {
 				this.selectionStart(data.currentIndex, data.emoji) //添加到原来的input里面去
 			},
+			// 获取所有的素材列表
+			getAllMaterial() {
+				var botId = this.paramMap.botId
+				var p1 = this.aboutMaterial.getMaterials('pic', botId)
+				var p2 = this.aboutMaterial.getMaterials('video', botId)
+				var p3 = this.aboutMaterial.getMaterials('voice', botId)
+				return new Promise((resolve, reject) => {
+					Promise.all([p1, p2, p3]).then((result) => {
+						resolve()
+					}).catch((error) => {})
+				})
+			},
 		},
-		created() {},
+		created() {
+			this.aboutMaterial = new AboutMaterial(this)
+			// this.getAllMaterial().then(() => {})
+		},
 		mounted() {
+			
 		},
 		destroyed() {
 			document.body.style.overflow = 'auto' //处理弹窗导致无法关闭的bug
