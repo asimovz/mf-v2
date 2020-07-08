@@ -67,7 +67,7 @@ export default {
         this.$emit("updateView")
       }, err => {
         // error callback
-        this.handleMessage("error", err.errorMessage + '<br>' + err.errors)
+        this.handleMessage(err.errorMessage,'error')
       })
     },
     bgStars() {

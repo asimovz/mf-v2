@@ -160,7 +160,7 @@ export default {
         currentValue: this.washValue(this.value),
         initValue: this.washValue(this.value),
         timer:null,
-        sizeType: sizeConfig[this.size]
+        sizeType: 'small'//sizeConfig[this.size]
     };
   },
 

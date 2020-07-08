@@ -140,7 +140,10 @@ export default {
 .m-link-button+.m-link-button {
   margin-left:10px;
 }
-.m-link-button+button {
-  margin-left:10px;
+.aw-modal,.aw-form {
+  .m-link-button+button {
+    margin-left:10px;
+  }
 }
+
 </style>
