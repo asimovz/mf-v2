@@ -11,7 +11,7 @@ export const typesList = [
     icon: "tupian",
     uri:"",
     size: '5',
-    accept: 'png、jpg、jpeg、gif、bmp',
+    accept: 'png、jpg、jpeg、gif',
   },
   {
     type: "video",
@@ -20,7 +20,7 @@ export const typesList = [
     poster: "",
     uri:"",
     size: '10',
-    accept: 'wmv、3gp、avi、f4v、m4v、mp4、mpg、ogv、vob'
+    accept: '3gp、mp4'
   },
   {
     type: "audio",
@@ -28,7 +28,7 @@ export const typesList = [
     icon: "yinpin",
     uri:"",
     size: '10',
-    accept: 'aac、m4a、wma、mp3',
+    accept: 'aac、mp3',
   }
 ]
 

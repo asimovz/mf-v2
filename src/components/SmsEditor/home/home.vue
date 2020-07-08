@@ -72,7 +72,7 @@
           </div>
         </div>
       </div>
-      <div class="toolbar-wrapper"  style="margin:20px">
+      <div class="toolbar-wrapper"  style="margin-top:20px">
           <div class="file-size">
             <p class="fileSize-process-word" v-if="fileStatus === 'exception'">超过最大限制</p>
             <el-progress class="progress" :stroke-width="6" :percentage="filePercentage" :status="fileStatus" ></el-progress>
@@ -93,18 +93,6 @@
 
   </div>
 
-  <el-dialog
-    title="保存"
-    :visible.sync="previewVisible"
-  >
-    <save-confirm :data="previewData" />
-
-    <div slot="footer" style="padding: 10px 0 20px">
-      <el-button size="small" @click="previewVisible = false">取消</el-button>
-      <el-button size="small" type="primary" @click="submit">提交</el-button>
-    </div>
-  </el-dialog>
-  
 </div> 
 </template>
 
@@ -134,6 +122,16 @@ function dataURLtoFile(dataurl, filename) {
   return new File([u8arr], filename, {type:mime});
 }
 
+function getAllData(arr){
+  return arr.map(ar => {
+    if(ar.type === 'group' && ar.list.length){
+      return getAllData(ar.list)
+    }else{
+      return ar
+    }
+  })
+}
+
 export default {
   name: "mms-editor",
   components: {
@@ -150,7 +148,7 @@ export default {
     mmsSave: String, //模板保存接口
     nodeUrl: String, //node服务接口
   },
-	data() {
+  data() {
     return {
       config: {
         nodeUrl: this.nodeUrl,
@@ -186,8 +184,6 @@ export default {
       isEditorShow: false,
       currentEditItem: {},
 
-      previewVisible: false,
-      previewData: []
     }
   },
   provide() {
@@ -214,12 +210,12 @@ export default {
     }
   },
   async created() {
-    if(this.mmsTemplate) await this.getTemplate()
+    if(this.mmsTemplate && this.initParams.messageId) await this.getTemplate()
   },
   mounted() {
     this.listenerPhone()
   },
-	computed: {
+  computed: {
     isComposeDisabled() {
       return Object.keys(this.composeGroupList).length >= 2
     },
@@ -263,7 +259,7 @@ export default {
       return !this.mmsData.list.length
     }
   },
-	methods: {
+  methods: {
     getTemplate(){
       this._http(this.mmsTemplate, {
         scenesTypeId: this.initParams.scenesTypeId
@@ -321,23 +317,19 @@ export default {
 
       // 点击素材库类型，关闭编辑区
       this.isEditorShow = false
+      let _data = JSON.parse(JSON.stringify(data))
 
-      data = JSON.parse(JSON.stringify(data))
-      let newData ={
-        ...data,
-        id: getRandomId()
-      }
-      if(data.type == "text") {
+      if(_data.type == "text") {
         if(this.widgetPaneShow){
           this.widgetPaneShow = false
         }
         
-        this.mmsData.list.push(newData)
+        this.mmsData.list.push({..._data, id: getRandomId()})
       } else {
-        this.handleWidget(data)
+        this.handleWidget(_data)
       }
 
-      this.currentItemType = data.type
+      this.currentItemType = _data.type
     },
 
     onLibAdd(data){
@@ -547,75 +539,94 @@ export default {
       })
     },
 
+    
+
     save(){
-      this.isEditorShow = false
+      this.widgetPaneShow = this.isEditorShow = false
 
-      const getData = function(arr){
-        return arr.map(ar => {
-          if(ar.type === 'group' && ar.list.length){
-            return getData(ar.list)
-          }else{
-            return ar
-          }
-        })
-      }
+      // 获取扁平模板数据
+      let flatList = getAllData(this.mmsData.list).flat(3)
 
-      let flatList = getData(this.mmsData.list).flat(3)
+      // 提交参数 mmsResourceIds
+      let ids = []
 
+      // 提取需要字段
       let newList = flatList.map(item => {
         let _item = {}
-        let { type, content, name, uri: src, size } = item
+        let { type, content, name = '', uri, size, id } = item
+
+        _item = { type, name, size }
 
         if(item.type === 'text'){
           let newContent = this.replaceTextContent(content)
-          _item = { content:newContent, size: 1 }
+          _item.content = newContent
+          _item.size = 1
         }else{
-          _item = { src, name, size }
+          ids.push(id)
+          _item.content = uri
         }
 
-        return Object.assign({}, {type, ..._item})
+        return _item
       })
 
+      let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
-      this.previewData = {...this.initParams, list: newList}
-
-      this.previewVisible = true
-
+      this.captrue(_data)
     },
 
-    submit(){
-      html2canvas(this.$refs.windowBody, {
+    // 截图前处理
+    beforeCaptrue(){
+      this.$refs.windowBody.classList.add('isCapture')
+      document.querySelector('.body-content').scrollTop = 0
+    },
+
+    async captrue(sData){
+      await this.beforeCaptrue()
+
+      let wBody = this.$refs.windowBody
+      let height = wBody.clientHeight
+      let width = wBody.clientWidth
+
+      html2canvas(wBody, {
+        width,
+        height,
         useCORS: true
       }).then(canvas => {
         let dataURL = canvas.toDataURL('image/png')
-        let file = dataURLtoFile(dataURL,"png")
+        let file = dataURLtoFile(dataURL, 'mmsTemplateCover.png')
 
-        let fd = new FormData()
-        fd.append('file', file)
+        // this.mmsData.list = oldList
 
-        for(let key in this.initParams){
-          fd.append(key, this.previewData[key])
-        }
-        let list = JSON.stringify(this.previewData.list)
+        let fdata = new FormData()
+        fdata.append('mmsTemplateCover', file)
 
-        fd.append('list', list)
+        // 提交字段 initParams、mmsTemplate、mmsTemplate
+        fdata.append('initParams', JSON.stringify(this.initParams))
+        fdata.append('mmsTemplate', JSON.stringify(sData.mmsTemplate))
+        fdata.append('mmsResourceIds', sData.mmsResourceIds)
+        fdata.append('mmsOriginalTemplate', JSON.stringify(this.mmsData.list))
 
-        this._http(this.mmsSave, fd).then(res => {
-          this.$message({
-            type: res.code === 0 ? 'success' : 'error',
-            message: res.message
-          })
-
-          setTimeout(() => {
-            window.history.back()
-          }, 1200)
-        }).catch(err => {
-          this.$message.error('请求失败')
-        })
+        this.submit(fdata)
 
       })
+    },
+    submit(fd){
+      this._http(this.mmsSave, fd).then(res => {
+        this.$message({
+          type: res.code === 0 ? 'success' : 'error',
+          message: res.message
+        })
+        this.$refs.windowBody.classList.remove('isCapture')
+        setTimeout(() => {
+          window.history.back()
+        }, 1200)
+      }).catch(err => {
+        this.$message.error('请求失败')
+        this.$refs.windowBody.classList.remove('isCapture')
+      })
     }
-  }
+  },
+
 }
 </script>
 

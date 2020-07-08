@@ -28,11 +28,10 @@
             v-model="form.videoBit"
             v-show="form.sizeType === 'rate'">
             <el-option
-              v-for="bit in videoBits"
+              v-for="bit in validateVideoBit"
               :key="bit"
               :label="`${bit} kbps`"
-              :value="bit"
-              :disabled="bit > form.videoBit"></el-option>
+              :value="bit"></el-option>
           </el-select>
         </el-form-item>
       </el-col>
@@ -90,6 +89,9 @@ export default {
     },
     videoSrc(){
       return this.parent.mediaInfo.uri
+    },
+    validateVideoBit(){
+      return this.videoBits.filter(bit => bit < this.videoBit)
     }
   },
   watch: {

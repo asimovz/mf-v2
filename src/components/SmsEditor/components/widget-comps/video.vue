@@ -1,10 +1,15 @@
 <template>
 	<div class="widget-video--wrapper">
-    <videoPlayer
+    <videoPlayer class="video-player"
       ref="videoPlayer"
       :hoverPlay="hoverPlay"
       :pointerEvents="false"
       :options="videoOptions" />
+
+    <div class="video-poster">
+      <img :src="data.poster">
+      <span class="video-playBtn"></span>
+    </div>
   </div>
 </template>
 
@@ -54,5 +59,34 @@ export default {
 <style lang="less">
 .widget-video--wrapper {
   width: 100%;
+}
+.video-poster{display: none;position: relative;
+  img{max-width: 100%;}
+  .video-playBtn{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid #fff;
+    border-radius: 100%;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    background: rgba(43, 51, 63, 0.7);
+    &:before{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      content: "\F101";
+      font-family: VideoJS;
+      font-size: 30px;
+      font-weight: normal;
+      font-style: normal;
+      text-align: center;
+      color: #fff;
+    }
+  }
 }
 </style>

@@ -30,7 +30,7 @@
     flex: 1;
     overflow: auto;
     margin-bottom: 10px;
-    &.no-data{background: url(../img/no-data.png) no-repeat center;}
+    &.no-data{background: url(../img/no-data.png) no-repeat center 40%;background-size: 50%}
 
     .lib {
       &-list {
@@ -63,6 +63,7 @@
           .lib-remove {
             display: block;
           }
+
 
         }
 
@@ -243,6 +244,7 @@
           border: none;
           height: 100%;
           border-top: 1px solid #46a6ff;
+          border-radius: 0;
           outline: none;
           background-color: #fff;
         }
@@ -256,7 +258,10 @@
 
         .lib-name-input {
           display: block;
+          padding: 4px 6px;
         }
+
+        .lib-name{padding: 0}
 
       }
 
