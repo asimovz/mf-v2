@@ -128,7 +128,7 @@ export default {
         store.set("moquiSessionToken", moquiData.confMoquiSessionToken)
         this.$emit("updateView")
       }, err => {
-        this.handleMessage('error', err.errorMessage + ' ' + err.errors)
+        this.handleMessage(err.errorMessage + ' ' + err.errors,'error')
       })
     }
   }

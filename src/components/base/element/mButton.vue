@@ -182,5 +182,5 @@ export default {
 .el-button {
   font-weight: 400;
 }
-// .el-button+.el-button{margin-left:0!important}
+.el-button+.el-button{margin-left:0!important}
 </style>

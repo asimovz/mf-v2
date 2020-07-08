@@ -1,5 +1,6 @@
 <template>
   <el-dialog
+    class="aw-modal"
     ref="modal"
     :id="id"
     :title="title"
