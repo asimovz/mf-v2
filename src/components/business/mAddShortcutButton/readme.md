@@ -6,7 +6,7 @@
 <add-shortcutbutton :data="addBTNData" />
 
 具体数据说明：
-addBTNData = [{}]
+addBTNData = []
 
 1、“回复按钮”
 {"type":"reply","description":""}
