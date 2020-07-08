@@ -25,7 +25,7 @@ export default {
   props: ['data'],
   data () {
     return {
-      items: [{}],
+      items: [],
       showData:false
     }
   },
@@ -53,7 +53,6 @@ export default {
       let index = val.index
       this.items[index] = val.data
       this.data[index] = val.data
-      console.log('I got the data 里面:', JSON.stringify(this.items))
     }
   }
 }
