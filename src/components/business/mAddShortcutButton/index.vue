@@ -46,8 +46,9 @@ export default {
       this.showData = true,
       this.items.push({type: 'reply', description: ''})
     },
-    del(index) {
+    del(index){
       this.items.splice(index, 1)
+      this.data.splice(index, 1)
     },
     getData(val) {
       let index = val.index
