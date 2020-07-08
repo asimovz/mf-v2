@@ -2,7 +2,7 @@
 <div style="display:flex">
   <div class="aw-editor-root" style="flex:1">
     <div class="editor-title">
-      <span class="editor-title-back el-icon-arrow-left" title="返回" @click="goBack"></span> 消息名称:{{initParams.messageTile}}
+      <span class="editor-title-back el-icon-arrow-left" title="返回" @click="goBack"></span> 消息名称:{{initParams.messageTitle}}
     </div>
     <div class="editor-pane-left">
       <ul class="basic-widgets">
@@ -32,7 +32,9 @@
           <!-- <div class="toolbar-item">
             <editor-icon name="yulan" size="16" />&nbsp;预览
           </div> -->
-          <div class="toolbar-item" @click="save">保存</div>
+          <div class="toolbar-item" @click="save">
+            <editor-icon name="baocun" size="16" />&nbsp;保存
+          </div>
           <el-popover
             placement="top"
             width="200"
@@ -262,12 +264,12 @@ export default {
   methods: {
     getTemplate(){
       this._http(this.mmsTemplate, {
-        scenesTypeId: this.initParams.scenesTypeId
+        messageId: this.initParams.messageId
       }).then(res => {
-        if(res.code !== 0){
-          this.$message.warning('请求参数错误')
+        if(res.error !== 0){
+          this.$message.warning('请求错误')
         }else{
-          this.mmsData.list = res.data && res.data.list || []
+          this.mmsData.list = JSON.parse(res.data)
         }
       }).catch(err => {
         this.$message.error('请求失败')
@@ -553,9 +555,10 @@ export default {
       // 提取需要字段
       let newList = flatList.map(item => {
         let _item = {}
-        let { type, content, name = '', uri, size, id } = item
+        let { type, content, name = '', uri, size, id, poster } = item
 
         _item = { type, name, size }
+        if(poster) _item.poster = poster
 
         if(item.type === 'text'){
           let newContent = this.replaceTextContent(content)
@@ -644,6 +647,7 @@ export default {
   position: absolute;
   font-size: 14px;
   line-height: 40px;
+  z-index: 2;
   .editor-title-back {
     padding: 4px;font-size: 14px;color: #409EFF;font-weight: bold;cursor: pointer;
   }

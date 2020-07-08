@@ -3,6 +3,8 @@
     class="upLoadImage"
     :action="uploadUrl"
     drag
+    :data="{actionType: 'upload', type: 'image'}"
+    :headers="{moquiSessionToken: storeToken}"
     :show-file-list="false"
     accept=".png, .jpg, .jpeg, .gif, .bmp"
     :on-success="successHandler">
@@ -36,11 +38,14 @@ export default {
   computed: {
     uploadUrl(){
       return `${this.mmsConfig.file}`
+    },
+    storeToken(){
+      return localStorage.getItem('moquiSessionToken')
     }
   },
   methods: {
     successHandler (response, file, fileList) {
-      this.$emit('input', response.data.uri)
+      this.$emit('input', response.uri)
     },
     clean(){
       this.$emit('input', '')

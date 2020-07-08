@@ -309,6 +309,7 @@ export default {
 
     beforeUpload(fd, id){
       fd.append('type', this.type['type'])
+      fd.append('saveResource', 'Y')
       
       if(this.type['type'] === 'video'){
         fd.append('thumbnailGenratedUrl', this.mmsConfig.nodeUrl + this.mmsConfig.videoThumbnail)
