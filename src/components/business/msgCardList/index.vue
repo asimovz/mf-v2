@@ -26,13 +26,13 @@
               <m-button>提交审核</m-button>
             </div>
             <div>
-              <m-button>预 览</m-button>
+              <m-button @click.native="preview">预 览</m-button>
             </div>
           </div>
         </div>
 
         <div class="flag" :class="item.state | stateFormat">
-          待审核
+          {{item.state | stateName}}
           <m-tooltip class="tooltip" v-if="item.desc" :title="item.desc">
               <span class="el-icon-warning-outline"></span>
           </m-tooltip>
@@ -48,13 +48,22 @@
         :pageSizeOpts="[30,60,90]"
         page-change="pageChangeByMsgCardList" />
     </div>
+
+    <msgCardPreview
+      v-model="previewVisible" />
   </div>
 </template>
 <script>
+import msgCardPreview from './components/preview'
+
 export default {
   name: 'msgCardList',
+  components: {
+    msgCardPreview
+  },
   data () {
     return {
+      previewVisible: false,
       page: {
         count: 10,
         pageIndex: 0,
@@ -95,17 +104,33 @@ export default {
     })
   },
   filters: {
+    // 1 待提交， 2 待审核， 3 审核通过， 4 审核不通过
     stateFormat (v) {
-      if (v === 1) {
-        return 'success'
-      }
-      if (v === 2) {
+      if (v === 1 || v === 2) {
         return 'warning'
-      }
-
-      if (v === 3) {
+      } else if (v === 3) {
+        return 'success'
+      } else if (v === 4) {
         return 'danger'
       }
+    },
+    stateName (v) {
+      let name
+      switch (v) {
+        case 1:
+          name = '待提交'
+          break
+        case 2:
+          name = '待审核'
+          break
+        case 3:
+          name = '审核通过'
+          break
+        case 4:
+          name = '审核不通过'
+          break
+      }
+      return name
     }
   },
   methods: {
@@ -116,6 +141,10 @@ export default {
       } catch (err) {
         console.log('request err', err)
       }
+    },
+    preview () {
+      console.log(1)
+      this.previewVisible = true
     }
   },
   beforeDestroy () {
