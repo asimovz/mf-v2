@@ -211,21 +211,9 @@ export default {
       }).then(async () => {
         await this.updateLib({ type: 'delete', id })
 
-        if(Array.isArray(id)){
-          for(let i = 0; i < id.length; i ++){
-            let index = this.dataList.findIndex(item => item.resourceId === id)
-            if(index !== undefined) this.dataList.splice(index, 1)
-          }
-        }else{
-          let _index = this.dataList.findIndex(item => item.resourceId === id)
-          this.dataList.splice(_index, 1)
-        }
-
-        // this.dataList = this.dataList.filter(item => 
-        //   Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
-        // )
-
-        this.$message.success('删除成功');
+        this.dataList = this.dataList.filter(item => 
+          Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
+        )
       })
     },
     // 处理点击音频
@@ -288,7 +276,7 @@ export default {
       let fd = new FormData()
       fd.append('actionType', type)
       name && fd.append('filename', name)
-      
+
       this.beforeUpload(fd, id)
     },
 
@@ -330,21 +318,29 @@ export default {
 
       this.handleUpload(fd)
     },
+
     // 上传、删除
     handleUpload(fd) {
       this._http(this.mmsConfig.file, fd)
       .then(res => {
-        let _data = {...res}
-        delete _data.resourceId
+        let actionType = fd.get('actionType')
 
-        this.dataList.unshift({
-          ..._data,
-          id: res.resourceId
-        })
-        // }
-
-      }).catch(err => {
-
+        switch(actionType){
+          case 'upload':
+            this.dataList.unshift(res);
+            this.$message.success('上传成功');
+            break;
+          case 'delete':
+            this.$message({
+              type: res.error === '0' ? 'success' : 'error',
+              message: res.message
+            });
+            break;
+          case 'renama':
+            this.$message.success('文件名修改成功');
+          default: break;
+        }
+        
       }).finally(cb => {
         this.isUpLoading = false
         if(this.$refs.file) this.$refs.file.value = ''
