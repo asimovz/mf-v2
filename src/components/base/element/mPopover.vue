@@ -1,5 +1,5 @@
 <template>
-  <el-popover class="aw-poptip"  placement="bottom" trigger="click" @on-popper-hide="hide" :popper-class="popperClass">
+  <el-popover v-model="visible" class="aw-poptip"  placement="bottom" trigger="click" @on-popper-hide="hide" :popper-class="popperClass">
     <slot slot="reference"></slot>
     <slot name="content"></slot>
   </el-popover>
@@ -11,6 +11,23 @@ export default {
   props: {
     popperClass: {
       type: String
+    },
+    value: {
+      type: Boolean,
+      default: false
+    },
+  },
+  data() {
+    return {
+      visible: this.value
+    }
+  },
+  watch: {
+    visible: {
+      handler(val) {
+        this.visible = val
+      },
+      deep: true
     }
   },
   methods: {

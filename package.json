@@ -21,6 +21,7 @@
     "@ag-grid-enterprise/all-modules": "^22.0.0",
     "diff-match-patch": "^1.0.4",
     "element-ui": "^2.13.2",
+    "emojicharstring": "^0.1.2",
     "inputmask": "^3.3.11",
     "iview": "3.4.2",
     "jsplumb": "^2.12.14",
