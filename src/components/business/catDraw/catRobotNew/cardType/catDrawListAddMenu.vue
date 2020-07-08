@@ -23,7 +23,8 @@
 			<!--已达上限-->
 			<!--<div v-else class="content-limit-reached">内容数量已达上限</div>-->
 			<div v-else class="flex-center add-button"  style="color:#A9AAB1">
-					<Icon type="ios-plus-empty" size="20" style="margin-right: 6px;"></Icon>
+					<!-- <Icon type="ios-plus-empty" size="20" style="margin-right: 6px;"></Icon> -->
+					<i class="el-icon-plus" style="margin-right: 6px;font-size:20px;"></i>
 					内容数量已达上限
 				</div>
 		</div>

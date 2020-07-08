@@ -7,8 +7,8 @@
       <div class="c"></div>
     </div>
   </div>
-  <catDrawList v-else :eventList="aboutReply" :nodeList="data.nodeList"  :listStyle="{width: '480px'}" :acceptUrl="acceptUrl"></catDrawList>
-  <!-- <component v-else v-bind:is="currentView" @updateView="updateView"></component> -->
+  <!-- <catDrawList v-else :selectOnlyOne="true" :hiddenAddMenuBottom="true" :hiddenModeLabel="true" :nodeList="data.nodeList"  :listStyle="{width: '480px'}" :acceptUrl="acceptUrl"></catDrawList> -->
+  <component v-else v-bind:is="currentView" @updateView="updateView"></component>
 </template>
 <script>
 import index from "./index";

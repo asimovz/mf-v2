@@ -4,9 +4,10 @@ import brandEditor from './brandEditor' //公众号品牌信息编辑
 import brandListEditor from './brandListEditor' //公众号菜单列表编辑
 import sceneConfig from './sceneConfig' //场景方案编辑组件
 import msgConfig from './msgConfig' //卡片方案编辑组件
+import catDrawList from './catDraw/catDrawList' //5g消息编辑组件
 
 const component = [
-	motionOptions, innerMenu, menuPreview, brandEditor, brandListEditor, sceneConfig, msgConfig
+	motionOptions, innerMenu, menuPreview, brandEditor, brandListEditor, sceneConfig, msgConfig, catDrawList
 ]
 
 export default component
