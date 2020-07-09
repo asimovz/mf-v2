@@ -148,11 +148,10 @@ export default {
     flex-direction: row;
   }
   .childInput{
-    margin-left: 10px;
-    width: 300px !important;
+    margin: 0 10px;
   }
   .el-icon-delete{
-    margin: 8px 0 0 0;
+    margin: 10px 0 0 0;
     cursor: pointer;
   }
 </style>
