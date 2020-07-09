@@ -11,6 +11,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const baseThemeConfig = require('../config/theme.config')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 var SSHWebpackPlugin = require('ssh-webpack-plugin');
 
@@ -41,21 +42,38 @@ const webpackConfig = merge(baseWebpackConfig, {
       'process.env': env,
       '__webpack_define_cdn__': JSON.stringify(config.build.assetsPublicPath)
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      //是否启用文件缓存，用来加快压缩速度。启用后js文件名不变并且内容不变就会读取缓存文件，不重新压缩。
-      cache: true,
-      //去掉注释
-      comments: false,
-      //打包过滤console，debugger等配置
-      compress: {
-        warnings: false,
-        drop_console: true,
-        drop_debugger: true
-      },
-      sourceMap: false,
-      //使用多进程并行运行来提高构建速度
-      parallel: true
+    new UglifyJSPlugin({
+      uglifyOptions: {
+        warning: false,
+        //是否启用文件缓存，用来加快压缩速度。启用后js文件名不变并且内容不变就会读取缓存文件，不重新压缩。
+        cache: true,
+        //去掉注释
+        comments: false,
+        //打包过滤console，debugger等配置
+        compress: {
+          drop_console: true,
+          drop_debugger: true
+        },
+        sourceMap: false,
+        //使用多进程并行运行来提高构建速度
+        parallel: true
+      }
     }),
+    // new webpack.optimize.UglifyJsPlugin({
+    //   //是否启用文件缓存，用来加快压缩速度。启用后js文件名不变并且内容不变就会读取缓存文件，不重新压缩。
+    //   cache: true,
+    //   //去掉注释
+    //   comments: false,
+    //   //打包过滤console，debugger等配置
+    //   compress: {
+    //     warnings: false,
+    //     drop_console: true,
+    //     drop_debugger: true
+    //   },
+    //   sourceMap: false,
+    //   //使用多进程并行运行来提高构建速度
+    //   parallel: true
+    // }),
     new ExtractTextPlugin({
       filename: config.build.isHash ? utils.assetsPath('[name].[hash].css') : utils.assetsPath('[name].css')
     }),
@@ -70,25 +88,25 @@ const webpackConfig = merge(baseWebpackConfig, {
     // keep module.id stable when vender modules does not change
     new webpack.HashedModuleIdsPlugin(),
     // split vendor js into its own file
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: function (module) {
-        // any required modules inside node_modules are extracted to vendor
-        return (
-          module.resource &&
-          /\.js$/.test(module.resource) &&
-          module.resource.indexOf(
-            path.join(__dirname, '../node_modules')
-          ) === 0
-        )
-      }
-    }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'vendor',
+    //   minChunks: function (module) {
+    //     // any required modules inside node_modules are extracted to vendor
+    //     return (
+    //       module.resource &&
+    //       /\.js$/.test(module.resource) &&
+    //       module.resource.indexOf(
+    //         path.join(__dirname, '../node_modules')
+    //       ) === 0
+    //     )
+    //   }
+    // }),
     // extract webpack runtime and module manifest to its own file in order to
     // prevent vendor hash from being updated whenever app bundle is updated
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest',
-      chunks: ['vendor']
-    }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'manifest',
+    //   chunks: ['vendor']
+    // }),
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, '../static'),
