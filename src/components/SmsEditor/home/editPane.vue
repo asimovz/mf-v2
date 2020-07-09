@@ -6,13 +6,13 @@
 		</div>
 		<div class="editPane-content">
 			<div class="editPane-preview">
-				<template v-if="currentData.type === 'image'">
+				<template v-if="currentData.type === 'pic'">
 					<img :src="currentData.uri">
 				</template>
 				<template v-if="currentData.type === 'video'">
 					<videoPlayer showMediaInfo :options="videoOptions" />
 				</template>
-				<template v-if="currentData.type === 'audio'">
+				<template v-if="currentData.type === 'voice'">
 					<audioPlayer style="flex:1" :options="audioOptions" />
 				</template>
 				<template v-if="currentData.type === 'text'">
@@ -72,10 +72,10 @@
 				return this.item.title
 			},
 			showEditBtn(){
-				return this.currentData.type === 'image' || this.currentData.type === 'video'
+				return this.currentData.type === 'pic' || this.currentData.type === 'video'
 			},
 			showRemoveBtn(){
-				return ['image', 'audio', 'video'].includes(this.currentData.type)
+				return ['pic', 'voice', 'video'].includes(this.currentData.type)
 			},
 			videoOptions(){
 				return {
@@ -118,7 +118,7 @@
 
 				this.editData = JSON.parse(JSON.stringify(this.currentData))
 				
-				if(this.currentData.type === 'image'){
+				if(this.currentData.type === 'pic'){
 					this.isImgEdit = true
 				}
 				if(this.currentData.type === 'video'){

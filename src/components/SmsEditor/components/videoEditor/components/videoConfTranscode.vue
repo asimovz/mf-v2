@@ -143,7 +143,13 @@ export default {
 
         this.loading = false
 
+
+        let _data = {
+          musicBit: this.musicBit,
+          videoBit: this.videoBit,
+        }
         this.$emit('complete', {
+          data: _data,
           uri: data.uri
         })
       } catch(err) {

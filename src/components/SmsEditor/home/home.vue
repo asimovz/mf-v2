@@ -341,7 +341,7 @@ export default {
       item = Object.assign(
         item,
         data,
-        item.type === 'image' ? { imgConf: {} } : null
+        item.type === 'pic' ? { imgConf: {} } : null
       )
       this.mmsData.list.push({
         ...item,
@@ -546,6 +546,11 @@ export default {
     save(){
       this.widgetPaneShow = this.isEditorShow = false
 
+      if(this.fileSize > this.maxFileSize){
+        this.$message.warning(`文件大小不能超过 ${this.maxFileSize}K`)
+        return false
+      }
+
       // 获取扁平模板数据
       let flatList = getAllData(this.mmsData.list).flat(3)
 
@@ -615,16 +620,19 @@ export default {
     },
     submit(fd){
       this._http(this.mmsSave, fd).then(res => {
-        this.$message({
-          type: res.code === 0 ? 'success' : 'error',
-          message: res.message
-        })
-        this.$refs.windowBody.classList.remove('isCapture')
+        // this.$message({
+        //   type: res.code === 0 ? 'success' : 'error',
+        //   message: res.message
+        // })
+
+        this.$message.success('保存成功')
+
         setTimeout(() => {
           window.history.back()
         }, 1200)
       }).catch(err => {
         this.$message.error('请求失败')
+      }).finally(end => {
         this.$refs.windowBody.classList.remove('isCapture')
       })
     }

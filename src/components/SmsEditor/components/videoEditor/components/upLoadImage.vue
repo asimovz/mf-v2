@@ -3,7 +3,7 @@
     class="upLoadImage"
     :action="uploadUrl"
     drag
-    :data="{actionType: 'upload', type: 'image'}"
+    :data="{actionType: 'upload', type: 'pic'}"
     :headers="{moquiSessionToken: storeToken}"
     :show-file-list="false"
     accept=".png, .jpg, .jpeg, .gif, .bmp"

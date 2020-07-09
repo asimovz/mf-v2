@@ -7,7 +7,9 @@
         showMediaInfo
         showFastBtns
         v-model="mediaInfo"
-        :options="videoOptions">
+        :options="videoOptions"
+        :extraData="extraData"
+      >
           <watermarkHandler
           v-model="dragRect"
           v-if="watermarkVisible"
@@ -102,7 +104,9 @@ export default {
       mediaInfo: {},
       watermarkOpts: {},
       activeName: 'crop',
-      videoPlayer: null // 播放器实例
+      videoPlayer: null, // 播放器实例,
+
+      extraData: null
     }
   },
   computed: {
@@ -111,7 +115,7 @@ export default {
         const {type, img, text} = this.watermarkOpts
         if(type === 'text' && text !== ''){
           return true
-        } else if (type === 'image' && img !== ''){
+        } else if (type === 'pic' && img !== ''){
           return true
         }else{
           return false
@@ -185,8 +189,9 @@ export default {
     cropComplete (res) {
       this.mediaInfo.uri = res.uri
     },
-    transComplete (res) {
-      this.mediaInfo.uri = res.uri
+    transComplete ({data, uri}) {
+      this.mediaInfo.uri = uri
+      this.extraData = data
     },
     watermarkComplete (res) {
       console.log(res.uri)

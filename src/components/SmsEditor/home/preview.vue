@@ -3,9 +3,9 @@
 		<div class="content-wrapper">
 			<div v-for="(item, index) in data" :class="['mms-item', `mms-item--${item.type}`]">
 				<div v-if="item.type === 'text'">{{item.content}}</div>
-				<img v-if="item.type === 'image'" :src="item.src">
+				<img v-if="item.type === 'pic'" :src="item.src">
 				<video v-if="item.type === 'video'" :src="item.src" controls></video>
-				<audio v-if="item.type === 'audio'" :src="item.src" controls></audio>
+				<audio v-if="item.type === 'voice'" :src="item.src" controls></audio>
 			</div>
 		</div>
 	</div>
