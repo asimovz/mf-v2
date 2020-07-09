@@ -2,35 +2,35 @@
   <div class="childContent">
     <div class="defaultContent">
       <m-select :options="btnList" @on-change="handleChange" v-model="btn.type" size="small" class="childSelect"></m-select>
-      <m-input class="childInput text-required" v-model="btn.description" size="small" placeholder="按钮文案" :maxlength="10" :validate="'required'" validate-msg="请输入按钮文案" />
+      <m-input class="childInput text-required" v-model="btn.description" size="small" placeholder="按钮文案（必填）" :maxlength="10" name="_NA_" :validate="'required'" validate-msg="请输入按钮文案" />
       <i class="el-icon-delete" @click="deleteBtn"></i>
     </div>
 
     <div class="btnMatch" v-if="btn.type=='url'">
-      <m-input class="matchInput" v-model="btn.url" size="small" placeholder="链接需以http(s)://开头" :validate="{regex:/^(http[s]{0,1}:\/\/)/i}" validate-msg="请输入正确链接" />
+      <m-input class="matchInput" v-model="btn.url" size="small" placeholder="链接需以http(s)://开头（必填）" name="_NA_" :validate="{regex:/^(http[s]{0,1}:\/\/)/i}" validate-msg="请输入正确链接" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='openApp'">
-      <m-input class="matchInput" v-model="btn.openAppAndroid" size="small" placeholder="[Android]请输入正确调起地址" :validate="'required'" validate-msg="请输入正确调起地址" />
+      <m-input class="matchInput" v-model="btn.openAppAndroid" size="small" placeholder="[Android]请输入正确调起地址（必填）" name="_NA_" :validate="'required'" validate-msg="请输入正确调起地址" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='call'">
-      <m-input class="matchInput" v-model="btn.phoneNum" size="small" placeholder="请输入电话号码" :validate="{regex:/^[\d\-\s\+]+$/}" validate-msg="请输入正确电话号码" />
+      <m-input class="matchInput" v-model="btn.phoneNum" size="small" placeholder="请输入电话号码（必填）" name="_NA_" :validate="{regex:/^[\d\-\s\+]+$/}" validate-msg="请输入正确电话号码" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='addressLocation'">
-      <m-input class="matchInput" data-name="longInput" v-model="btn.sendAddressPlaceName" size="small" placeholder="位置名称" :maxlength="20" :validate="'required'" validate-msg="请输入位置名称" />
-      <m-input class="matchInput" v-model="btn.sendAddressLongitude" size="small" placeholder="经度" :validate="'required'" validate-msg="请输入经度" />
-      <m-input class="matchInput" v-model="btn.sendAddressLatitude" size="small" placeholder="纬度" :validate="'required'" validate-msg="请输入纬度" />
+      <m-input class="matchInput" data-name="longInput" v-model="btn.sendAddressPlaceName" size="small" placeholder="位置名称（必填）" name="_NA_" :maxlength="20" :validate="'required'" validate-msg="请输入位置名称" />
+      <m-input class="matchInput" v-model="btn.sendAddressLongitude" size="small" placeholder="经度（必填）" name="_NA_" :validate="'required'" validate-msg="请输入经度" />
+      <m-input class="matchInput" v-model="btn.sendAddressLatitude" size="small" placeholder="纬度（必填）" name="_NA_" :validate="'required'" validate-msg="请输入纬度" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='screen'">
-      <m-input class="matchInput" v-model="btn.targetContact" size="small" placeholder="目标联系人" :validate="'required'" validate-msg="请输入目标联系人" />
+      <m-input class="matchInput" v-model="btn.targetContact" size="small" placeholder="目标联系人（必填）" name="_NA_" :validate="'required'" validate-msg="请输入目标联系人" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='bringUp'">
-      <m-input class="matchInput" v-model="btn.targetContact" size="small" placeholder="目标联系人" :validate="'required'" validate-msg="请输入目标联系人" />
-      <m-input class="matchInput" data-name="longInput" v-model="btn.presendContent" size="small" placeholder="预发送内容" :maxlength="100" />
+      <m-input class="matchInput" v-model="btn.targetContact" size="small" placeholder="目标联系人（必填）" name="_NA_" :validate="'required'" validate-msg="请输入目标联系人" />
+      <m-input class="matchInput" data-name="longInput" v-model="btn.presendContent" size="small" name="_NA_" placeholder="预发送内容" :maxlength="100" />
     </div>
     <input type="hidden" name="addshortcutbutton" :value="data"/>
   </div>
