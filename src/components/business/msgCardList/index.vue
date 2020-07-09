@@ -1,7 +1,7 @@
 <template>
   <div class="msgCardList">
     <ul class="list-wrap">
-      <li class="item btn-add">
+      <li class="item btn-add" @click="edit()">
         <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
       </li>
       <li class="item" v-for="(item, index) in items" :key="index">
@@ -18,15 +18,14 @@
 
         <div class="mask">
           <div class="control">
-            <div class="btns">
-              <i class="el-icon-edit"></i>
-              <i class="el-icon-delete"></i>
+            <div>
+              <m-button type="default" size="small" @click.native="edit(item)">编辑</m-button>
             </div>
             <div>
-              <m-button>提交审核</m-button>
+              <m-button type="default" size="small" @click.native="verifyBefore(item)">提交</m-button>
             </div>
-            <div>
-              <m-button @click.native="preview">预 览</m-button>
+            <div v-show="true">
+              <m-button type="default" size="small" @click.native="preview">预览</m-button>
             </div>
           </div>
         </div>
@@ -51,6 +50,18 @@
 
     <msgCardPreview
       v-model="previewVisible" />
+
+    <m-modal
+      id="confirmModal"
+      :width="300"
+      :title="confirmModal.title"
+      v-model="confirmModal.visible">
+      <p>{{confirmModal.desc}}</p>
+      <div slot="footer" class="dialog-footer" align="center">
+        <el-button size="mini" @click="confirmModal.visible = false">取消</el-button>
+        <el-button size="mini" type="primary" @click="del">确认</el-button>
+      </div>
+    </m-modal>
   </div>
 </template>
 <script>
@@ -64,6 +75,12 @@ export default {
   data () {
     return {
       previewVisible: false,
+      confirmModal: {
+        visible: false,
+        title: '',
+        desc: ''
+      },
+      activeData: {},
       page: {
         count: 10,
         pageIndex: 0,
@@ -74,6 +91,18 @@ export default {
   },
   props: {
     transition: {
+      type: String,
+      default: ''
+    },
+    createApi: {
+      type: String,
+      default: ''
+    },
+    previewApi: {
+      type: String,
+      default: ''
+    },
+    verifyApi: {
       type: String,
       default: ''
     }
@@ -104,29 +133,31 @@ export default {
     })
   },
   filters: {
-    // 1 待提交， 2 待审核， 3 审核通过， 4 审核不通过
+    // MmsOpen 待提交， MmsSubmit 待审核， MmsApproved 审核通过， MmsReject 审核不通过
     stateFormat (v) {
-      if (v === 1 || v === 2) {
+      if (v === 'MmsOpen') {
         return 'warning'
-      } else if (v === 3) {
+      } else if (v === 'MmsSubmit') {
+        return 'info'
+      } else if (v === 'MmsApproved') {
         return 'success'
-      } else if (v === 4) {
+      } else if (v === 'MmsReject') {
         return 'danger'
       }
     },
     stateName (v) {
       let name
       switch (v) {
-        case 1:
+        case 'MmsOpen':
           name = '待提交'
           break
-        case 2:
+        case 'MmsSubmit':
           name = '待审核'
           break
-        case 3:
+        case 'MmsApproved':
           name = '审核通过'
           break
-        case 4:
+        case 'MmsReject':
           name = '审核不通过'
           break
       }
@@ -143,8 +174,30 @@ export default {
       }
     },
     preview () {
-      console.log(1)
       this.previewVisible = true
+    },
+    edit (item) {
+      location.href = item ? `${this.createApi}?msgId=${item.msgId}` : this.createApi
+    },
+    verifyBefore (item) {
+      this.confirmModal = {
+        title: '提交审核',
+        desc: '确认提交审核',
+        visible: true
+      }
+
+      this.activeData = item
+    },
+    async verify () {
+      try {
+        await this.$root.$http.post(this.verifyApi, {
+          msgId: this.activeData.msgId
+        })
+
+        this.confirmModal.visible = false
+      } catch (err) {
+        console.log('request err', err)
+      }
     }
   },
   beforeDestroy () {
@@ -163,6 +216,8 @@ export default {
       background: #fff;
       margin-bottom: 20px;
       position: relative;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.15);
       &:hover{
         .mask{
           visibility:visible;
@@ -179,7 +234,6 @@ export default {
       position: relative;
       height: 120px;
       overflow: hidden;
-      background: #F2F6FC;
       .img{
         width: 100%;
         position: absolute;
@@ -187,6 +241,7 @@ export default {
         left:50%;
         transform: translate(-50%, -50%);
         vertical-align: bottom;
+        border-radius: 8px 8px 0 0;
       }
     }
 
@@ -220,9 +275,12 @@ export default {
       font-size: 12px;
       color: #fff;
       position: absolute;
-      top:0;
-      left:0;
+      top:-1px;
+      left:-1px;
       padding:.5em 1em;
+      width: 108px;
+      text-align: center;
+      border-radius: 8px 0 4px 0;
       .tooltip{
         font-size: 1.2em;
         position: absolute;
@@ -231,47 +289,35 @@ export default {
         transform: translate(0, -50%);
       }
       &.warning{
-        background: #E6A23C;
+        background: #e6a23c;
+      }
+      &.info{
+        background: #3c64b9;
       }
       &.danger{
-        background: #F56C6C;
+        background: #d35656;
         padding-right: 2.2em;
       }
       &.success{
-        background: #67C23A;
+        background: #52bb90;
       }
     }
 
     .mask{
       position: absolute;
-      width:100%;
-      height: 100%;
-      top:0;
-      right:0;
-      bottom:0;
-      left:0;
+      top:-1px;
+      right:-1px;
+      bottom:-1px;
+      left:-1px;
       padding:10px;
-      background: rgba(0, 0, 0, .2);
+      background: rgba(0, 0, 0, .4);
       visibility:hidden;
       text-align: center;
-      i{
-        cursor: pointer;
-        color: #fff;
-        font-size: 1.2em;
-        width:30px;
-        line-height:30px;
-        margin: 0 5px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, .3);
-        transform: scale(1);
-        &:hover{
-          transform: scale(1.2);
-          transition: transform .3s;
-        }
-      }
+      border-radius: 8px;
       button{
-        width:10em;
-        margin-bottom: 5px;
+        width: 95px;
+        margin-bottom: 15px;
+        vertical-align: bottom;
       }
     }
 
@@ -280,9 +326,6 @@ export default {
       top:50%;
       left:50%;
       transform: translate(-50%, -50%);
-      .btns{
-        padding-bottom: 40px;
-      }
     }
   }
 }
