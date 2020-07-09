@@ -8,13 +8,13 @@
                   @deleteIndex="del"
                   @uploadData="getData">
     </childContent>
-    <div @click="add" v-if="items.length<10" class="addButton">
+    <div @click="add" v-if="items.length < max" class="addButton">
       + 添加快捷按钮
     </div>
-    <div v-if="items.length==10" class="addButton grayBTN">
-      + 快捷按钮和设置中的固定按钮总和不能超过10个
+    <div v-if="items.length == max" class="addButton grayBTN">
+      + 快捷按钮和设置中的固定按钮总和不能超过{{max}}个
     </div>
-    <input type="hidden" :id="id" :form="form" :name="name" :value="data"/>
+    <input type="hidden" :id="id" :form="form" :name="name" :value="JSON.stringify(data)"/>
   </div>
 </template>
 <script>
@@ -35,6 +35,10 @@ export default {
     id: {
       type: String,
       default:''
+    },
+    max: {
+      type: Number,
+      default: 10
     }
   },
   data () {
@@ -72,21 +76,44 @@ export default {
   }
 }
 </script>
-<style lang='less' scoped>
+<style lang='less' >
 
 .addshortcutbutton{
-  min-height: 46px;
+  .el-input{
+    width: 100% !important;
+  }
+  .childSelect{
+    width: 200px !important;
+    .el-input.el-input--mini.el-input--suffix{
+      width: 200px !important;
+    }
+  }
+
+  .btnMatch{
+    width: 100% !important;
+    margin: 8px 0;
+    .matchInput{
+      margin: 8px 0 0 0;
+      padding-right: 23px;
+    }
+  }
+
+}
+
+
+.addshortcutbutton{
   border: 1px solid #DCDFE6;
   border-radius: 4px;
   background: #fff;
 }
 .addButton{
-  height: 46px;
+  height: 32px;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   border-top: 1px solid #DCDFE6;
+  font-size: 14px;
 }
 
 .grayBTN{

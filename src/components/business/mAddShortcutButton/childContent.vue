@@ -32,7 +32,6 @@
       <m-input class="matchInput" v-model="btn.targetContact" size="small" placeholder="目标联系人（必填）" name="_NA_" :validate="'required'" validate-msg="请输入目标联系人" />
       <m-input class="matchInput" data-name="longInput" v-model="btn.presendContent" size="small" name="_NA_" placeholder="预发送内容" :maxlength="100" />
     </div>
-    <input type="hidden" name="addshortcutbutton" :value="data"/>
   </div>
 </template>
 <script>
