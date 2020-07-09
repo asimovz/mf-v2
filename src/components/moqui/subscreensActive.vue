@@ -1,6 +1,5 @@
 <template>
-      <!-- <component :is="activeComponent"></component> -->
-      <msgCardList transition="http://localhost:3001/v1/f?a=1&b=2&c=3" />
+      <component :is="activeComponent"></component>
 </template>
 
 <script>
