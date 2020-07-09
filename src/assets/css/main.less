@@ -2158,24 +2158,26 @@ h5.text-inline{
   width: auto;
 }
 
-.childSelect{
-  width: 200px !important;
-  .el-input.el-input--mini.el-input--suffix{
+.addshortcutbutton{
+  .el-input{
+    width: 100% !important;
+  }
+  .childSelect{
     width: 200px !important;
+    .el-input.el-input--mini.el-input--suffix{
+      width: 200px !important;
+    }
   }
+
+  .btnMatch{
+    width: 100% !important;
+    margin: 8px 0;
+    .matchInput{
+      margin: 8px 0 0 0;
+      padding-right: 23px;
+    }
+  }
+
 }
 
-.btnMatch{
-  width: 100% !important;
-  margin: 8px 0;
-  .matchInput, input{
-    width: 496px !important;
-  }
-  .matchInput{
-    margin: 8px 0 0 0;
-  }
-}
 
-.matchInput[data-name="longInput"] .el-input.el-input--mini.aw-input{
-  width: 496px !important;
-}
