@@ -1,6 +1,6 @@
 var isTest = false //是否是测试环境
 
-import EmojiCharString from 'EmojiCharString' //新增处理emoji的长度问题
+import EmojiCharString from 'emojicharstring' //新增处理emoji的长度问题
 
 //获取前七天或后7天的日期(时间跨度)
 function getDateSpan(index) {

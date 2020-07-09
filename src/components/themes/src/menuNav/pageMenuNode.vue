@@ -1,10 +1,10 @@
 <template>
   <m-menu-item class="mf-li" :index="menuData.path" :key="menuData.name" v-if="deepNumber>=maxDeep || !menuData.children || menuData.children.length == 0 ">
-  <m-link class="mf-a" :href="menuData.path" @click.native="menuClick(menuData.path)">
-    <!-- <Icon type="android-remove" size="12" style="margin-right: 2px"></Icon> -->
-    <!-- <i class="el-icon-document-remove"></i> -->
-    <span class="menu-title">{{menuData.title}}</span>
-  </m-link>
+    <m-link class="mf-a" :href="menuData.path" @click.native="menuClick(menuData.path)" toggle="menu">
+      <!-- <Icon type="android-remove" size="12" style="margin-right: 2px"></Icon> -->
+      <!-- <i class="el-icon-document-remove"></i> -->
+      <span class="menu-title">{{menuData.title}}</span>
+    </m-link>
   </m-menu-item>
   <m-submenu v-else :index="menuData.path" :key="menuData.path">
     <template slot="title">

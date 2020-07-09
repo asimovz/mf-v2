@@ -44,11 +44,11 @@
 			<catDrawListAddMenu v-if="!hiddenAddMenuBottom" @addMenu="addMenu" :showMaxMenus="showMaxMenus"></catDrawListAddMenu>
 		</div>
 		<catChoose ref="catChooseMedia" :id="catChooseId" :materialList="materialList"></catChoose>
+		<input type="hidden" :name="paramName" :form="form" v-model="formValue"/>
 	</div>
 </template>
 <script>
 	import catDrawPoptip from './catDrawPoptip'
-
 	import catDrawListTop from './catRobotNew/cardType/catDrawListTop'  //顶部菜单
 	import catDrawListMedia from './catRobotNew/cardType/catDrawListMedia'  //图片，音频和视频
 	import catDrawListSimpleCard from './catRobotNew/cardType/catDrawListSimpleCard'  //单卡
@@ -76,6 +76,9 @@
 	export default {
 		name: 'catDrawList',
 		props: {
+			form: String,
+			paramName: String,
+			botId: String,
 			//0528修改上传的地址
 			// 素材上传接口
 			acceptUrl: {
@@ -176,6 +179,9 @@
 			}
 		},
 		computed:{
+			formValue() {
+				return this.eventList.inputContents.length ? JSON.stringify(this.eventList.inputContents) : ''
+			},
 		  //改变备注的长度，长度大于14位就用...代替剩余内容
 		  calculateStringActualLength(){
 		      //text就是所传参数
@@ -274,15 +280,11 @@
 				var that = this
 				var type = obj.addMenuType
 				if(this.selectOnlyOne) {
-					// this.$set(this.eventList.inputContents, 0, new catDrawListData[type]())
 					this.eventList.inputContents.splice(0,1,new catDrawListData[type]())
 				} else {
 					//添加到数组里去
-					// this.$set(this.eventList.inputContents, this.eventList.inputContents.length, new catDrawListData[type]())
 					this.eventList.inputContents.push(new catDrawListData[type]())  
 				}
-				
-				this.$forceUpdate()
 			},
 			//新增监听input改变值
 			onChangeInput(val, index) {
@@ -291,10 +293,7 @@
 				
 				//延时去设置,否则不能设置成功
 				// setTimeout(() => {
-					// this.$nextTick(()=>{
 						this.eventList.inputContents[index].originalMessage = result
-						this.$forceUpdate()
-					// })
 					 // 赋值给表单中的的字段
 		    // }, 20)
 			},

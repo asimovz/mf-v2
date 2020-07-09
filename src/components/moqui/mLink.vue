@@ -26,6 +26,7 @@ export default {
   methods: {
     go: function (event) {
 
+      
       if (this.toggle == "close") {
         this.BoxInstance && this.BoxInstance.close();
         return
@@ -42,7 +43,9 @@ export default {
           window.open(this.linkHref, '_blank')
         } else {
           this.$root.setUrl(this.linkHref)
-          this.$root.eventBus.$emit("updateAsideMenu", true, this.linkHref)
+          if(this.toggle != "menu") {
+            this.$root.eventBus.$emit("updateAsideMenu", true, this.linkHref)
+          }
           window.history.pushState(null, 'title', this.linkHref)
           //页面跳转，取消之前的请求
           this.$root.axiosRequest.map((ax,index) => {

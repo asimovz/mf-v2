@@ -5,9 +5,9 @@ import brandListEditor from './brandListEditor' //公众号菜单列表编辑
 import sceneConfig from './sceneConfig' //场景方案编辑组件
 import msgConfig from './msgConfig' //卡片方案编辑组件
 import catDrawList from './catDraw/catDrawList' //5g消息编辑组件
-
+import mAddShortcutButton from './mAddShortcutButton' //固定快捷按钮组件
 const component = [
-	motionOptions, innerMenu, menuPreview, brandEditor, brandListEditor, sceneConfig, msgConfig, catDrawList
+	motionOptions, innerMenu, menuPreview, brandEditor, brandListEditor, sceneConfig, msgConfig, catDrawList, mAddShortcutButton
 ]
 
 export default component

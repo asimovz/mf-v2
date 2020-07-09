@@ -14,7 +14,7 @@ export default {
   props: {
     deep: {
       type: Number,
-      default: 3
+      default: 4
     }
   },
   data() {
@@ -106,7 +106,7 @@ export default {
       let names = urlpath.split("/")
       names.shift()
       let openArr = []
-      for (var i = 1; i <= names.length - 1; i++) {
+      for (var i = 1; i <= names.length; i++) {
         let item = names.slice(0, i)
         openArr.push("/" + item.join("/"))
       }
@@ -116,7 +116,7 @@ export default {
       return this.deep
     },
     updateMenu(isOut) {
-      // this.activeName = this.filterPath(this.activeName, this.deep + 1)
+      this.activeName = this.filterPath(this.activeName, this.deep + 1)
       this.activeName = this.activeName.split("?")[0]
       let menu = this.$refs.menu
       if (this.activeName != "/") {
