@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name:"widget-video",
+  name:"widget-pic",
   props: {
     data:Object
   },

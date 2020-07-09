@@ -36,7 +36,11 @@ export default {
     isGroup: Boolean,
   },
   components: {
-    widgetGroup,widgetText,widgetImage,widgetVideo, widgetAudio
+    widgetGroup,
+    widgetText,
+    widgetPic: widgetImage,
+    widgetVideo,
+    widgetVoice: widgetAudio
   },
   inject:['setSelectWidget','setSelectGroup','delWidget'],
   data() {

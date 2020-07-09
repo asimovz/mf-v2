@@ -59,6 +59,10 @@ export default {
           src: ''
         }
       }
+    },
+    extraData: {
+      type: Object,
+      default: null
     }
   },
   data () {
@@ -262,7 +266,8 @@ export default {
           const {nodeUrl, videoInfo} = this.mmsConfig
           
           const { data } = await this._http(`${nodeUrl}${videoInfo}`,{
-            uri
+            uri,
+            extra: this.extraData
           })
           resData = data
 

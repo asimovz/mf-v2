@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div v-show="markOpts.type === 'image'">
+    <div v-show="markOpts.type === 'pic'">
       <upLoadImage v-model="markOpts.img" />
     </div>
 

@@ -24,19 +24,16 @@
       <!-- 图片/视频 -->
       <div class="lib-list" :class="{'isCheckable': isCheckAble}">
         <template>
-          <div v-for="(item, index) in dataList" :key="item.resourceId" :class="[
+          <div :title="isCheckAble ? '选中' : type.type !== 'voice' ? `添加${typeLabel}` : ''" v-for="(item, index) in dataList" :key="item.resourceId" :class="[
               'lib-item',
               {
                 'lib-item--checked': item.checked,
-                'lib-item--audio': type.type === 'audio',
+                'lib-item--audio': type.type === 'voice',
               },
-            ]"
-
-            @click="libAdd(item, index, $event)"
-          >
+            ]" @click="libAdd(item, index, $event)">
             <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
             <div class="lib-preview">
-              <img :src="item.uri" v-if="type['type'] === 'image'" />
+              <img :src="item.uri" v-if="type['type'] === 'pic'" />
               <template v-else-if="type['type'] === 'video'">
                 <img v-if="item.poster" :src="item.poster" />
                 <video v-else :src="item.uri"></video>
@@ -48,15 +45,15 @@
                 </widget-audio>
               </template>
             </div>
-            <div class="lib-name" v-if="item.name" :title="isCheckAble || !isEditAble ? '' : '双击可编辑'">
-               <!-- @dblclick="nameEdit" -->
+            <!-- :title="isCheckAble || !isEditAble ? '' : '双击可编辑'" -->
+            <div class="lib-name" v-if="item.name">
+              <!-- @dblclick="nameEdit" -->
               <div class="lib-name-word">{{ item.name }}</div>
-              <span class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
+              <span title="重新命名" class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
               <input class="lib-name-input" :value="item.name" @blur="(evt) => nameEdited(evt, item)" />
             </div>
           </div>
         </template>
-       
       </div>
     </div>
   </div>
@@ -118,7 +115,7 @@ export default {
       },
 
       isUpLoading: false, // 上传loading
-      isEditAble: false, // 可编辑名称
+      // isEditAble: false, // 可编辑名称
       isCheckAble: false, // 选择模式
       checkAll: false, // 全选
     }
@@ -209,20 +206,25 @@ export default {
       this.$confirm(`确定删除此${this.typeLabel}?`, '提示', {
         type: 'warning'
       }).then(async () => {
-        await this.updateLib({ type: 'delete', id })
 
-        this.dataList = this.dataList.filter(item => 
+        let fd = new FormData()
+        fd.append('actionType', 'delete')
+        fd.append('resourceIds', id)
+        await this.updateLib(fd)
+
+
+        this.dataList = this.dataList.filter(item =>
           Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
         )
       })
     },
     // 处理点击音频
-    audioClick(event){
-      if(!this.isCheckAble) event.stopPropagation()
+    audioClick(event) {
+      if (!this.isCheckAble) event.stopPropagation()
     },
     // 选中/选择
     libAdd(item, index, evt) {
-      if(evt.target.tagName === 'INPUT') return
+      if (evt && evt.target.tagName === 'INPUT') return
 
       if (this.isCheckAble) {
         item.checked = !item.checked
@@ -261,24 +263,18 @@ export default {
       let value = target.value
       if (value !== item.name) {
         console.log('名称修改过')
-        this.updateLib({type: 'rename', id: item.resourceId, name: value})
+
+        let fd = new FormData()
+        fd.append('actionType', 'rename')
+        fd.append('resourceId', item.resourceId)
+        fd.append('newFileName', value)
+
+        this.updateLib(fd)
+
         item.name = value
       }
     },
 
-    /**
-     * 更新素材库
-     * @param  {[string/number/array]} id   [素材 id]
-     * @param  {[string]} name [素材名]
-     * 没有 name 则删除素材
-     */
-    updateLib({ type, id, name }) {
-      let fd = new FormData()
-      fd.append('actionType', type)
-      name && fd.append('filename', name)
-
-      this.beforeUpload(fd, id)
-    },
 
     // 选择文件
     fileChanged(evt) {
@@ -294,12 +290,17 @@ export default {
       }
 
       this.isUpLoading = true
-      let formData = new FormData()
+      let fd = new FormData()
 
-      formData.append('file', file)
-      formData.append('actionType', 'upload')
+      fd.append('type', this.type['type'])
+      fd.append('saveResource', 'Y')
+      fd.append('file', file)
+      fd.append('actionType', 'upload')
+      if (this.type['type'] === 'video') {
+        fd.append('thumbnailGenratedUrl', this.mmsConfig.nodeUrl + this.mmsConfig.videoThumbnail)
+      }
 
-      this.beforeUpload(formData)
+      this.updateLib(fd)
     },
 
     // 验证文件大小
@@ -307,65 +308,53 @@ export default {
       return this.type['size'] * 1024 * 1024 > size
     },
 
-    beforeUpload(fd, id){
-      fd.append('type', this.type['type'])
-      fd.append('saveResource', 'Y')
-      
-      if(this.type['type'] === 'video'){
-        fd.append('thumbnailGenratedUrl', this.mmsConfig.nodeUrl + this.mmsConfig.videoThumbnail)
-      }
 
-      id && fd.append('resourceIds', id)
+    // 更新素材
+    updateLib(fd) {
+      this._http(this.mmsConfig.file, fd, { timeout: 90000 })
+        .then(res => {
+          let actionType = fd.get('actionType')
 
-      this.handleUpload(fd)
+          switch (actionType) {
+            case 'upload':
+              this.dataList.unshift(res);
+              this.$message.success('上传成功');
+              break;
+            case 'delete':
+            case 'rename':
+              this.$message({
+                type: res.error === '0' ? 'success' : 'error',
+                message: res.message
+              });
+              break;
+            default:
+              break;
+          }
+
+        }).finally(cb => {
+          this.isUpLoading = false
+          if (this.$refs.file) this.$refs.file.value = ''
+        })
     },
 
-    // 上传、删除
-    handleUpload(fd) {
-      this._http(this.mmsConfig.file, fd)
-      .then(res => {
-        let actionType = fd.get('actionType')
-
-        switch(actionType){
-          case 'upload':
-            this.dataList.unshift(res);
-            this.$message.success('上传成功');
-            break;
-          case 'delete':
-            this.$message({
-              type: res.error === '0' ? 'success' : 'error',
-              message: res.message
-            });
-            break;
-          case 'renama':
-            this.$message.success('文件名修改成功');
-          default: break;
-        }
-        
-      }).finally(cb => {
-        this.isUpLoading = false
-        if(this.$refs.file) this.$refs.file.value = ''
-      })
-
-    },
-   
     // 获取素材库数据
     async fetchData(type) {
       this.dataList = []
       this.fetchLoading = true
 
-      let {pageIndex, pageSize} = this.pager
+      let { pageIndex, pageSize } = this.pager
 
       this._http(this.mmsConfig.library, { type, pageIndex: pageIndex - 1, pageSize })
-      .then(res => {
-        if(res.error === 0){
-          this.dataList = [...res.data]
-        }
-        this.fetchLoading = false
-      }).catch(err => {
-        this.fetchLoading = false
-      })
+        .then(res => {
+          if (res.error === 0) {
+            this.dataList = [...res.data]
+          }
+          this.fetchLoading = false
+        }).catch(err => {
+          this.fetchLoading = false
+        })
     }
   },
 };
+
 </script>
