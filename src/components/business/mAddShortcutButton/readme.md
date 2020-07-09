@@ -7,7 +7,10 @@
 <m-addshortcutbutton :data="addBTNData" :id="id" :form="form" :name="name" />
 
 具体数据说明：
-addBTNData = []
+addBTNData:[],
+id:"",
+form:"",
+name:""
 
 1、“回复按钮”
 {"type":"reply","description":""}
