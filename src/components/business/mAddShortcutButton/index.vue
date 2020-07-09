@@ -14,7 +14,7 @@
     <div v-if="items.length==10" class="addButton grayBTN">
       + 快捷按钮和设置中的固定按钮总和不能超过10个
     </div>
-    <input type="hidden" name="addshortcutbutton" :value="data"/>
+    <input type="hidden" :id="id" :form="form" :name="name" :value="data"/>
   </div>
 </template>
 <script>
@@ -22,7 +22,21 @@ import childContent from './childContent'
 
 export default {
   name: 'm-addshortcutbutton',
-  props: ['data'],
+  props: {
+    data:{},
+    name: {
+      type: String,
+      default:''
+    },
+    form: {
+      type: String,
+      default:''
+    },
+    id: {
+      type: String,
+      default:''
+    }
+  },
   data () {
     return {
       items: [],

@@ -4,7 +4,7 @@
 2、删除时不显示弹窗
 
 在HTML中引用：
-<add-shortcutbutton :data="addBTNData" />
+<m-addshortcutbutton :data="addBTNData" :id="id" :form="form" :name="name" />
 
 具体数据说明：
 addBTNData = []
