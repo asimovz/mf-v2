@@ -84,7 +84,7 @@ export default {
       return p < 1 ? 1 : Math.ceil(p) + 1
     },
     params () {
-      if (!this.transition) return {}
+      if (!this.transition || this.transition.indexOf('?') < 0) return {}
 
       const searchArr = this.transition.split('?')[1].split('&')
       const res = {}
@@ -137,7 +137,7 @@ export default {
     async getData () {
       try {
         const { data } = await this.$root.$http.get(this.transition, {...this.params})
-        this.items = data
+        this.items = data.data
       } catch (err) {
         console.log('request err', err)
       }
