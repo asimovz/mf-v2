@@ -34,7 +34,7 @@
           </div> -->
 
            <!-- style="justify-content: 'space-evenly';width: 86px;" -->
-          <div class="toolbar-item" :class="{'disabled': saveLoading}" @click="save">
+          <div class="toolbar-item" :class="{'disabled': saveLoading || !mmsData.list.length}" @click="save">
             <editor-icon v-if="!saveLoading" name="baocun" size="16" />
             <i v-else class="el-icon-loading" style="font-size: 16px;"></i>&nbsp;保存<font v-if="saveLoading">中</font>
           </div>
@@ -549,6 +549,8 @@ export default {
 
     save(){
       this.widgetPaneShow = this.isEditorShow = false
+
+      if(!this.mmsData.list.length) return
 
       if(this.fileSize > this.maxFileSize){
         this.$message.warning(`文件大小不能超过 ${this.maxFileSize}K`)
