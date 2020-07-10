@@ -1,6 +1,6 @@
 <template>
   <draggable :list="data.list" v-bind="dragOptions" @end="end">
-    <render-comp v-for="(item, index) in data.list" :data="item" :key="item.id" :list-index="index" :isGroup="isGroup" :select-widget-id="selectWidgetId"  @del="handleDel(index)">
+    <render-comp v-for="(item, index) in data.list" :data="item" :key="item.resourceId" :list-index="index" :isGroup="isGroup" :select-widget-id="selectWidgetId"  @del="handleDel(index)">
     </render-comp>
   </draggable>
 </template>
