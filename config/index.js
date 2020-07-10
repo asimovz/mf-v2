@@ -4,6 +4,7 @@
 
 const path = require('path')
 let host = 'http://10.0.80.16:8082/' //http://tenanttest.mfexcel.com/
+// let host = 'http://10.0.8.3:8080/' //http://tenanttest.mfexcel.com/
 let buildTo = ''
 
 

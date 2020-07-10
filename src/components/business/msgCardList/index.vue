@@ -1,10 +1,10 @@
 <template>
   <div class="msgCardList">
     <ul class="list-wrap">
-      <li class="item btn-add" @click="edit()">
+      <li class="item btn-add" @click="create()">
         <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
       </li>
-      <li class="item" v-for="(item, index) in items" :key="index">
+      <li class="item" v-for="(item, index) in items" :key="item.msgId">
         <div class="preview">
           <img class="img" :src="item.thumb">
         </div>
@@ -13,25 +13,29 @@
           <div class="other">
             <p><label>消息ID：</label>{{item.msgId}}</p>
             <p><label>场景名称：</label>{{item.sceneName}}</p>
+            <p v-show="item.botName"><label>机器人：</label>{{item.botName}}</p>
           </div>
         </div>
 
         <div class="mask">
           <div class="control">
-            <div>
+            <div v-show="item.statusId !== 'MmsSubmit'">
               <m-button type="default" size="small" @click.native="edit(item)">编辑</m-button>
             </div>
-            <div>
-              <m-button type="default" size="small" @click.native="verifyBefore(item)">提交</m-button>
+            <div v-show="item.statusId === 'MmsOpen'">
+              <m-button type="default" size="small" @click.native="verifyBefore(item, index)">提交</m-button>
             </div>
-            <div v-show="true">
+            <div>
               <m-button type="default" size="small" @click.native="preview">预览</m-button>
+            </div>
+            <div v-show="!standard">
+              <m-button type="default" size="small" @click.native="delBefore(item, index)">删除</m-button>
             </div>
           </div>
         </div>
 
-        <div class="flag" :class="item.state | stateFormat">
-          {{item.state | stateName}}
+        <div class="flag" v-if="standard" :class="item.statusId | stateFormat">
+          {{item.statusId | stateName}}
           <m-tooltip class="tooltip" v-if="item.desc" :title="item.desc">
               <span class="el-icon-warning-outline"></span>
           </m-tooltip>
@@ -42,7 +46,7 @@
       <m-page 
         :enable-all="false"
         :max-allowed-count="30"
-        :paginate="{count: page.total, pageIndex: page.pageIndex, pageSize: page.pageSize, pageMaxIndex: pageMaxIndex}"
+        :paginate="{count: page.count, pageIndex: page.pageIndex, pageSize: page.pageSize, pageMaxIndex: pageMaxIndex}"
         :show-total="true"
         :pageSizeOpts="[30,60,90]"
         page-change="pageChangeByMsgCardList" />
@@ -59,7 +63,7 @@
       <p>{{confirmModal.desc}}</p>
       <div slot="footer" class="dialog-footer" align="center">
         <el-button size="mini" @click="confirmModal.visible = false">取消</el-button>
-        <el-button size="mini" type="primary" @click="del">确认</el-button>
+        <el-button size="mini" type="primary" @click="confirm">确认</el-button>
       </div>
     </m-modal>
   </div>
@@ -76,17 +80,20 @@ export default {
     return {
       previewVisible: false,
       confirmModal: {
+        type: '',
         visible: false,
         title: '',
         desc: ''
       },
       activeData: {},
+      standard: true,
       page: {
         count: 10,
         pageIndex: 0,
         pageSize: 30
       },
-      items: []
+      items: [],
+      params: {}
     }
   },
   props: {
@@ -94,7 +101,15 @@ export default {
       type: String,
       default: ''
     },
-    createApi: {
+    targetModal: {
+      type: String,
+      default: ''
+    },
+    editUrl: {
+      type: String,
+      default: ''
+    },
+    delUrl: {
       type: String,
       default: ''
     },
@@ -102,35 +117,51 @@ export default {
       type: String,
       default: ''
     },
-    verifyApi: {
+    verifyUrl: {
       type: String,
       default: ''
-    }
+    },
+    searchForm: String
   },
   computed: {
     pageMaxIndex () {
       let p = this.page.count / this.page.pageSize
       return p < 1 ? 1 : Math.ceil(p) + 1
+    }
+  },
+  watch: {
+    page: {
+      deep: true,
+      handler (v) {
+        this.$set(this.params, 'pageIndex', v.pageIndex)
+        this.$set(this.params, 'pageSize', v.pageSize)
+      }
     },
-    params () {
-      if (!this.transition || this.transition.indexOf('?') < 0) return {}
-
-      const searchArr = this.transition.split('?')[1].split('&')
-      const res = {}
-
-      searchArr.forEach(item => {
-        const tmp = item.split('=')
-        res[tmp[0]] = tmp[1]
-      })
-
-      return res
+    params: {
+      deep: true,
+      handler () {
+        this.getData()
+      }
     }
   },
   created () {
-    this.getData()
+    this.standard = location.href.indexOf('StandardFiveGMessage') >= 0
+
     this.$root.eventBus.$on('pageChangeByMsgCardList', data => {
-      this.getData()
+      this.page.pageIndex = data.pageIndex
+      this.page.pageSize = data.pageSize
     })
+
+    if (this.searchForm) {
+      this.$root.eventBus.$on('search_form_data_' + this.searchForm, data => {
+        for (let key in data) {
+          this.$set(this.params, key, data[key])
+        }
+      })
+    }
+
+    this.getQuery()
+    this.getData()
   },
   filters: {
     // MmsOpen 待提交， MmsSubmit 待审核， MmsApproved 审核通过， MmsReject 审核不通过
@@ -165,9 +196,20 @@ export default {
     }
   },
   methods: {
+    getQuery () {
+      if (!this.transition || this.transition.indexOf('?') < 0) return
+
+      const searchArr = this.transition.split('?')[1].split('&')
+
+      searchArr.forEach(item => {
+        const tmp = item.split('=')
+        this.$set(this.params, tmp[0], tmp[1])
+      })
+    },
     async getData () {
       try {
-        const { data } = await this.$root.$http.get(this.transition, {...this.params})
+        const { data } = await this.$http.get(this.transition, this.params)
+        this.page.count = data.count
         this.items = data.data
       } catch (err) {
         console.log('request err', err)
@@ -176,23 +218,52 @@ export default {
     preview () {
       this.previewVisible = true
     },
-    edit (item) {
-      location.href = item ? `${this.createApi}?msgId=${item.msgId}` : this.createApi
+    create () {
+      if (this.standard && this.targetModal) {
+        this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
+      } else {
+        location.href = `${this.editUrl}`
+      }
     },
-    verifyBefore (item) {
+    edit (item) {
+      location.href = `${this.editUrl}?messageId=${item.msgId}`
+    },
+    verifyBefore (item, index) {
       this.confirmModal = {
+        type: 'verify',
         title: '提交审核',
         desc: '确认提交审核',
         visible: true
       }
 
+      this.activeIndex = index
       this.activeData = item
     },
-    async verify () {
+    delBefore (item, index) {
+      this.confirmModal = {
+        type: 'del',
+        title: '删除',
+        desc: '确认删除消息',
+        visible: true
+      }
+
+      this.activeIndex = index
+      this.activeData = item
+    },
+    async confirm () {
       try {
-        await this.$root.$http.post(this.verifyApi, {
-          msgId: this.activeData.msgId
+        const { type } = this.confirmModal
+        const api = type === 'del' ? this.delUrl : this.verifyUrl
+
+        await this.$root.$http.post(api, {
+          messageId: this.activeData.msgId
         })
+
+        if (type === 'verify') {
+          this.activeData.statusId = 'MmsSubmit'
+        } else {
+          this.items.splice(this.activeIndex, 1)
+        }
 
         this.confirmModal.visible = false
       } catch (err) {
@@ -212,6 +283,7 @@ export default {
     flex-wrap: wrap;
     justify-content: space-between;
     .item{
+      color:#303133;
       flex: 0 0 19%;
       background: #fff;
       margin-bottom: 20px;
@@ -234,6 +306,7 @@ export default {
       position: relative;
       height: 120px;
       overflow: hidden;
+      border-radius: 8px 8px 0 0;
       .img{
         width: 100%;
         position: absolute;
@@ -241,33 +314,29 @@ export default {
         left:50%;
         transform: translate(-50%, -50%);
         vertical-align: bottom;
-        border-radius: 8px 8px 0 0;
       }
     }
 
     .title{
-      height: 3em;
-      margin-bottom: 1em;
+      margin-bottom: 8px;
       overflow: hidden;
       text-overflow: ellipsis;
-      display:-webkit-box; //作为弹性伸缩盒子模型显示。
-      -webkit-box-orient:vertical; //设置伸缩盒子的子元素排列方式--从上到下垂直排列
-      -webkit-line-clamp:2; //显示的行
     }
 
     .main{
-      padding:1em;
+      padding:8px 16px;
     }
 
     .other{
+      color:#606266;
+      font-size: 12px;
       line-height: 1.75;
       label{
-        color:#909399;
         display: inline-block;
-        width:5em;
-        text-align:justify;
-        text-align-last: justify;
-        margin-right: .5em;
+        // width:5em;
+        // text-align:justify;
+        // text-align-last: justify;
+        // margin-right: .5em;
       }
     }
 
