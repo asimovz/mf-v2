@@ -13,14 +13,20 @@
       </template>
       <!-- 编辑模式 -->
       <template v-else>
-        <el-button size="small" @click="isCheckAble = true">批量操作</el-button>
+        <el-button size="small" :disabled="isUpLoading" @click="isCheckAble = true">批量操作</el-button>
         <el-popover style="margin-left: 10px;" placement="bottom" trigger="hover" :content="popoverContent">
           <el-button slot="reference" type="primary" size="small" :disabled="isUpLoading" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">上传{{ typeLabel }}</el-button>
         </el-popover>
         <input style="display: none;" ref="file" type="file" :accept="currentAccept" name="upload" @change="fileChanged" />
       </template>
     </div>
-    <div class="library--content scrollbar" :class="{'no-data': !dataList.length}" v-loading="fetchLoading">
+    <div class="library--content scrollbar"
+      :class="{'no-data': !dataList.length}"
+      v-loading="fetchLoading || isUpLoading"
+      :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''"
+      :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''"
+      :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''"
+    >
       <!-- 图片/视频 -->
       <div class="lib-list" :class="{'isCheckable': isCheckAble}">
         <template>
@@ -46,7 +52,7 @@
               </template>
             </div>
             <!-- :title="isCheckAble || !isEditAble ? '' : '双击可编辑'" -->
-            <div class="lib-name" v-if="item.name">
+            <div class="lib-name" v-if="item.name" :title="item.name">
               <!-- @dblclick="nameEdit" -->
               <div class="lib-name-word">{{ item.name }}</div>
               <span title="重新命名" class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
@@ -89,6 +95,13 @@ function selectText(el) {
 
 function getRandomId() {
   return Math.ceil(Math.random() * 100000)
+}
+
+function movetoEnd(el){
+  let range = window.getSelection()
+  range.selectAllChildren(el)
+  range.collapseToEnd()
+  el.select()
 }
 
 export default {
@@ -250,7 +263,11 @@ export default {
       parent.classList.add('isEdit')
 
       let input = target.parentElement.querySelector('input')
-      input.select()
+      input.focus()
+
+      this.$nextTick(() => {
+        movetoEnd(input)
+      })
     },
 
     // 文件名编辑结束
