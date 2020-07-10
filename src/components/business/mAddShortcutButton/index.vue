@@ -66,7 +66,8 @@ export default {
     },
     del(index){
       this.items.splice(index, 1)
-      this.data.splice(index, 1)
+      this.data = [{}]
+      this.data = this.items
     },
     getData(val) {
       let index = val.index
