@@ -1,15 +1,8 @@
 <template>
   <div class="msgCardList">
     <ul class="list-wrap">
-      <li class="item btn-add">
-        <div class="inner-wrap" v-if="standard" @click="standardCreate">
-          <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
-        </div>
-        <m-link v-else :href="editUrl">
-          <div class="inner-wrap">
-            <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
-          </div>
-        </m-link>
+      <li class="item btn-add" @click="create()">
+        <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
       </li>
       <li class="item" v-for="(item, index) in items" :key="item.msgId">
         <div class="preview">
@@ -27,15 +20,13 @@
         <div class="mask">
           <div class="control">
             <div v-show="item.statusId !== 'MmsSubmit'">
-              <m-link :href="editUrlItem(item)">
-                <m-button type="default" size="small">编辑</m-button>
-              </m-link>
+              <m-button type="default" size="small" @click.native="edit(item)">编辑</m-button>
             </div>
             <div v-show="item.statusId === 'MmsOpen'">
               <m-button type="default" size="small" @click.native="verifyBefore(item, index)">提交</m-button>
             </div>
             <div>
-              <m-button type="default" size="small" @click.native="preview(item, index)">预览</m-button>
+              <m-button type="default" size="small" @click.native="preview">预览</m-button>
             </div>
             <div v-show="!standard">
               <m-button type="default" size="small" @click.native="delBefore(item, index)">删除</m-button>
@@ -61,6 +52,9 @@
         page-change="pageChangeByMsgCardList" />
     </div>
 
+    <msgCardPreview
+      v-model="previewVisible" />
+
     <m-modal
       id="confirmModal"
       :width="300"
@@ -72,19 +66,16 @@
         <el-button size="mini" type="primary" @click="confirm">确认</el-button>
       </div>
     </m-modal>
-
-    <m-modal
-      title="预览"
-      id="previewModal"
-      v-model="previewVisible">
-      <msgPreview align-center :message-id="activeData.msgId" :api="previewDataUrl" />
-    </m-modal>
   </div>
 </template>
 <script>
+import msgCardPreview from './components/preview'
 
 export default {
   name: 'msgCardList',
+  components: {
+    msgCardPreview
+  },
   data () {
     return {
       previewVisible: false,
@@ -102,7 +93,7 @@ export default {
         pageSize: 30
       },
       items: [],
-      formParams: {}
+      params: {}
     }
   },
   props: {
@@ -122,7 +113,7 @@ export default {
       type: String,
       default: ''
     },
-    previewDataUrl: {
+    previewApi: {
       type: String,
       default: ''
     },
@@ -138,37 +129,34 @@ export default {
       return p < 1 ? 1 : Math.ceil(p) + 1
     }
   },
+  watch: {
+    page: {
+      deep: true,
+      handler (v) {
+        this.$set(this.params, 'pageIndex', v.pageIndex)
+        this.$set(this.params, 'pageSize', v.pageSize)
+      }
+    },
+    params: {
+      deep: true,
+      handler () {
+        this.getData()
+      }
+    }
+  },
   created () {
     this.standard = location.href.indexOf('StandardFiveGMessage') >= 0
 
     this.$root.eventBus.$on('pageChangeByMsgCardList', data => {
       this.page.pageIndex = data.pageIndex
       this.page.pageSize = data.pageSize
-      this.getData()
     })
 
     if (this.searchForm) {
       this.$root.eventBus.$on('search_form_data_' + this.searchForm, data => {
-        let formParams = {}
-        if (typeof data.entries === 'function') {
-          for (let pair of data.entries()) {
-            let key = pair[0]
-            let value = pair[1]
-            if (value == '' || key === 'moquiSessionToken' || key === 'moquiFormName') continue
-            formParams[key] = value
-            if (value.split(',').length > 1) {
-              formParams[pair[0] + '_op'] = 'in'
-            } else {
-              formParams[pair[0] + '_op'] = 'includes'
-            }
-          }
-        } else {
-          formParams = data
+        for (let key in data) {
+          this.$set(this.params, key, data[key])
         }
-
-        this.formParams = formParams
-
-        this.getData()
       })
     }
 
@@ -215,34 +203,30 @@ export default {
 
       searchArr.forEach(item => {
         const tmp = item.split('=')
-        this.formParams[tmp[0]] = tmp[1]
+        this.$set(this.params, tmp[0], tmp[1])
       })
     },
     async getData () {
       try {
-        const { data } = await this.$http.get(this.transition, {
-          params: {
-            ...this.formParams,
-            pageIndex: this.page.pageIndex,
-            pageSize: this.page.pageSize
-          }
-        })
+        const { data } = await this.$http.get(this.transition, this.params)
         this.page.count = data.count
         this.items = data.data
       } catch (err) {
         console.log('request err', err)
       }
     },
-    preview (item, index) {
+    preview () {
       this.previewVisible = true
-      this.activeIndex = index
-      this.activeData = item
     },
-    standardCreate () {
-      this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
+    create () {
+      if (this.standard && this.targetModal) {
+        this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
+      } else {
+        location.href = `${this.editUrl}`
+      }
     },
-    editUrlItem (item) {
-      return `${this.editUrl}?messageId=${item.msgId}`
+    edit (item) {
+      location.href = `${this.editUrl}?messageId=${item.msgId}`
     },
     verifyBefore (item, index) {
       this.confirmModal = {
@@ -278,9 +262,7 @@ export default {
         if (type === 'verify') {
           this.activeData.statusId = 'MmsSubmit'
         } else {
-          this.page.pageIndex = 0
-          this.getData()
-          // this.items.splice(this.activeIndex, 1)
+          this.items.splice(this.activeIndex, 1)
         }
 
         this.confirmModal.visible = false
@@ -316,14 +298,7 @@ export default {
     }
 
     .btn-add{
-      .inner-wrap{
-        cursor: pointer;
-        position: absolute;
-        top:0;
-        right:0;
-        bottom:0;
-        left:0;
-      }
+      cursor: pointer;
     }
 
     .preview{

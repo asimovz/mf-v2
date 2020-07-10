@@ -3,7 +3,8 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-let host = 'http://10.0.8.3:8080/' //http://tenanttest.mfexcel.com/
+let host = 'http://10.0.80.16:8082/' //http://tenanttest.mfexcel.com/
+// let host = 'http://10.0.8.3:8080/' //http://tenanttest.mfexcel.com/
 let buildTo = ''
 
 
@@ -148,7 +149,7 @@ module.exports = {
     },
 
     // Various Dev Server settings
-    host: '0.0.0.0', // can be overwritten by process.env.HOST
+    host: 'localhost', // can be overwritten by process.env.HOST
     port: 9090, // can be overwritten by process.env.HOST, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
