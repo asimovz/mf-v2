@@ -90,10 +90,6 @@ function selectText(el) {
   }
 }
 
-function getRandomId() {
-  return Math.ceil(Math.random() * 100000)
-}
-
 function movetoEnd(el){
   let range = window.getSelection()
   range.selectAllChildren(el)
