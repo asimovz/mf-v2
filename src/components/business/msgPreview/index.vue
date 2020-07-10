@@ -1,9 +1,10 @@
 <template>
-  <m-modal
-    class="msgCardPreview"
-    id="msgCardPreview"
-    v-model="dialogVisible"
-    >
+  <div
+    class="msgPreview"
+    :style="{
+      margin: alignCenter !== undefined ? '0 auto' : 0
+    }">
+    <div class="title">消息名称</div>
     <div class="scroll-wrap">
       <span>这是一段信息</span><br>
       <span>这是一段信息</span><br>
@@ -35,45 +36,47 @@
       <span>这是一段信息</span><br>
       <span>这是一段信息</span><br>
     </div>
-    
-    <div slot="footer" class="dialog-footer">
-      <el-button size="mini" @click="dialogVisible = false">关闭</el-button>
-    </div>
-  </m-modal>
+  </div>
 </template>
 <script>
 export default {
-  name: 'msgCardPreview',
+  name: 'msgPreview',
   data () {
     return {
-      dialogVisible: false
+      jsonData: []
     }
   },
   props: {
-    value: {
-      type: Boolean,
-      default: false
-    }
+    api: {
+      type: String,
+      default: ''
+    },
+    messageId: {
+      type: String,
+      default: ''
+    },
+    alignCenter: {}
   },
   computed: {
-
+    source () {
+      return this.api + this.messageId
+    }
   },
   watch: {
-    value (v) {
-      this.dialogVisible = v
-    },
-    dialogVisible (v) {
-      this.$emit('input', v)
+    source (v) {
+      this.getData()
     }
   },
   created () {
-
+    this.getData()
   },
   methods: {
     async getData () {
       try {
-        const { data } = await this.$root.$http.get(this.transition, {...this.params})
-        this.items = data
+        const { data } = await this.$root.$http.get(this.transition, {
+          messageId: this.messageId
+        })
+        this.jsonData = data
       } catch (err) {
         console.log('request err', err)
       }
@@ -85,29 +88,22 @@ export default {
 }
 </script>
 <style lang='less'>
-.msgCardPreview {
-  .el-dialog__header{
-    display: none;
-  }
-  .dialog-footer{
-    text-align: center;
-    padding:10px;
-  }
-  .el-dialog{
-    background: none;
-    box-shadow: none;
-    width:260px!important;
-  }
-  .el-dialog__body{
-    height:520px;
-    padding:35px 15px;
-    max-height: none!important;
-    background:url('./phone-bg.png') 0 0 no-repeat;
-    background-size: cover;
+.msgPreview {
+  width:280px;
+  height:560px;
+  padding:40px 15px;
+  background:url('./phone-bg.png') 0 0 no-repeat;
+  background-size: cover;
+  font-size: 12px;
+  color:#606266;
+  .title{
+    padding: 0 10px 10px;
+    border-bottom: 1px solid #ebeef5;
   }
   .scroll-wrap{
     width:100%;
-    height:100%;
+    height:445px;
+    padding:10px;
     overflow-x: hidden;
     overflow-y: auto;
     &::-webkit-scrollbar {

@@ -1,8 +1,15 @@
 <template>
   <div class="msgCardList">
     <ul class="list-wrap">
-      <li class="item btn-add" @click="create()">
-        <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
+      <li class="item btn-add">
+        <div class="inner-wrap" v-if="standard" @click="standardCreate">
+          <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
+        </div>
+        <m-link v-else :href="editUrl">
+          <div class="inner-wrap">
+            <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
+          </div>
+        </m-link>
       </li>
       <li class="item" v-for="(item, index) in items" :key="item.msgId">
         <div class="preview">
@@ -20,7 +27,9 @@
         <div class="mask">
           <div class="control">
             <div v-show="item.statusId !== 'MmsSubmit'">
-              <m-button type="default" size="small" @click.native="edit(item)">编辑</m-button>
+              <m-link :href="editUrlItem(item)">
+                <m-button type="default" size="small">编辑</m-button>
+              </m-link>
             </div>
             <div v-show="item.statusId === 'MmsOpen'">
               <m-button type="default" size="small" @click.native="verifyBefore(item, index)">提交</m-button>
@@ -52,9 +61,6 @@
         page-change="pageChangeByMsgCardList" />
     </div>
 
-    <msgCardPreview
-      v-model="previewVisible" />
-
     <m-modal
       id="confirmModal"
       :width="300"
@@ -66,16 +72,18 @@
         <el-button size="mini" type="primary" @click="confirm">确认</el-button>
       </div>
     </m-modal>
+
+    <m-modal
+      title="预览"
+      v-model="previewVisible">
+      <msgPreview align-center :message-id="activeData.msgId" :api="previewApi" />
+    </m-modal>
   </div>
 </template>
 <script>
-import msgCardPreview from './components/preview'
 
 export default {
   name: 'msgCardList',
-  components: {
-    msgCardPreview
-  },
   data () {
     return {
       previewVisible: false,
@@ -218,15 +226,11 @@ export default {
     preview () {
       this.previewVisible = true
     },
-    create () {
-      if (this.standard && this.targetModal) {
-        this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
-      } else {
-        location.href = `${this.editUrl}`
-      }
+    standardCreate () {
+      this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
     },
-    edit (item) {
-      location.href = `${this.editUrl}?messageId=${item.msgId}`
+    editUrlItem (item) {
+      return `${this.editUrl}?messageId=${item.msgId}`
     },
     verifyBefore (item, index) {
       this.confirmModal = {
@@ -262,7 +266,8 @@ export default {
         if (type === 'verify') {
           this.activeData.statusId = 'MmsSubmit'
         } else {
-          this.items.splice(this.activeIndex, 1)
+          this.params.pageIndex = 0
+          // this.items.splice(this.activeIndex, 1)
         }
 
         this.confirmModal.visible = false
@@ -298,7 +303,14 @@ export default {
     }
 
     .btn-add{
-      cursor: pointer;
+      .inner-wrap{
+        cursor: pointer;
+        position: absolute;
+        top:0;
+        right:0;
+        bottom:0;
+        left:0;
+      }
     }
 
     .preview{

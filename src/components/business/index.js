@@ -5,9 +5,10 @@ import brandListEditor from './brandListEditor' // 公众号菜单列表编辑
 import sceneConfig from './sceneConfig' // 场景方案编辑组件
 import msgConfig from './msgConfig' // 卡片方案编辑组件
 import msgCardList from './msgCardList' // 5G消息卡片列表
+import msgPreview from './msgPreview' // 5G消息卡片列表
 
 const component = [
-  motionOptions, innerMenu, menuPreview, brandEditor, brandListEditor, sceneConfig, msgConfig, msgCardList
+  motionOptions, innerMenu, menuPreview, brandEditor, brandListEditor, sceneConfig, msgConfig, msgCardList, msgPreview
 ]
 
 export default component
