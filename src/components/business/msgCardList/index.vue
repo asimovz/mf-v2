@@ -102,7 +102,7 @@ export default {
         pageSize: 30
       },
       items: [],
-      params: {}
+      formParams: {}
     }
   },
   props: {
@@ -138,51 +138,37 @@ export default {
       return p < 1 ? 1 : Math.ceil(p) + 1
     }
   },
-  watch: {
-    page: {
-      deep: true,
-      handler (v) {
-        this.$set(this.params, 'pageIndex', v.pageIndex)
-        this.$set(this.params, 'pageSize', v.pageSize)
-      }
-    },
-    params: {
-      deep: true,
-      handler () {
-        this.getData()
-      }
-    }
-  },
   created () {
     this.standard = location.href.indexOf('StandardFiveGMessage') >= 0
 
     this.$root.eventBus.$on('pageChangeByMsgCardList', data => {
       this.page.pageIndex = data.pageIndex
       this.page.pageSize = data.pageSize
+      this.getData()
     })
 
     if (this.searchForm) {
       this.$root.eventBus.$on('search_form_data_' + this.searchForm, data => {
-        let jsonData = {}
+        let formParams = {}
         if (typeof data.entries === 'function') {
           for (let pair of data.entries()) {
             let key = pair[0]
             let value = pair[1]
             if (value == '' || key === 'moquiSessionToken' || key === 'moquiFormName') continue
-            jsonData[key] = value
+            formParams[key] = value
             if (value.split(',').length > 1) {
-              jsonData[pair[0] + '_op'] = 'in'
+              formParams[pair[0] + '_op'] = 'in'
             } else {
-              jsonData[pair[0] + '_op'] = 'includes'
+              formParams[pair[0] + '_op'] = 'includes'
             }
           }
         } else {
-          jsonData = data
+          formParams = data
         }
 
-        for (let key in jsonData) {
-          this.$set(this.params, key, jsonData[key])
-        }
+        this.formParams = formParams
+
+        this.getData()
       })
     }
 
@@ -229,13 +215,17 @@ export default {
 
       searchArr.forEach(item => {
         const tmp = item.split('=')
-        this.$set(this.params, tmp[0], tmp[1])
+        this.formParams[tmp[0]] = tmp[1]
       })
     },
     async getData () {
       try {
         const { data } = await this.$http.get(this.transition, {
-          params: this.params
+          params: {
+            ...this.formParams,
+            pageIndex: this.page.pageIndex,
+            pageSize: this.page.pageSize
+          }
         })
         this.page.count = data.count
         this.items = data.data
@@ -288,7 +278,8 @@ export default {
         if (type === 'verify') {
           this.activeData.statusId = 'MmsSubmit'
         } else {
-          this.params.pageIndex = 0
+          this.page.pageIndex = 0
+          this.getData()
           // this.items.splice(this.activeIndex, 1)
         }
 
