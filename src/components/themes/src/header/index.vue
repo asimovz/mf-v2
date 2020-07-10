@@ -30,7 +30,7 @@
           </li>
         </ul>
         <div class="topbar-user">
-          <m-popover @on-hide="changeGroupHidden=true">
+          <m-popover @on-hide="changeGroupHidden=true" popperClass="header-setting-popover">
             <div class="topbar-user_name">
               <img class="face" src="/static/images/user.png" alt="">
               <span>{{userFullName}}</span>
