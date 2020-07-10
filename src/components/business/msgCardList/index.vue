@@ -50,6 +50,7 @@
           </m-tooltip>
         </div>
       </li>
+      <li class="item blank" v-for="item in blanks" :key="item"></li>
     </ul>
     <div class="pagination_box">
       <m-page 
@@ -120,6 +121,9 @@ export default {
     searchForm: String
   },
   computed: {
+    blanks () {
+      return this.items.length % 5
+    },
     pageMaxIndex () {
       let p = this.page.count / this.page.pageSize
       return p < 1 ? 1 : Math.ceil(p) + 1
@@ -302,6 +306,9 @@ export default {
       position: relative;
       border-radius: 8px;
       border: 1px solid rgba(0,0,0,0.15);
+      &.blank{
+        border:none
+      }
       &:hover{
         .mask{
           visibility:visible;
