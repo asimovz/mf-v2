@@ -341,7 +341,7 @@ export default {
       item = Object.assign(
         item,
         data,
-        item.type === 'pic' ? { imgConf: {} } : null
+        item.type === 'image' ? { imgConf: {} } : null
       )
       this.mmsData.list.push({
         ...item,
@@ -620,16 +620,7 @@ export default {
     },
     submit(fd){
       this._http(this.mmsSave, fd).then(res => {
-        // this.$message({
-        //   type: res.code === 0 ? 'success' : 'error',
-        //   message: res.message
-        // })
-
         this.$message.success('保存成功')
-
-        setTimeout(() => {
-          window.history.back()
-        }, 1200)
       }).catch(err => {
         this.$message.error('请求失败')
       }).finally(end => {

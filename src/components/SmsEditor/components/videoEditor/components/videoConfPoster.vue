@@ -109,25 +109,13 @@ export default {
     /**
      * 获取多少张
      */
-    getTimestamps(page = 6){
+    getTimestamps(page = 10){
       let times = []
 
-      if(this.duration <= 6) {
-          page = this.duration
-          for(let i = 1; i <= page; i++){
-            times.push(i)
-          }
-      }else if(this.duration > 6 && this.duration < 10){
-        times = [1,2,3,4,5,6]
-      }else{
-        const padding = 2
-        const duration = this.duration
-        const step = parseInt((duration - padding * 2) / page)
+      page = this.duration > page ? page : this.duration
 
-        for(let i = 0; i < page; i++){
-          times.push(step * i + padding)
-        }
-      }
+      times = Array.from(Array(page), (x, i) => i + 1).slice(0, -1)
+
       return times
     }
   }

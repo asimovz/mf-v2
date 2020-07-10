@@ -75,7 +75,15 @@ export default {
           uri: this.parent.mediaInfo.uri,
           seek: this.timeRange[0],
           duration: this.timeRange[1] - this.timeRange[0]
-        }, {timeout: 20000})
+        }, {timeout: 20000}).then(res => {
+          this.$message({
+            type: res.error === 0 ? 'success' : 'error',
+            message: res.message
+          })
+          return {
+            data: res.data
+          }
+        })
 
         this.timeRange[0] = 0
         this.cutIng = false

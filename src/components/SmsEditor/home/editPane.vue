@@ -6,13 +6,13 @@
 		</div>
 		<div class="editPane-content">
 			<div class="editPane-preview">
-				<template v-if="currentData.type === 'pic'">
+				<template v-if="currentData.type === 'image'">
 					<img :src="currentData.uri">
 				</template>
 				<template v-if="currentData.type === 'video'">
 					<videoPlayer showMediaInfo :options="videoOptions" />
 				</template>
-				<template v-if="currentData.type === 'voice'">
+				<template v-if="currentData.type === 'audio'">
 					<audioPlayer style="flex:1" :options="audioOptions" />
 				</template>
 				<template v-if="currentData.type === 'text'">
@@ -27,15 +27,15 @@
 
 		<img-editor-modal
 			:showEditor.sync="isImgEdit"
-			:data="editData"
-			:configData="editData.imgConf"
+			:data="editDataImg"
+			:configData="editDataImg.imgConf"
 			@on-save="onSave"
 		>
 		</img-editor-modal>
 
 		<video-conf
 		  :visible.sync="isVideoEdit"
-		  :mediaData="editData"
+		  :mediaData="editDataVideo"
 		  @on-save="onSave"
 		>
 		</video-conf>
@@ -64,7 +64,8 @@
 				currentData: {},
 				isImgEdit: false,
 				isVideoEdit: false,
-				editData: {},
+				editDataImg: {},
+				editDataVideo: {}
 			}
 		},
 		computed: {
@@ -72,10 +73,10 @@
 				return this.item.title
 			},
 			showEditBtn(){
-				return this.currentData.type === 'pic' || this.currentData.type === 'video'
+				return this.currentData.type === 'image' || this.currentData.type === 'video'
 			},
 			showRemoveBtn(){
-				return ['pic', 'voice', 'video'].includes(this.currentData.type)
+				return ['image', 'audio', 'video'].includes(this.currentData.type)
 			},
 			videoOptions(){
 				return {
@@ -103,10 +104,10 @@
 				immediate: true
 			},
 			isVideoEdit(visible){
-				if(!visible) this.editData = {}
+				if(!visible) this.editDataImg = {}
 			},
 			isImgEdit(visible){
-				if(!visible) this.editData = {}
+				if(!visible) this.editDataVideo = {}
 			}
 		},
 		methods: {
@@ -115,13 +116,15 @@
 				this.$emit('on-remove', this.currentData)
 			},
 			edit(){
-
-				this.editData = JSON.parse(JSON.stringify(this.currentData))
-				
-				if(this.currentData.type === 'pic'){
+				let dt = JSON.parse(JSON.stringify(this.currentData))
+				if(this.currentData.type === 'image'){
+					this.editDataImg = dt
 					this.isImgEdit = true
 				}
 				if(this.currentData.type === 'video'){
+					delete dt.size
+					this.editDataVideo = dt
+					
 					this.isVideoEdit = true
 				}
 			},

@@ -16,6 +16,30 @@ Vue.filter('decodeHtml', moqui.htmlDecode)
 Vue.filter('format', moqui.dateFormat)
 
 
+// import { smsEditor, locale } from './components/mmsEditor/library.core.js'
+// import './components/mmsEditor/style/bundle.css'
+
+import { smsEditor, locale } from './components/SmsEditor'
+
+// import {smsEditor,locale} from './SmsEditor'
+
+// import {smsEditor,locale} from '../compile/dist/library.core.js'
+Vue.use(smsEditor, {
+  http(url, data, config = {}){
+    return new Promise((resolve, reject) => {
+      axios.post(url, data, {...config})
+      .then(res => {
+        if(res.status === 200){
+          return resolve(res.data)
+        }
+      })
+      .catch(err => reject(err))
+    })
+  }
+})
+
+
+
 window.moquiVue = new Vue({
   el: '#app',
   template:'<App />',

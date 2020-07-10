@@ -13,7 +13,6 @@
           <watermarkHandler
           v-model="dragRect"
           v-if="watermarkVisible"
-          :mediaInfo="mediaInfo"
           :options="watermarkOpts"
           @img-rect-change="imgRectChange" />
       </videoPlayer>
@@ -115,7 +114,7 @@ export default {
         const {type, img, text} = this.watermarkOpts
         if(type === 'text' && text !== ''){
           return true
-        } else if (type === 'pic' && img !== ''){
+        } else if (type === 'image' && img !== ''){
           return true
         }else{
           return false

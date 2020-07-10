@@ -6,7 +6,7 @@ export const typesList = [
     content:""
   },
   {
-    type: "pic",
+    type: "image",
     title:"图片",
     icon: "tupian",
     uri:"",
@@ -23,7 +23,7 @@ export const typesList = [
     accept: '3gp、mp4'
   },
   {
-    type: "voice",
+    type: "audio",
     title:"音频",
     icon: "yinpin",
     uri:"",

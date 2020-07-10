@@ -8,7 +8,7 @@
 <script>
 import audioPlayer from '../audioPlayer'
 export default {
-  name:"widget-voice",
+  name:"widget-audio",
   components:{
     audioPlayer
   },
