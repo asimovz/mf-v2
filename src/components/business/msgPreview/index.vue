@@ -8,35 +8,18 @@
     <m-carousel class="carousel" height="445px" trigger="click" :loop="false" :autoplay="false" indicator-position="outside">
       <m-carousel-item v-for="item in 1" :key="item">
         <div class="scroll-wrap">
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
+          <div v-for="(item, index) in jsonData" :key="index">
+            <p v-if="item.type === 'text'">{{item.content}}</p>
+            <div v-if="item.type === 'image'">
+              <img :src="item.content" />
+            </div>
+            <div v-if="item.type === 'video'">
+              <video controls :src="item.content" preload="metadata"></video>
+            </div>
+            <div v-if="item.type === 'audio'">
+              <audio :src="item.content"></audio>
+            </div>
+          </div>
         </div>
       </m-carousel-item>
     </m-carousel>
@@ -48,6 +31,7 @@ export default {
   name: 'msgPreview',
   data () {
     return {
+      standard: true,
       jsonData: []
     }
   },
@@ -73,6 +57,7 @@ export default {
     }
   },
   created () {
+    this.standard = location.href.indexOf('StandardFiveGMessage') >= 0
     this.getData()
   },
   methods: {
@@ -83,10 +68,28 @@ export default {
             messageId: this.messageId
           }
         })
-        this.jsonData = JSON.parse(data.data)
+        this.jsonData = this.filterData(data.data)
         console.log(this.jsonData)
       } catch (err) {
         console.log('request err', err)
+      }
+    },
+    filterData (data) {
+      const dataArr = JSON.parse(data)
+      if (this.standard) {
+        return dataArr.map(item => {
+          return {
+            content: item.content,
+            type: item.type
+          }
+        })
+      } else {
+        return dataArr.map(item => {
+          return {
+            content: item.content,
+            type: item.type
+          }
+        })
       }
     }
   },
@@ -114,6 +117,12 @@ export default {
     padding:10px;
     overflow-x: hidden;
     overflow-y: auto;
+    img{
+      vertical-align: bottom;
+    }
+    video,audio,img{
+      max-width: 100%;
+    }
     &::-webkit-scrollbar {
       width: 4px;
       height: 1px;
