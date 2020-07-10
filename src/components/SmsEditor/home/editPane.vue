@@ -197,7 +197,7 @@
 		}
 		&-operation{
 			display: flex;justify-content: center;margin: 20px 0 15px;
-			.btn{flex: 1;}
+			.btn{flex: 1; margin:0 10px}
 		}
 	}
 </style>
