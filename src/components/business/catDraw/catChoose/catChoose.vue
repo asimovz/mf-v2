@@ -1,6 +1,6 @@
 <template>
 	<!--选择素材的弹窗-->
-	<m-modal :id="id" :title="modalTitle" :width="780" :height="600" :openDialog='false'>
+	<m-modal :id="id" :value="visible" :showClose="false" :title="modalTitle" :width="780" :height="600">
 		<div v-if="showListArr.length">
 				<div v-if="showListArr.length > 1" class="ivu-tabs-nav-scroll" style="margin-bottom: 10px;">
 			   <div v-for="(item,index) in showListArr" :key="index"  @click="changTab(item)" :class="{'ivu-tabs-tab-focused' : (materialType == item), 'ivu-tabs-tab-active' : (materialType == item),}" class="ivu-tabs-nav">
@@ -156,6 +156,10 @@
 	export default {
 		name: 'catChoose',
 		props: {
+			visible: {
+				type: Boolean,
+				default: false,
+			},
 			botId: {
 				type: String,
 				default: '102658',
@@ -264,10 +268,14 @@
 			},
 			confirmDelete() {
 				//新增关闭弹窗
-				this.$root.eventBus.$emit("modal_visible_change_" + this.id)
+				this.$emit("update:visible", false)
+				// this.$root.eventBus.$emit("modal_visible_change_" + this.id)
 			},
 			rejectConfirm() {
+				console.log(11111,this.fileList)
 				if(!this.fileList.checked) {
+					
+					this.handleNotice('未选择素材','info')
 //		   		this.$Message.info("未选择素材");
 					this.picResponse = {}
 					return  //0629新增未选择素材，不让提交

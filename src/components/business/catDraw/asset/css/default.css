@@ -211,6 +211,7 @@
 .pop-footer {
 	display: flex;
 	justify-content: flex-end;
+	padding-bottom: 20px;
 }
 
 .pop-footer-bottom {

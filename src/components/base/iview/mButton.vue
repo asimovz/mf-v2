@@ -126,6 +126,7 @@ export default {
         }
       } else {
         if (this.FormInstance && this.toggle == "linkFormForm") {
+          this.$root.eventBus.$emit('linkFormForm_check', params);
           this.confirmation ? this.confirm(this.handleSubmitForm) : this.handleSubmitForm()
         } else {
           this.toggle == "linkFormLink" && this.$root.eventBus.$emit("m_form_submit_" + this.form)

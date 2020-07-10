@@ -21,7 +21,7 @@
 						<!--默认回复中去掉引用内容-->
 						<catDrawPoptip v-if="item.replyType == 'text' && pageParameters.showQuote"  @drawQuote="drawQuote" :currentIndex="index" :nodeList="nodeList" :otherNodeList="otherNodeList" :nowNode="eventList" style="margin-right: 15px;"></catDrawPoptip>
 						<!-- <Icon @click="removeList(index)" class="cursor-pointer" type="ios-trash-outline" size="16"></Icon> -->
-						<i class="el-icon-delete cursor-pointer" @click="removeList(index)" style="font-size:16px;"></i>
+						<i v-if="!selectOnlyOne" class="el-icon-delete cursor-pointer" @click="removeList(index)" style="font-size:16px;"></i>
 					</template>
 				</catDrawListTop>
 
@@ -37,18 +37,30 @@
 				<cat-draw-list-simple-card  :reply="item.reply" :listStyle="listStyle"  v-if="item.replyType == 'singleCard'" :currentIndex="index" :nodeList="nodeList" :otherNodeList="otherNodeList" :nowNode="eventList" :pageParameters="pageParameters" :acceptUrl="acceptUrl" ></cat-draw-list-simple-card>
 				<!--新增多卡-->
 				<cat-draw-list-multiple-card :reply="item.reply"  v-if="item.replyType == 'manyCards'" :currentIndex="index" :nodeList="nodeList" :otherNodeList="otherNodeList" :nowNode="eventList" :pageParameters="pageParameters" :acceptUrl="acceptUrl" ></cat-draw-list-multiple-card>
-
+				
 			</div>
-			
 			<!--新增底部添加按钮-->
 			<catDrawListAddMenu v-if="!hiddenAddMenuBottom" @addMenu="addMenu" :showMaxMenus="showMaxMenus"></catDrawListAddMenu>
 		</div>
-		<catChoose ref="catChooseMedia" :id="catChooseId" :materialList="materialList"></catChoose>
+		<catChoose ref="catChooseMedia" :visible.sync="showCatChoose" :id="catChooseId" :materialList="materialList"></catChoose>
+		<input 
+			type="hidden" 
+			:name="paramName" 
+			:form="form" 
+			v-model="formValue"/>
+		<!-- <input 
+			type="hidden"
+			v-validate="'required'"
+      :data-vv-as="fieldTitle"
+      :data-vv-name="name"  
+			v-model="checkValidate"/> -->
+		<span v-if="checkValidate" class="m-form-error-tip">
+			{{ validateMsg?validateMsg:errors.first(name) }}
+		</span>
 	</div>
 </template>
 <script>
 	import catDrawPoptip from './catDrawPoptip'
-
 	import catDrawListTop from './catRobotNew/cardType/catDrawListTop'  //顶部菜单
 	import catDrawListMedia from './catRobotNew/cardType/catDrawListMedia'  //图片，音频和视频
 	import catDrawListSimpleCard from './catRobotNew/cardType/catDrawListSimpleCard'  //单卡
@@ -64,6 +76,7 @@
 	import {emojiCharStringLen, emojiCharStringSubstr, getUUID} from './util'  //新增处理emoji表情等
 	import catChoose from './catChoose/catChoose'  //素材的弹窗
 	import { AboutMaterial } from './catChoose/aboutMaterial.js' //选择素材的弹窗
+	import { CatDrawJudge } from './catDrawJudge' //判断条件的处理
 
 	//初始化数据
 	class Reply {
@@ -76,6 +89,10 @@
 	export default {
 		name: 'catDrawList',
 		props: {
+			name: String,
+			form: String,
+			paramName: String,
+			botId: String,
 			//0528修改上传的地址
 			// 素材上传接口
 			acceptUrl: {
@@ -140,6 +157,11 @@
 				type: Boolean,
 				default: false,  //默认值是false
 			},
+			fieldTitle: {
+				type: String,
+				default: ""
+			},
+			validate:[String,Object],
 		},
 		components: {
 			catDrawPoptip,
@@ -173,9 +195,21 @@
 					voiceList: [],
 					videoList: [],
 				},
+				showCatChoose: false,
+				catChooseShow: {
+					showPic: true, //显示图片
+					showVoice: true, //显示音频
+					showVideo: true, //显示视频
+				},
+				validateMsg: '发送内容 字段为必填项.',
+				checkValidate: false
 			}
 		},
 		computed:{
+			formValue() {
+				// if(!this.catDrawJudge.judgeEmpty(this.eventList.inputContents)) return ''
+				return this.eventList.inputContents.length>0 ? JSON.stringify(this.eventList.inputContents) : ''
+			},
 		  //改变备注的长度，长度大于14位就用...代替剩余内容
 		  calculateStringActualLength(){
 		      //text就是所传参数
@@ -201,7 +235,16 @@
 								} else {
 									this.showMaxMenus = false  //显示上限按钮
 								}
-							}	
+							}
+							this.checkValidate = !this.catDrawJudge.judgeEmpty(this.eventList.inputContents)
+		      },
+		      // immediate: true,
+		      deep: true
+			},
+			botId: {
+		      handler(val) {
+						this.aboutMaterial = new AboutMaterial(this)
+		      	if(val) this.getAllMaterial().then(() => {})
 		      },
 		      immediate: true,
 		      deep: true
@@ -274,15 +317,11 @@
 				var that = this
 				var type = obj.addMenuType
 				if(this.selectOnlyOne) {
-					// this.$set(this.eventList.inputContents, 0, new catDrawListData[type]())
 					this.eventList.inputContents.splice(0,1,new catDrawListData[type]())
 				} else {
 					//添加到数组里去
-					// this.$set(this.eventList.inputContents, this.eventList.inputContents.length, new catDrawListData[type]())
 					this.eventList.inputContents.push(new catDrawListData[type]())  
 				}
-				
-				this.$forceUpdate()
 			},
 			//新增监听input改变值
 			onChangeInput(val, index) {
@@ -291,10 +330,7 @@
 				
 				//延时去设置,否则不能设置成功
 				// setTimeout(() => {
-					// this.$nextTick(()=>{
 						this.eventList.inputContents[index].originalMessage = result
-						this.$forceUpdate()
-					// })
 					 // 赋值给表单中的的字段
 		    // }, 20)
 			},
@@ -304,7 +340,7 @@
 			},
 			// 获取所有的素材列表
 			getAllMaterial() {
-				var botId = this.paramMap.botId
+				var botId = this.botId
 				var p1 = this.aboutMaterial.getMaterials('pic', botId)
 				var p2 = this.aboutMaterial.getMaterials('video', botId)
 				var p3 = this.aboutMaterial.getMaterials('voice', botId)
@@ -317,13 +353,33 @@
 		},
 		created() {
 			this.aboutMaterial = new AboutMaterial(this)
-			// this.getAllMaterial().then(() => {})
+			if(this.botId) this.getAllMaterial().then(() => {})
+			this.catDrawJudge = new CatDrawJudge(this)
+			this.catDrawJudge.warning = (content) => {
+				this.validateMsg = content
+			}
 		},
 		mounted() {
-			
+			this.$root.eventBus.$on("modal_material_modal", (obj) => {
+
+				if(!this.botId) {
+					this.handleNotice('请先选择机器人','info')
+					// this.$Message.info('请先选择机器人');
+					return
+				}
+
+				var mediaReply = obj.mediaReply
+				this.showCatChoose = true
+				this.$refs.catChooseMedia && this.$refs.catChooseMedia.setChooseStyle({
+					mediaReply,
+					catChooseShow: obj.catChooseShow || this.catChooseShow,
+					modalId: obj.modalId,
+				})
+			})
 		},
 		destroyed() {
 			document.body.style.overflow = 'auto' //处理弹窗导致无法关闭的bug
+			this.$root.eventBus.$off("modal_material_modal")
 		},
 	}
 </script>

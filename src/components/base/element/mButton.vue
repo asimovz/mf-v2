@@ -12,6 +12,7 @@
     :form="form"
     :native-type="htmlType"
     :confirmation="confirmation"
+    :disabled="disabled"
 		@click="handleClick"
 		>
       <slot v-if="text == ''"></slot>
@@ -86,6 +87,10 @@ export default {
       default: false
     },
     ghost: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     }
