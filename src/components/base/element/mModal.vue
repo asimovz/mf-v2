@@ -3,6 +3,7 @@
     ref="modal"
     :id="id"
     :title="title"
+    :show-close="showClose"
     :width="width+`px`"
     :visible.sync="visible"
     :append-to-body="true"
@@ -60,7 +61,11 @@ export default {
     maskClosable: {
       type: Boolean,
       default: false
-    }
+    },
+    showClose: {
+      type: Boolean,
+      default: true
+    },
 
   },
   provide() {
