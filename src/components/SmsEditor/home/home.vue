@@ -32,8 +32,11 @@
           <!-- <div class="toolbar-item">
             <editor-icon name="yulan" size="16" />&nbsp;预览
           </div> -->
-          <div class="toolbar-item" @click="save">
-            <editor-icon name="baocun" size="16" />&nbsp;保存
+
+           <!-- style="justify-content: 'space-evenly';width: 86px;" -->
+          <div class="toolbar-item" :class="{'disabled': saveLoading}" @click="save">
+            <editor-icon v-if="!saveLoading" name="baocun" size="16" />
+            <i v-else class="el-icon-loading" style="font-size: 16px;"></i>&nbsp;保存<font v-if="saveLoading">中</font>
           </div>
           <el-popover
             placement="top"
@@ -70,6 +73,7 @@
            <div :class="['phone-window_body',''] " ref="windowBody"> <!--body--empty -->
             <div class="body-content scrollbar">
               <editor-draggable style="padding-bottom: 15px" :data="mmsData" :select-widget-id="selectWidgetId" @on-del-group="deleteGroup"></editor-draggable>
+              <div v-show="!mmsData.list" class="widget-empty">asdasda</div>
             </div>
           </div>
         </div>
@@ -185,7 +189,7 @@ export default {
 
       isEditorShow: false,
       currentEditItem: {},
-
+      saveLoading: false,   // 保存的loading
     }
   },
   provide() {
@@ -589,6 +593,8 @@ export default {
     },
 
     async captrue(sData){
+      this.saveLoading = true
+
       await this.beforeCaptrue()
 
       let wBody = this.$refs.windowBody
@@ -625,6 +631,7 @@ export default {
         this.$message.error('请求失败')
       }).finally(end => {
         this.$refs.windowBody.classList.remove('isCapture')
+        this.saveLoading = false
       })
     }
   },
@@ -648,7 +655,7 @@ export default {
   line-height: 40px;
   z-index: 2;
   .editor-title-back {
-    padding: 4px;font-size: 14px;color: #409EFF;font-weight: bold;cursor: pointer;
+    padding: 4px;vertical-align: middle; font-size: 16px;color: #409EFF;font-weight: bold;cursor: pointer;
   }
 }
 </style>

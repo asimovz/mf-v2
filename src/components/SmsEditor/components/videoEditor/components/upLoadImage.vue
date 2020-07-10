@@ -64,9 +64,16 @@ export default {
 
     upload(fd) {
       this._http(this.mmsConfig.file, fd).then(res => {
-        this.f_imgSrc = _imgSrc
+        
+        this.$message({
+          type: res.type,
+          message: res.messages
+        })
 
-        this.$emit('input', res.uri)
+        if(res.type === 'success'){
+          this.f_imgSrc = _imgSrc
+          this.$emit('input', res.data.uri)
+        }
       }).finally(end => {
         _imgSrc = ''
         this.$refs.file.value = ''
