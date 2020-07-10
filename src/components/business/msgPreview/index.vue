@@ -5,37 +5,42 @@
       margin: alignCenter !== undefined ? '0 auto' : 0
     }">
     <div class="title">消息名称</div>
-    <div class="scroll-wrap">
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-      <span>这是一段信息</span><br>
-    </div>
+    <m-carousel class="carousel" height="445px" trigger="click" :loop="false">
+      <m-carousel-item v-for="item in 4" :key="item">
+        <div class="scroll-wrap">
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+          <span>这是一段信息</span><br>
+        </div>
+      </m-carousel-item>
+    </m-carousel>
+    
   </div>
 </template>
 <script>
@@ -118,6 +123,10 @@ export default {
     &::-webkit-scrollbar-track {
       background: none;
     }
+  }
+
+  .carousel{
+    width:100%;
   }
 }
 </style>

@@ -72,9 +72,10 @@
         <el-button size="mini" type="primary" @click="confirm">确认</el-button>
       </div>
     </m-modal>
-
+    
     <m-modal
       title="预览"
+      id="previewModal"
       v-model="previewVisible">
       <msgPreview align-center :message-id="activeData.msgId" :api="previewApi" />
     </m-modal>
