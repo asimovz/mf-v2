@@ -23,7 +23,7 @@ import childContent from './childContent'
 export default {
   name: 'm-addshortcutbutton',
   props: {
-    data:{},
+    data:[],
     name: {
       type: String,
       default:''
@@ -66,12 +66,14 @@ export default {
     },
     del(index){
       this.items.splice(index, 1)
-      this.data.splice(index, 1)
+      this.data = [{}]
+      this.data = this.items
     },
     getData(val) {
       let index = val.index
+      this.data = [{}]
       this.items[index] = val.data
-      this.data[index] = val.data
+      this.data = this.items
     }
   }
 }
