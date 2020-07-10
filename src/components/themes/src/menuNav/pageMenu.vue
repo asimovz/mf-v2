@@ -130,7 +130,7 @@ export default {
             crumb.shift()
             this.$root.eventBus.$emit("updateCrumb", crumb)
             this.$root.eventBus.$emit('active_header_nav',{
-              title: currentCrumb.crumb.split(",")[this.deep-1],
+              title: currentCrumb.crumb.split(",").slice(-1),
               path:currentCrumb.path
             })
           }
