@@ -352,7 +352,7 @@ export default {
                 type: res.type || 'warning',
                 message: res.messages
               });
-              res.type === 'success' && this.dataList.unshift(res)
+              res.type === 'success' && this.dataList.unshift(res.data)
               break;
             case 'delete':
             case 'rename':
