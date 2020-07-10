@@ -20,7 +20,7 @@ export const typesList = [
     poster: "",
     uri:"",
     size: '10',
-    accept: '3gp、mp4'
+    accept: 'wmv、3gp、avi、f4v、m4v、mp4、mpg、ogv、vob'
   },
   {
     type: "audio",
