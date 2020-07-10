@@ -254,12 +254,12 @@ export default {
       this.alertConfirm()
     },
     alertConfirm () {
-      this.$confirm(this.confirmModal.desc, this.confirmModal.title, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.confirm()
+      this.handleConfirm({
+        title: this.confirmModal.title,
+        content: this.confirmModal.desc,
+        onOk: () => {
+          this.confirm()
+        }
       })
     },
     async confirm () {
