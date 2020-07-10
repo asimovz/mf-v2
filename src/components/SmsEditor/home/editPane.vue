@@ -164,7 +164,7 @@
             message: res.messages
           })
 
-          return res.type === 'success' ? res.data : ''
+          return res.type === 'success' ? res.data.uri : ''
 				})
 			}
 		},
