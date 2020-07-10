@@ -111,6 +111,16 @@ import editPane from './editPane'
 import saveConfirm from './saveConfirm'
 import '../assets/css/home.less'
 
+function getRandomId(){
+  let maxNumber = 99999999
+  let minNumber = 1000000
+  let range = maxNumber - minNumber; //取值范围的差
+  let random = Math.random(); //小于1的随机数
+  return minNumber + Math.round(random * range); 
+}
+
+
+
 function dataURLtoFile(dataurl, filename) {
   var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
     bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
@@ -170,7 +180,7 @@ export default {
       compList: typesList, 
       currentAddDragItem:{},
       currentItemType: '',
-      selectWidgetId:null,
+      selectWidgetId:-1,
       composeGroupList:{},
       splitGroupList: {},
       currentGroupIndex:-1,
@@ -321,8 +331,7 @@ export default {
         if(this.widgetPaneShow){
           this.widgetPaneShow = false
         }
-        
-        this.mmsData.list.push(_data)
+        this.mmsData.list.push({..._data, resourceId: getRandomId()})
       } else {
         this.handleWidget(_data)
       }
@@ -377,13 +386,13 @@ export default {
     //选择组合
     setSelectGroup(data,param) {
       let el = param.evt
-      if(this.selectWidgetId == data.id) {
+      if(this.selectWidgetId == data.resourceId) {
         this.splitGroupList = {}
         this.selectWidgetId = -1
       } else {
         this.splitGroupList = data
         this.currentGroupIndex = param.index
-        this.selectWidgetId = data.id
+        this.selectWidgetId = data.resourceId
       }
     },
     //选择组件
@@ -406,7 +415,7 @@ export default {
           }
         }
       } else {
-        this.selectWidgetId = data.id
+        this.selectWidgetId = data.resourceId
         this.currentEditItem = data
         this.isEditorShow = true
       }
@@ -430,7 +439,7 @@ export default {
               groupIndex = [index,resp]
             }
           } else {
-            if(item.id == data.id) {
+            if(item.resourceId == data.resourceId) {
               listIndex = index
               groupIndex = [index]
             }
