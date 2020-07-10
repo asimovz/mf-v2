@@ -5,8 +5,8 @@
       margin: alignCenter !== undefined ? '0 auto' : 0
     }">
     <div class="title">消息名称</div>
-    <m-carousel class="carousel" height="445px" trigger="click" :loop="false">
-      <m-carousel-item v-for="item in 4" :key="item">
+    <m-carousel class="carousel" height="445px" trigger="click" :loop="false" :autoplay="false" indicator-position="outside">
+      <m-carousel-item v-for="item in 1" :key="item">
         <div class="scroll-wrap">
           <span>这是一段信息</span><br>
           <span>这是一段信息</span><br>
@@ -78,10 +78,13 @@ export default {
   methods: {
     async getData () {
       try {
-        const { data } = await this.$root.$http.get(this.transition, {
-          messageId: this.messageId
+        const { data } = await this.$root.$http.get(this.api, {
+          params: {
+            messageId: this.messageId
+          }
         })
-        this.jsonData = data
+        this.jsonData = JSON.parse(data.data)
+        console.log(this.jsonData)
       } catch (err) {
         console.log('request err', err)
       }
@@ -127,6 +130,9 @@ export default {
 
   .carousel{
     width:100%;
+    .el-carousel__indicator--horizontal{
+      padding: 8px 4px 12px;   
+    }
   }
 }
 </style>

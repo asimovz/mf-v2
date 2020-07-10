@@ -35,7 +35,7 @@
               <m-button type="default" size="small" @click.native="verifyBefore(item, index)">提交</m-button>
             </div>
             <div>
-              <m-button type="default" size="small" @click.native="preview">预览</m-button>
+              <m-button type="default" size="small" @click.native="preview(item, index)">预览</m-button>
             </div>
             <div v-show="!standard">
               <m-button type="default" size="small" @click.native="delBefore(item, index)">删除</m-button>
@@ -72,12 +72,12 @@
         <el-button size="mini" type="primary" @click="confirm">确认</el-button>
       </div>
     </m-modal>
-    
+
     <m-modal
       title="预览"
       id="previewModal"
       v-model="previewVisible">
-      <msgPreview align-center :message-id="activeData.msgId" :api="previewApi" />
+      <msgPreview align-center :message-id="activeData.msgId" :api="previewDataUrl" />
     </m-modal>
   </div>
 </template>
@@ -122,7 +122,7 @@ export default {
       type: String,
       default: ''
     },
-    previewApi: {
+    previewDataUrl: {
       type: String,
       default: ''
     },
@@ -163,8 +163,25 @@ export default {
 
     if (this.searchForm) {
       this.$root.eventBus.$on('search_form_data_' + this.searchForm, data => {
-        for (let key in data) {
-          this.$set(this.params, key, data[key])
+        let jsonData = {}
+        if (typeof data.entries === 'function') {
+          for (let pair of data.entries()) {
+            let key = pair[0]
+            let value = pair[1]
+            if (value == '' || key === 'moquiSessionToken' || key === 'moquiFormName') continue
+            jsonData[key] = value
+            if (value.split(',').length > 1) {
+              jsonData[pair[0] + '_op'] = 'in'
+            } else {
+              jsonData[pair[0] + '_op'] = 'includes'
+            }
+          }
+        } else {
+          jsonData = data
+        }
+
+        for (let key in jsonData) {
+          this.$set(this.params, key, jsonData[key])
         }
       })
     }
@@ -217,15 +234,19 @@ export default {
     },
     async getData () {
       try {
-        const { data } = await this.$http.get(this.transition, this.params)
+        const { data } = await this.$http.get(this.transition, {
+          params: this.params
+        })
         this.page.count = data.count
         this.items = data.data
       } catch (err) {
         console.log('request err', err)
       }
     },
-    preview () {
+    preview (item, index) {
       this.previewVisible = true
+      this.activeIndex = index
+      this.activeData = item
     },
     standardCreate () {
       this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
