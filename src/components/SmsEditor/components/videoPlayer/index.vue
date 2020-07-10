@@ -10,9 +10,9 @@
     </video>
     <slot />
     <div class="video-info" v-if="showMediaInfo">
-      <div><label>视频大小</label> {{mediaInfo.size}}Kb</div>
-      <div><label>视频码率</label> {{mediaInfo.videoBit}}Kbps</div>
-      <div><label>音频码率</label> {{mediaInfo.musicBit}}Kbps</div>
+      <div><label>视频大小</label> {{parseInt(mediaInfo.size / 1024)}}Kb</div>
+      <div><label>视频码率</label> {{parseInt(mediaInfo.videoBit / 1000)}}Kbps</div>
+      <div><label>音频码率</label> {{parseInt(mediaInfo.musicBit / 1000)}}Kbps</div>
     </div>
   </div>
 </template>
@@ -115,6 +115,7 @@ export default {
   },
   watch: {
     sourceStr (v,ov) {
+      // debugger
       this.replay()
     },
     currentTime (v) {
@@ -275,9 +276,9 @@ export default {
           sessionStorage.setItem('localVideosInfo', JSON.stringify(dbs))
         }
 
-        this.mediaInfo.size = parseInt(resData.size / 1024)
-        this.mediaInfo.musicBit =  parseInt(resData.musicBit / 1000)
-        this.mediaInfo.videoBit = parseInt(resData.videoBit / 1000)
+        this.mediaInfo.size = parseInt(resData.size)
+        this.mediaInfo.musicBit =  parseInt(resData.musicBit)
+        this.mediaInfo.videoBit = parseInt(resData.videoBit)
         this.mediaInfo.duration = parseInt(resData.duration)
         this.mediaInfo.videoHeight = resData.height
         this.mediaInfo.videoWidth = resData.width

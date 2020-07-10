@@ -24,16 +24,16 @@
       <!-- 图片/视频 -->
       <div class="lib-list" :class="{'isCheckable': isCheckAble}">
         <template>
-          <div :title="isCheckAble ? '选中' : type.type !== 'voice' ? `添加${typeLabel}` : ''" v-for="(item, index) in dataList" :key="item.resourceId" :class="[
+          <div :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in dataList" :key="item.resourceId" :class="[
               'lib-item',
               {
                 'lib-item--checked': item.checked,
-                'lib-item--audio': type.type === 'voice',
+                'lib-item--audio': type.type === 'audio',
               },
             ]" @click="libAdd(item, index, $event)">
             <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
             <div class="lib-preview">
-              <img :src="item.uri" v-if="type['type'] === 'pic'" />
+              <img :src="item.uri" v-if="type['type'] === 'image'" />
               <template v-else-if="type['type'] === 'video'">
                 <img v-if="item.poster" :src="item.poster" />
                 <video v-else :src="item.uri"></video>

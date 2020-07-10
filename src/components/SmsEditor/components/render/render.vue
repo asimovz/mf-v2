@@ -38,9 +38,9 @@ export default {
   components: {
     widgetGroup,
     widgetText,
-    widgetPic: widgetImage,
+    widgetImage,
     widgetVideo,
-    widgetVoice: widgetAudio
+    widgetAudio
   },
   inject:['setSelectWidget','setSelectGroup','delWidget'],
   data() {

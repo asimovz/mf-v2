@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name:"widget-pic",
+  name:"widget-image",
   props: {
     data:Object
   },

@@ -7,7 +7,7 @@
       :w="w"
       :x="x"
       :y="y"
-      :isResizable="options.type === 'pic'"
+      :isResizable="options.type === 'image'"
       :minh="30"
       :minw="30"
       :parentW="mediaInfo.renderWidth || 609"
@@ -28,7 +28,7 @@
       </div>
       <img
         class="mark-img"
-        v-show="options.type === 'pic'"
+        v-show="options.type === 'image'"
         :src="options.img">
     </vue-drag-resize>
   </div>
@@ -143,7 +143,7 @@ export default {
       const {type, img, fontSize} = this.options
 
       return new Promise((resolve, reject) => {
-        if (type === 'pic') {
+        if (type === 'image') {
           if(!this.tempImg){
             this.tempImg = new Image()
           }

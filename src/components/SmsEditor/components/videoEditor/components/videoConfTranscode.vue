@@ -4,31 +4,19 @@
       <el-col>
         <el-form-item label="视频参数设置" style="margin-bottom:10px;">
             <el-radio-group size="small" v-model="form.sizeType">
-              <el-radio-button label="size">指定预估大小</el-radio-button>
+              <el-radio-button label="size">指定预估大小(MB)</el-radio-button>
               <el-radio-button label="rate">指定码率</el-radio-button>
             </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <!-- <el-select
-            size="small"
-            v-model="form.videoSize"
-            v-show="form.sizeType === 'size'">
-            <el-option
-              v-for="size in videoSizes"
-              :key="size"
-              :label="`${size}MB`"
-              :value="size"
-              :disabled="size > form.videoSize"></el-option>
-          </el-select> -->
-
-          <el-input-number style="width: 215px;" v-show="form.sizeType === 'size'" v-model="form.videoSize" :min="0.1" :max="maxSize" :step="0.1" label="预估大小"></el-input-number>
+          <el-input-number size="small" style="width: 215px;" v-show="form.sizeType === 'size'" v-model="form.videoSize" :min="0.1" :max="maxSize" :precision="1" :step="0.1" label="预估大小"></el-input-number>
 
           <el-select
             size="small"
             v-model="form.videoBit"
             v-show="form.sizeType === 'rate'">
             <el-option
-              v-for="bit in validateVideoBit"
+              v-for="bit in validateVideoBits"
               :key="bit"
               :label="`${bit} kbps`"
               :value="bit"></el-option>
@@ -41,11 +29,11 @@
             size="small"
             v-model="form.musicBit">
             <el-option
-              v-for="bit in musicBits"
+              v-for="bit in validateMusicBits"
               :key="bit"
               :label="`${bit} kbps`"
               :value="bit"
-              :disabled="bit > form.musicBit"></el-option>
+              ></el-option>
           </el-select>
         </el-form-item>
       </el-col>
@@ -79,19 +67,22 @@ export default {
   },
   computed: {
     musicBit(){
-      return this.parent.mediaInfo.musicBit
+      return parseInt(this.parent.mediaInfo.musicBit / 1000)
     },
     videoBit(){
-      return this.parent.mediaInfo.videoBit
+      return parseInt(this.parent.mediaInfo.videoBit / 1000)
     },
     videoSize(){
-      return (this.parent.mediaInfo.size / 1024).toFixed(1)
+      return (this.parent.mediaInfo.size / 1024 / 1024).toFixed(1)
     },
     videoSrc(){
       return this.parent.mediaInfo.uri
     },
-    validateVideoBit(){
+    validateVideoBits(){
       return this.videoBits.filter(bit => bit < this.videoBit)
+    },
+    validateMusicBits(){
+      return this.musicBits.filter(bit => bit < this.musicBit)
     }
   },
   watch: {
@@ -140,13 +131,21 @@ export default {
         const {nodeUrl, videoCompress} = this.mmsConfig
 
         const { data } = await this._http(`${nodeUrl}${videoCompress}`, requestData, {timeout: 20000})
+          .then(res => {
+            this.$message({
+              type: res.error === 0 ? 'success' : 'error',
+              message: res.message
+            })
+            return {
+              data: res.data
+            }
+          })
 
         this.loading = false
 
-
         let _data = {
-          musicBit: this.musicBit,
-          videoBit: this.videoBit,
+          musicBit: musicBit * 1000,
+          videoBit: videoBit * 1000,
         }
         this.$emit('complete', {
           data: _data,

@@ -61,7 +61,7 @@ export default {
   width: 100%;
 }
 .video-poster{display: none;position: relative;
-  img{max-width: 100%;}
+  img{width: 100%;max-height: 160px;object-fit: contain;background-color: #000;}
   .video-playBtn{
     position: absolute;
     top: 50%;

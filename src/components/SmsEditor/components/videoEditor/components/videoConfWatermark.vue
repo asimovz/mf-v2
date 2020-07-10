@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div v-show="markOpts.type === 'pic'">
+    <div v-show="markOpts.type === 'image'">
       <upLoadImage v-model="markOpts.img" />
     </div>
 
@@ -133,6 +133,11 @@ export default {
       this.markOpts.fontColor = e
     },
     async launch () {
+      let ops = this.markOpts
+      if(ops.type === 'text' && !ops.text || ops.type === 'image' && !ops.img){
+        this.$message.warning('水印内容为空')
+        return false
+      }
       this.loading = true
       try {
         const {type, text, img, fontFamily, fontSize, fontColor} = this.markOpts
@@ -165,7 +170,15 @@ export default {
           uri,
           type,
           agrv
-        }, {timeout: 20000})
+        }, {timeout: 20000}).then(res => {
+          this.$message({
+            type: res.error === 0 ? 'success' : 'error',
+            message: res.message
+          })
+          return {
+            data: res.data
+          }
+        })
 
         this.markOpts.text = ''
         this.markOpts.img = ''
