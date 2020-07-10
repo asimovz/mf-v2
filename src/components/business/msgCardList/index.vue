@@ -62,18 +62,6 @@
     </div>
 
     <m-modal
-      id="confirmModal"
-      :width="300"
-      :title="confirmModal.title"
-      v-model="confirmModal.visible">
-      <p>{{confirmModal.desc}}</p>
-      <div slot="footer" class="dialog-footer" align="center">
-        <el-button size="mini" @click="confirmModal.visible = false">取消</el-button>
-        <el-button size="mini" type="primary" @click="confirm">确认</el-button>
-      </div>
-    </m-modal>
-
-    <m-modal
       title="预览"
       id="previewModal"
       v-model="previewVisible">
@@ -90,7 +78,6 @@ export default {
       previewVisible: false,
       confirmModal: {
         type: '',
-        visible: false,
         title: '',
         desc: ''
       },
@@ -248,23 +235,32 @@ export default {
       this.confirmModal = {
         type: 'verify',
         title: '提交审核',
-        desc: '确认提交审核',
-        visible: true
+        desc: '确认提交审核'
       }
 
       this.activeIndex = index
       this.activeData = item
+      this.alertConfirm()
     },
     delBefore (item, index) {
       this.confirmModal = {
         type: 'del',
         title: '删除',
-        desc: '确认删除消息',
-        visible: true
+        desc: '确认删除消息'
       }
 
       this.activeIndex = index
       this.activeData = item
+      this.alertConfirm()
+    },
+    alertConfirm () {
+      this.$confirm(this.confirmModal.desc, this.confirmModal.title, {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.confirm()
+      })
     },
     async confirm () {
       try {
@@ -282,8 +278,6 @@ export default {
           this.getData()
           // this.items.splice(this.activeIndex, 1)
         }
-
-        this.confirmModal.visible = false
       } catch (err) {
         console.log('request err', err)
       }
