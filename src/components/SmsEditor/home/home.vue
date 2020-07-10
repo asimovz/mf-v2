@@ -111,14 +111,6 @@ import editPane from './editPane'
 import saveConfirm from './saveConfirm'
 import '../assets/css/home.less'
 
-function getRandomId(){
-  let maxNumber = 99999999
-  let minNumber = 1000000
-  let range = maxNumber - minNumber; //取值范围的差
-  let random = Math.random(); //小于1的随机数
-  return minNumber + Math.round(random * range); 
-}
-
 function dataURLtoFile(dataurl, filename) {
   var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
     bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
@@ -330,7 +322,7 @@ export default {
           this.widgetPaneShow = false
         }
         
-        this.mmsData.list.push({..._data, id: getRandomId()})
+        this.mmsData.list.push(_data)
       } else {
         this.handleWidget(_data)
       }
@@ -347,10 +339,7 @@ export default {
         data,
         item.type === 'image' ? { imgConf: {} } : null
       )
-      this.mmsData.list.push({
-        ...item,
-        id: getRandomId(),
-      })
+      this.mmsData.list.push(item)
       // 添加素材后中间区域显示最底部
       this.$nextTick(() => {
         let wrapper = document.querySelector('.body-content')
@@ -566,7 +555,7 @@ export default {
       // 提取需要字段
       let newList = flatList.map(item => {
         let _item = {}
-        let { type, content, name = '', uri, size, id, poster } = item
+        let { type, content, name = '', uri, size, resourceId, poster } = item
 
         _item = { type, name, size }
         if(poster) _item.poster = poster
@@ -576,7 +565,7 @@ export default {
           _item.content = newContent
           _item.size = 1
         }else{
-          ids.push(id)
+          ids.push(resourceId)
           _item.content = uri
         }
 
