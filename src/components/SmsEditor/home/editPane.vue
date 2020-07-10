@@ -110,6 +110,7 @@
 				if(!visible) this.editDataVideo = {}
 			}
 		},
+		inject: [ 'mmsConfig' ],
 		methods: {
 
 			remove(){
@@ -129,16 +130,43 @@
 				}
 			},
 
-			onSave({ newData, imgConf = {} }){
-				// let _newD = {}
-				// if(newData.poster){
-				// 	_newD.poster = newData.poster
-				// }
-				// _newD.uri = newData.uri
+			async onSave({ newData, imgConf = {} }){
+				if(this.currentData.type === 'video'){
+					let { uri, duration, size, poster, videoHeight: height, videoWidth: width,  } = newData
+					// 视频被 裁剪、转码、水印设置 过， 需要重新上传
+					if(newData.uri !== this.currentData.uri){
+						newData.uri = await this.uploadVideo({uri, height, width, duration, size, poster })
+					}
+					// 封面不会修改原视频
+				}else{
+					this.currentData.imgConf = imgConf
+				}
 
 				this.currentData = Object.assign(this.currentData, newData)
-				this.currentData.imgConf = imgConf
 			},
+
+			uploadVideo({uri, height, width, duration, size, poster }){
+				let fd = new FormData()
+
+				fd.append('type', 'video')
+				fd.append('actionType', 'upload')
+				fd.append('saveResource', 'Y')
+				fd.append('fileUrl', uri)
+				fd.append('poster', poster)
+				fd.append('height', height)
+				fd.append('width', width)
+				fd.append('duration', duration)
+				fd.append('size', size)
+
+				return this._http(this.mmsConfig.file, fd).then(res => {
+					this.$message({
+            type: res.type || 'warning',
+            message: res.messages
+          })
+
+          return res.type === 'success' ? res.data : ''
+				})
+			}
 		},
 
 		beforeCreate(){

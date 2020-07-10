@@ -1,6 +1,6 @@
 <template>
   <el-form class="videoConfPoster" :model="form" label-width="70px" label-position="left">
-    <el-form-item label="水印设置">
+    <el-form-item label="封面设置">
       <el-radio-group size="small" v-model="form.type">
         <el-radio-button label="recommend">推荐封面</el-radio-button>
         <el-radio-button label="custom">自定义封面</el-radio-button>

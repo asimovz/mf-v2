@@ -1,8 +1,8 @@
 <template>
-    <el-dialog title="编辑图片" class="img-modal" width="1000px" :visible.sync="showEditor" append-to-body :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false">
-      <div class="close-icon" @click="closeEditorModal">
+    <el-dialog title="编辑图片" class="img-modal" width="1000px" :visible.sync="showEditor" append-to-body :close-on-press-escape="false" :close-on-click-modal="false" @close="closedCb">
+      <!-- <div class="close-icon" @click="closeEditorModal">
         <i class="el-icon-close"></i>
-      </div>
+      </div> -->
       <div class="editor-container">
         <div class="add">
           <div class="add-box" @click="addText">
@@ -200,10 +200,8 @@
         </div>
       </div>
       <div  slot="footer" class="footer" style="padding: 10px 0 20px">
-        <span>
-          <el-button size="small" @click="closeEditorModal">取 消</el-button>
+          <el-button size="small" @click="close">取 消</el-button>
           <el-button size="small" type="primary" @click="saveImage">保 存</el-button>
-        </span>
       </div>
       <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);" accept="image/png, image/jpeg, image/jpg" @change="upload($event)">
       <input ref="addImg" type="file" id="uploadsImg" style="position:absolute; clip:rect(0 0 0 0);" accept="image/png, image/jpeg, image/jpg" @change="addImg($event)">
@@ -348,10 +346,10 @@ export default {
   },
 
   methods: {
-    
-    closeEditorModal () {
-      // 让组件showEditor支持.sync
+    close(){
       this.$emit("update:showEditor", false)
+    },
+    closedCb(){
       window.onkeydown = null
     },
     selectAlign(val) {
@@ -603,16 +601,22 @@ export default {
             let file = this.dataURLtoFile(dataURL,"png")
             // this.data.uri = dataURL
             this.configData.baseImg = data
+
             let formData = new FormData()
             formData.append('file', file)
             formData.append('type', 'image')
+            formData.append('actionType', 'upload')
+            formData.append('saveResource', 'Y')
+
             this._http(this.mmsConfig.file, formData)
             .then(res => {
-              if(res.error === 0){
+
+              if(res.type === 'success'){
                 this.$emit('on-save', {
                   newData: res.data,
                   imgConf: this.configData
                 })
+
                 this.$emit("update:showEditor", false)
               }
             })

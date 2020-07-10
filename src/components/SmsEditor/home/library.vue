@@ -27,40 +27,37 @@
       :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''"
       :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''"
     >
-      <!-- 图片/视频 -->
-      <div class="lib-list" :class="{'isCheckable': isCheckAble}">
-        <template>
-          <div :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in dataList" :key="item.resourceId" :class="[
-              'lib-item',
-              {
-                'lib-item--checked': item.checked,
-                'lib-item--audio': type.type === 'audio',
-              },
-            ]" @click="libAdd(item, index, $event)">
-            <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
-            <div class="lib-preview">
-              <img :src="item.uri" v-if="type['type'] === 'image'" />
-              <template v-else-if="type['type'] === 'video'">
-                <img v-if="item.poster" :src="item.poster" />
-                <video v-else :src="item.uri"></video>
-                <!-- <widget-video v-else :data="{...item, uri: item.src}" :showControls="false"></widget-video> -->
-              </template>
-              <template v-else>
-                <widget-audio :showPlusBtn="true" :data="{ uri: item.uri }" @click.native="audioClick">
-                  <div class="lib-add el-icon-plus" :title="`${isCheckAble ? '选中' : '添加音频素材'}`" @click.stop="libAdd(item, index)"></div>
-                </widget-audio>
-              </template>
-            </div>
-            <!-- :title="isCheckAble || !isEditAble ? '' : '双击可编辑'" -->
-            <div class="lib-name" v-if="item.name" :title="item.name">
-              <!-- @dblclick="nameEdit" -->
-              <div class="lib-name-word">{{ item.name }}</div>
-              <span title="重新命名" class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
-              <input class="lib-name-input" :value="item.name" @blur="(evt) => nameEdited(evt, item)" />
-            </div>
+      <transition-group name="fade" tag="div" class="lib-list" :class="{'isCheckable': isCheckAble}">
+        <div :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in dataList" :key="item.resourceId" :class="[
+            'lib-item',
+            {
+              'lib-item--checked': item.checked,
+              'lib-item--audio': type.type === 'audio',
+            },
+          ]" @click="libAdd(item, index, $event)">
+          <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
+          <div class="lib-preview">
+            <img :src="item.uri" v-if="type['type'] === 'image'" />
+            <template v-else-if="type['type'] === 'video'">
+              <img v-if="item.poster" :src="item.poster" />
+              <video v-else :src="item.uri"></video>
+              <!-- <widget-video v-else :data="{...item, uri: item.src}" :showControls="false"></widget-video> -->
+            </template>
+            <template v-else>
+              <widget-audio :showPlusBtn="true" :data="{ uri: item.uri }" @click.native="audioClick">
+                <div class="lib-add el-icon-plus" :title="`${isCheckAble ? '选中' : '添加音频素材'}`" @click.stop="libAdd(item, index)"></div>
+              </widget-audio>
+            </template>
           </div>
-        </template>
-      </div>
+          <!-- :title="isCheckAble || !isEditAble ? '' : '双击可编辑'" -->
+          <div class="lib-name" v-if="item.name" :title="item.name">
+            <!-- @dblclick="nameEdit" -->
+            <div class="lib-name-word">{{ item.name }}</div>
+            <span title="重新命名" class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
+            <input class="lib-name-input" :value="item.name" @blur="(evt) => nameEdited(evt, item)" />
+          </div>
+        </div>
+      </transition-group>
     </div>
   </div>
 </template>
@@ -299,11 +296,23 @@ export default {
       let { files } = input
       let file = [...files][0]
 
-      if (!this.isSizeValidated(file.size)) {
+      // 文件的 格式
+      let _fileType = file.name.split('.').slice(-1).join()
+      // 允许上传的 格式
+      let accepts = input.getAttribute('accept')
+
+      if(!this.isTypeValidated(_fileType)) {
+        this.$message.warning('请上传正确格式的素材')
         input.value = ''
-        return this.$message.warning(
+        return
+      }
+
+      if (!this.isSizeValidated(file.size)) {
+        this.$message.warning(
           `${this.typeLabel} 上传大小不得超过 ${this.type['size']}M`
         )
+        input.value = ''
+        return
       }
 
       this.isUpLoading = true
@@ -325,6 +334,11 @@ export default {
       return this.type['size'] * 1024 * 1024 > size
     },
 
+    // 验证文件格式
+    isTypeValidated(type){
+      return this.currentAccept.includes(type)
+    },
+
 
     // 更新素材
     updateLib(fd) {
@@ -334,8 +348,11 @@ export default {
 
           switch (actionType) {
             case 'upload':
-              this.dataList.unshift(res);
-              this.$message.success('上传成功');
+              this.$message({
+                type: res.type || 'warning',
+                message: res.messages
+              });
+              res.type === 'success' && this.dataList.unshift(res)
               break;
             case 'delete':
             case 'rename':
@@ -366,8 +383,7 @@ export default {
           if (res.error === 0) {
             this.dataList = [...res.data]
           }
-          this.fetchLoading = false
-        }).catch(err => {
+        }).finally(end => {
           this.fetchLoading = false
         })
     }
