@@ -35,7 +35,7 @@
               <m-button type="default" size="small" @click.native="verifyBefore(item, index)">提交</m-button>
             </div>
             <div>
-              <m-button type="default" size="small" @click.native="preview">预览</m-button>
+              <m-button type="default" size="small" @click.native="preview(item, index)">预览</m-button>
             </div>
             <div v-show="!standard">
               <m-button type="default" size="small" @click.native="delBefore(item, index)">删除</m-button>
@@ -75,8 +75,9 @@
 
     <m-modal
       title="预览"
+      id="previewModal"
       v-model="previewVisible">
-      <msgPreview align-center :message-id="activeData.msgId" :api="previewApi" />
+      <msgPreview align-center :message-id="activeData.msgId" :api="previewDataUrl" />
     </m-modal>
   </div>
 </template>
@@ -101,7 +102,7 @@ export default {
         pageSize: 30
       },
       items: [],
-      params: {}
+      formParams: {}
     }
   },
   props: {
@@ -121,7 +122,7 @@ export default {
       type: String,
       default: ''
     },
-    previewApi: {
+    previewDataUrl: {
       type: String,
       default: ''
     },
@@ -137,34 +138,37 @@ export default {
       return p < 1 ? 1 : Math.ceil(p) + 1
     }
   },
-  watch: {
-    page: {
-      deep: true,
-      handler (v) {
-        this.$set(this.params, 'pageIndex', v.pageIndex)
-        this.$set(this.params, 'pageSize', v.pageSize)
-      }
-    },
-    params: {
-      deep: true,
-      handler () {
-        this.getData()
-      }
-    }
-  },
   created () {
     this.standard = location.href.indexOf('StandardFiveGMessage') >= 0
 
     this.$root.eventBus.$on('pageChangeByMsgCardList', data => {
       this.page.pageIndex = data.pageIndex
       this.page.pageSize = data.pageSize
+      this.getData()
     })
 
     if (this.searchForm) {
       this.$root.eventBus.$on('search_form_data_' + this.searchForm, data => {
-        for (let key in data) {
-          this.$set(this.params, key, data[key])
+        let formParams = {}
+        if (typeof data.entries === 'function') {
+          for (let pair of data.entries()) {
+            let key = pair[0]
+            let value = pair[1]
+            if (value == '' || key === 'moquiSessionToken' || key === 'moquiFormName') continue
+            formParams[key] = value
+            if (value.split(',').length > 1) {
+              formParams[pair[0] + '_op'] = 'in'
+            } else {
+              formParams[pair[0] + '_op'] = 'includes'
+            }
+          }
+        } else {
+          formParams = data
         }
+
+        this.formParams = formParams
+
+        this.getData()
       })
     }
 
@@ -211,20 +215,28 @@ export default {
 
       searchArr.forEach(item => {
         const tmp = item.split('=')
-        this.$set(this.params, tmp[0], tmp[1])
+        this.formParams[tmp[0]] = tmp[1]
       })
     },
     async getData () {
       try {
-        const { data } = await this.$http.get(this.transition, this.params)
+        const { data } = await this.$http.get(this.transition, {
+          params: {
+            ...this.formParams,
+            pageIndex: this.page.pageIndex,
+            pageSize: this.page.pageSize
+          }
+        })
         this.page.count = data.count
         this.items = data.data
       } catch (err) {
         console.log('request err', err)
       }
     },
-    preview () {
+    preview (item, index) {
       this.previewVisible = true
+      this.activeIndex = index
+      this.activeData = item
     },
     standardCreate () {
       this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
@@ -266,7 +278,8 @@ export default {
         if (type === 'verify') {
           this.activeData.statusId = 'MmsSubmit'
         } else {
-          this.params.pageIndex = 0
+          this.page.pageIndex = 0
+          this.getData()
           // this.items.splice(this.activeIndex, 1)
         }
 
