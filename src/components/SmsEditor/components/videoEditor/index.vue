@@ -1,5 +1,5 @@
 <template>
-<el-dialog width="1100px" class="videoConf" title="视频编辑" :visible.sync="_visible" @close="close" @open="dialogOpened" append-to-body>
+<el-dialog width="1100px" class="videoConf" title="视频编辑" :visible.sync="_visible" :close-on-click-modal="false" :before-close="beforeClose" @open="dialogOpened" append-to-body>
   <el-row :gutter="20">
     <el-col class="player-wrap" :span="14">
       <videoPlayer
@@ -52,7 +52,7 @@
   </el-row>
   <div slot="footer" class="dialog-footer" style="padding: 10px 0 20px">
     <el-button size="small" @click="close">取消</el-button>
-    <el-button size="small" type="primary" @click="save">保存</el-button>
+    <el-button size="small" :icon="saveLoading ? 'el-icon-loading' : ''" type="primary" @click="save">保存</el-button>
   </div>
 </el-dialog>
 </template>
@@ -105,10 +105,18 @@ export default {
       activeName: 'crop',
       videoPlayer: null, // 播放器实例,
 
-      extraData: null
+      extraData: null,
+      saveLoading: ''
     }
   },
   computed: {
+    _visible: {
+      get(){
+        return this.visible
+      },
+      set(){
+      }
+    },
     watermarkVisible(){
       if(this.activeName === 'watermark'){
         const {type, img, text} = this.watermarkOpts
@@ -122,12 +130,6 @@ export default {
       }else{
         return false
       }
-    },
-    _visible: {
-      get () {
-        return this.visible
-      },
-      set () {}
     },
     videoOptions () {
       return {
@@ -148,6 +150,7 @@ export default {
     // },
     _visible(v){
       if(!v || !this.$refs.refWatermark) return
+      v && this.initData()
       this.activeName = 'crop'
       this.watermarkOpts = {}
       this.$refs.refWatermark.init()
@@ -167,6 +170,18 @@ export default {
     }
   },
   methods: {
+    initData(){
+      for(var key in this.mediaData){
+        this.$set(this.mediaInfo, key, this.mediaData[key])
+      }
+      this.videoPlayer.showPoster()
+    },
+    showLoading(){
+      this.saveLoading = true
+    },
+    hideLoading(){
+      this.saveLoading = false
+    },
     imgRectChange(v){
       this.imgRect = v
     },
@@ -202,14 +217,21 @@ export default {
       this.mediaInfo.poster = res.poster
       this.videoPlayer.showPoster()
     },
-    close () {
-      this.$emit('update:visible', false)
+    close(){
+      // this.$emit('update:visible', false)
+      this.beforeClose()
+    },
+    beforeClose(done){
+      this.$confirm('丢失编辑内容并关闭？', '提示', {type: 'warning'})
+      .then(_ => {
+        typeof done === 'function' && done()
+        this.$emit('update:visible', false)
+      })
     },
     save () {
       this.$emit('on-save', {
         newData: this.mediaInfo
       })
-      this.close()
     }
   }
 }

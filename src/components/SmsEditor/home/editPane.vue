@@ -10,7 +10,7 @@
 					<img :src="currentData.uri">
 				</template>
 				<template v-if="currentData.type === 'video'">
-					<videoPlayer showMediaInfo :options="videoOptions" />
+					<videoPlayer ref="videoPlayer" showMediaInfo :options="videoOptions" />
 				</template>
 				<template v-if="currentData.type === 'audio'">
 					<audioPlayer style="flex:1" :options="audioOptions" />
@@ -34,9 +34,11 @@
 		</img-editor-modal>
 
 		<video-conf
+			ref="videoConf"
 		  :visible.sync="isVideoEdit"
 		  :mediaData="editDataVideo"
 		  @on-save="onSave"
+		  @on-cancel="onCancel"
 		>
 		</video-conf>
 
@@ -108,6 +110,11 @@
 			},
 			isImgEdit(visible){
 				if(!visible) this.editDataVideo = {}
+			},
+			'currentData.poster': {
+				handler(nVal, oVal){
+					nVal && this.$refs.videoPlayer && this.$refs.videoPlayer.showPoster()
+				}
 			}
 		},
 		inject: [ 'mmsConfig' ],
@@ -130,16 +137,25 @@
 				}
 			},
 
+			onCancel(){
+				if(this.isImgEdit) this.isImgEdit = false
+					if(this.isVideoEdit) this.isVideoEdit = false
+			},
+
 			async onSave({ newData, imgConf = {} }){
 				if(this.currentData.type === 'video'){
 					let { uri, duration, size, poster, videoHeight: height, videoWidth: width,  } = newData
 					// 视频被 裁剪、转码、水印设置 过， 需要重新上传
 					if(newData.uri !== this.currentData.uri){
+						this.$refs.videoConf.showLoading()
 						newData.uri = await this.uploadVideo({uri, height, width, duration, size, poster })
 					}
+
+					this.isVideoEdit = false
 					// 封面不会修改原视频
 				}else{
 					this.currentData.imgConf = imgConf
+					this.isImgEdit = false
 				}
 
 				this.currentData = Object.assign(this.currentData, newData)
@@ -165,6 +181,8 @@
           })
 
           return res.type === 'success' ? res.data.uri : ''
+				}).finally(end => {
+					this.$refs.videoConf.hideLoading()
 				})
 			}
 		},

@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="编辑图片" class="img-modal" width="1000px" :visible.sync="visible" append-to-body :close-on-press-escape="false" :close-on-click-modal="false" @close="closedCb">
+    <el-dialog title="编辑图片" class="img-modal" width="1000px" :visible.sync="visible" append-to-body :close-on-press-escape="false" :close-on-click-modal="false" :before-close="beforeClose" @close="closedCb">
       <div class="editor-container">
         <div class="add">
           <div class="add-box" @click="addText">
@@ -189,7 +189,7 @@
       </div>
       <div  slot="footer" class="footer" style="padding: 10px 0 20px">
           <el-button size="small" @click="close">取 消</el-button>
-          <el-button size="small" type="primary" @click="saveImage">保 存</el-button>
+          <el-button size="small" :icon="saveLoading ? 'el-icon-loading' : ''" type="primary" @click="saveImage">保 存</el-button>
       </div>
       <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);" accept="image/png, image/jpeg, image/jpg" @change="upload($event)">
       <input ref="addImg" type="file" id="uploadsImg" style="position:absolute; clip:rect(0 0 0 0);" accept="image/png, image/jpeg, image/jpg" @change="addImg($event)">
@@ -248,7 +248,6 @@ export default {
         return this.showEditor
       },
       set(v){
-        this.$emit("update:showEditor", false)
       }
     }
   },
@@ -338,13 +337,11 @@ export default {
       }],
       // 去除底图上的图片在切换时，收到realtime的影响，发生闪现
       imgItemLoad: true,
+      saveLoading: false
     }
   },
 
   methods: {
-    close(){
-      this.$emit("update:showEditor", false)
-    },
     closedCb(){
       window.onkeydown = null
     },
@@ -553,6 +550,19 @@ export default {
       }
       return new File([u8arr], filename, {type:mime});
     },
+
+    close(){
+      // this.$emit("update:showEditor", false)
+      this.beforeClose()
+    },
+
+    beforeClose(done){
+      this.$confirm('丢失编辑内容并关闭？', '提示', {type: 'warning'})
+      .then(_ => {
+        typeof done === 'function' && done()
+        this.$emit("update:showEditor", false)
+      })
+    },
     saveImage () {
       if(this.w/this.h < 0.45) {
         this.$message({
@@ -561,6 +571,9 @@ export default {
         });
         return
       }
+
+      this.saveLoading = true
+
       this.selectedItem = undefined
       this.previewStyle = {
         width: this.w + 'px',
@@ -598,15 +611,14 @@ export default {
 
             this._http(this.mmsConfig.file, formData)
             .then(res => {
-
               if(res.type === 'success'){
                 this.$emit('on-save', {
                   newData: res.data,
                   imgConf: this.configData
                 })
-
-                this.$emit("update:showEditor", false)
               }
+            }).finally(end => {
+              this.saveLoading = false
             })
           })
         })

@@ -39,7 +39,7 @@ export default {
   data () {
     return {
       imgs: [],
-      currentPoster: '',
+      // currentPoster: '',
       loading: false,
       loaded: false,
       loadErr: false,
@@ -57,6 +57,15 @@ export default {
     },
     videoSrc(){
       return this.parent.mediaInfo.uri
+    },
+
+    currentPoster: {
+      get(){
+        return this.parent.mediaInfo.poster || ''
+      },
+      set(val){
+        this.parent.mediaInfo.poster = val
+      }
     }
   },
   watch: {

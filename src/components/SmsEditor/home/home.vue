@@ -580,9 +580,18 @@ export default {
         return _item
       })
 
+      if(!this.submitValidate(newList)){
+        this.$message.warning('模板必须包含文本');
+        return
+      }
+
       let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
       this.captrue(_data)
+    },
+
+    submitValidate(datas){
+      return datas.some(data => data.type === 'text')
     },
 
     // 截图前处理

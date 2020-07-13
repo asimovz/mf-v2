@@ -39,6 +39,15 @@ export default {
   mounted(){
     this.$refs.videoPlayer.replay()
   },
+  watch: {
+    'data.poster': {
+      handler(val){
+        this.$nextTick(() => {
+          this.$refs.videoPlayer.showPoster()
+        })
+      }
+    }
+  },
   computed:{
     videoOptions(){
       return {
