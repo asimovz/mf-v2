@@ -3,11 +3,11 @@
     <ul class="list-wrap">
       <li class="item btn-add">
         <div class="inner-wrap" v-if="standard" @click="standardCreate">
-          <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
+          <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
         </div>
         <m-link v-else :href="editUrl">
           <div class="inner-wrap">
-            <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
+            <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
           </div>
         </m-link>
       </li>
@@ -28,17 +28,21 @@
           <div class="control">
             <div v-show="item.statusId !== 'MmsSubmit'">
               <m-link :href="editUrlItem(item)">
-                <m-button type="default" size="small">编辑</m-button>
+                <img class="icon icon-edit" src="./icons/icon-edit.svg">
+                <span>编辑</span>
               </m-link>
             </div>
-            <div v-show="item.statusId === 'MmsOpen'">
-              <m-button type="default" size="small" @click.native="verifyBefore(item, index)">提交</m-button>
+            <div v-show="item.statusId === 'MmsOpen'" @click="verifyBefore(item, index)">
+              <img class="icon icon-submit" src="./icons/icon-submit.svg">
+              <span>提交</span>
             </div>
-            <div>
-              <m-button type="default" size="small" @click.native="preview(item, index)">预览</m-button>
+            <div @click="preview(item, index)">
+              <img class="icon icon-preview" src="./icons/icon-preview.svg">
+              <span>预览</span>
             </div>
-            <div v-show="!standard">
-              <m-button type="default" size="small" @click.native="delBefore(item, index)">删除</m-button>
+            <div v-show="!standard" @click="delBefore(item, index)">
+              <img class="icon icon-del" src="./icons/icon-del.svg">
+              <span>删除</span>
             </div>
           </div>
         </div>
@@ -304,7 +308,7 @@ export default {
       background: #fff;
       margin-bottom: 20px;
       position: relative;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid rgba(0,0,0,0.15);
       &.blank{
         border:none
@@ -317,7 +321,9 @@ export default {
     }
 
     .btn-add{
+      font-size: 12px;
       .inner-wrap{
+        color:#C0C4CC;
         cursor: pointer;
         position: absolute;
         top:0;
@@ -332,7 +338,8 @@ export default {
       position: relative;
       height: 120px;
       overflow: hidden;
-      border-radius: 8px 8px 0 0;
+      border-radius: 6px 6px 0 0;
+      margin: -1px;
       .img{
         width: 100%;
         position: absolute;
@@ -375,7 +382,7 @@ export default {
       padding:.5em 1em;
       width: 108px;
       text-align: center;
-      border-radius: 8px 0 4px 0;
+      border-radius: 6px 0 3px 0;
       .tooltip{
         font-size: 1.2em;
         position: absolute;
@@ -406,9 +413,9 @@ export default {
       left:-1px;
       padding:10px;
       background: rgba(0, 0, 0, .4);
-      visibility:hidden;
+      visibility:visible;
       text-align: center;
-      border-radius: 8px;
+      border-radius: 6px;
       button{
         width: 95px;
         margin-bottom: 15px;
@@ -417,10 +424,56 @@ export default {
     }
 
     .control{
+      text-align: center;
       position: absolute;
+      width: 100%;
       top:50%;
       left:50%;
       transform: translate(-50%, -50%);
+      .icon{
+        width:12px;
+        height: 12px;
+      }
+      .icon-add{
+        width: 24px;
+        height: 24px;
+      }
+      span{
+        display: none;
+        font-size: 10px;
+      }
+      div{
+        width:30px;
+        height:30px;
+        line-height: 30px;
+        background: #fff;
+        display: inline-block;
+        border-radius: 50%;
+        cursor: pointer;
+        color: #fff;
+        position: relative;
+        a:hover{
+          color:#fff;
+        }
+        span{
+          width:100%;
+        }
+        img,span{
+          position: absolute;
+          top:50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+        &:hover{
+          background: #3c64b9;
+          span{
+            display: inline;
+          }
+          .icon{
+            display: none;
+          }
+        }
+      }
     }
   }
 }
