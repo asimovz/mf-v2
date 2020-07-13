@@ -10,7 +10,9 @@
         <div class="scroll-wrap">
           <div v-for="(item, index) in card" :key="index">
             <div v-if="item.type === 'card'" class="card">
-              <img :src="item.content" />
+              <video v-if="item.mediaType === 'video'" controls :src="item.content" preload="metadata"></video>
+              <img v-if="item.mediaType === 'pic'" :src="item.content" />
+              <audio controls v-if="item.mediaType === 'voice'" :src="item.content"></audio>
               <div class="desc" v-if="card.title">
                 <h3>{{card.title}}</h3>
                 <p>{{card.desc}}</p>
@@ -27,7 +29,7 @@
               <video controls :src="item.content" preload="metadata"></video>
             </div>
             <div v-if="item.type === 'audio' || item.type === 'voice'">
-              <audio :src="item.content"></audio>
+              <audio controls :src="item.content"></audio>
             </div>
           </div>
         </div>
@@ -110,12 +112,15 @@ export default {
               }
             ])
           } else if (item.replyType === 'singleCard') {
-            const {originalTitle, mediaUrl, description, buttons} = item.reply.card
+            console.log(item.reply.card)
+            const {originalTitle, description, buttons} = item.reply.card
+            const {mediaUrl, mediaType} = item.reply.card.media
             cards.push([{
               content: mediaUrl,
               title: originalTitle,
               desc: description,
               buttons,
+              mediaType,
               type: 'card'
             }])
           } else {
@@ -126,6 +131,7 @@ export default {
                   title: card.originalTitle,
                   desc: card.description,
                   buttons: card.buttons,
+                  mediaType: card.media.mediaType,
                   type: 'card'
                 }
               ])
