@@ -253,6 +253,7 @@ export default {
   }
   .el-slider__button-wrapper{
     top:-15px;
+    z-index: 10,
   }
   .el-slider__button{
     border:none;
