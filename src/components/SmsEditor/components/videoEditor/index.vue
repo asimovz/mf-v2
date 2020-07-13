@@ -150,7 +150,7 @@ export default {
     // },
     _visible(v){
       if(!v || !this.$refs.refWatermark) return
-      v && this.initData()
+      // v && this.initData()
       this.activeName = 'crop'
       this.watermarkOpts = {}
       this.$refs.refWatermark.init()

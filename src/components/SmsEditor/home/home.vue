@@ -570,6 +570,8 @@ export default {
 
         if (item.type === 'text') {
           let newContent = this.replaceTextContent(content)
+
+          _item.name = this.initParams.messageName
           _item.content = newContent
           _item.size = 1
         } else {
@@ -615,7 +617,7 @@ export default {
         useCORS: true
       }).then(canvas => {
         let dataURL = canvas.toDataURL('image/png')
-        let file = dataURLtoFile(dataURL, 'mmsTemplateCover.png')
+        let file = dataURLtoFile(dataURL, getRandomId() + '.png')
 
         // this.mmsData.list = oldList
 

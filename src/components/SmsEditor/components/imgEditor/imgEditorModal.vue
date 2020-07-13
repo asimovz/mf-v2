@@ -204,11 +204,12 @@ import editText from '../widget-comps/editText'
 import html2canvas from 'html2canvas'
 
 
-function uuid(){
-  function S4() {
-    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-  }
-  return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+function getRandomId() {
+  let maxNumber = 99999999
+  let minNumber = 1000000
+  let range = maxNumber - minNumber; //取值范围的差
+  let random = Math.random(); //小于1的随机数
+  return minNumber + Math.round(random * range);
 }
 
 export default {
@@ -443,7 +444,7 @@ export default {
     },
 
     addImg (event) {
-      let key = uuid()
+      let key = getRandomId()
       let url,height
       let files = Array.from(event.target.files)
       if(files.length <= 0) return
@@ -475,7 +476,7 @@ export default {
     },
 
     addText () {
-      let key = uuid()
+      let key = getRandomId()
       let obj = {
         type: 'text',
         value: '文字',
@@ -599,7 +600,7 @@ export default {
             useCORS: true
           }).then(canvas => {
             let dataURL = canvas.toDataURL('image/png')
-            let file = this.dataURLtoFile(dataURL,"png")
+            let file = this.dataURLtoFile(dataURL, getRandomId() + '.png')
             // this.data.uri = dataURL
             this.configData.baseImg = data
 
