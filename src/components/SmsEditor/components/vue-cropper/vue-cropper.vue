@@ -529,7 +529,7 @@ export default {
         xhr.responseType = "blob";
         xhr.send();
       } else {
-        img.src = this.img;
+        img.src = this.img + `?v=${+new Date()}`;
       }
     },
     // 当按下鼠标键
