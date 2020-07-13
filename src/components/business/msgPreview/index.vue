@@ -26,7 +26,7 @@
             <div v-if="item.type === 'video'">
               <video controls :src="item.content" preload="metadata"></video>
             </div>
-            <div v-if="item.type === 'audio'">
+            <div v-if="item.type === 'audio' || item.type === 'voice'">
               <audio :src="item.content"></audio>
             </div>
           </div>
@@ -102,7 +102,7 @@ export default {
         const dataJson = JSON.parse(data.result.massMessage)
 
         dataJson.replyCollection.forEach(item => {
-          if (['text', 'voice', 'video'].includes(item.replyType)) {
+          if (['text', 'voice', 'video', 'image'].includes(item.replyType)) {
             cards.push([
               {
                 content: item.replyType === 'text' ? item.reply.content : item.reply.mediaUrl,
