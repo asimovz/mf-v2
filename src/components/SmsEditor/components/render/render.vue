@@ -1,11 +1,11 @@
 <template>
     <div class="widget-wrapper" :data-type="data.type">
       <!-- 组合 -->
-      <div v-if="data.type=='group'" ref="widget" :class="[{'group--selected':data.resourceId == selectWidgetId}]">
-        <component :selected="data.resourceId == selectWidgetId" :select-widget-id="selectWidgetId" is="widgetGroup" :group="listIndex" :data="data"></component>
+      <div v-if="data.type=='group'" ref="widget" :class="[{'group--selected':data.id == selectWidgetId}]">
+        <component :selected="data.id == selectWidgetId" :select-widget-id="selectWidgetId" is="widgetGroup" :group="listIndex" :data="data"></component>
       </div>
       <!-- 基础组件 -->
-      <div v-else :class="['widget-border',{'widget--selected':data.resourceId == selectWidgetId,'noText':data.type != 'text'}]" ref="widget" @click.stop="selectWidget">
+      <div v-else :class="['widget-border',{'widget--selected':data.id == selectWidgetId,'noText':data.type != 'text'}]" ref="widget" @click.stop="selectWidget">
         <component  :is="setCompWidget(data)" @edit="setWidgetState" :data="data" v-bind="data.props" v-on="$listeners"></component>
       </div>
 
@@ -14,11 +14,11 @@
         <span :class="['move','drag-widget',{'cursor-grabbing':isDragGroup}]"  @mousedown.capture="dropGroup">
           <editor-icon name="yidong" size="14" />
         </span>
-        <span :class="[{'selected':data.resourceId == selectWidgetId}]" @click.stop="selectGroup"><i style="font-weight:700" class="el-icon-check"></i></span>
+        <span :class="[{'selected':data.id == selectWidgetId}]" @click.stop="selectGroup"><i style="font-weight:700" class="el-icon-check"></i></span>
         <span class="delete"><editor-icon name="shanchu" size="12" @click.native="handleDel" /></span>
       </div>
 
-      <div class="widget-handle" ref="handleBox" v-if="data.type!='group' && data.resourceId == selectWidgetId && !isEdit">
+      <div class="widget-handle" ref="handleBox" v-if="data.type!='group' && data.id == selectWidgetId && !isEdit">
         <editor-icon class="move drag-widget" name="yidong" size="14" />
         <editor-icon class="del"  name="shanchu" size="14" @click.native="handleDel" />
       </div>

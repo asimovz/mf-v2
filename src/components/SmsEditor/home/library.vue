@@ -90,6 +90,14 @@ function selectText(el) {
   }
 }
 
+function getRandomId(){
+  let maxNumber = 99999999
+  let minNumber = 1000000
+  let range = maxNumber - minNumber; //取值范围的差
+  let random = Math.random(); //小于1的随机数
+  return minNumber + Math.round(random * range); 
+}
+
 function movetoEnd(el){
   let range = window.getSelection()
   range.selectAllChildren(el)
