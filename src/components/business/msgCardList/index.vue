@@ -149,7 +149,7 @@ export default {
           for (let pair of data.entries()) {
             let key = pair[0]
             let value = pair[1]
-            if (value == '' || key === 'moquiSessionToken' || key === 'moquiFormName') continue
+            if (value === '' || key === 'moquiSessionToken' || key === 'moquiFormName') continue
             formParams[key] = value
             if (value.split(',').length > 1) {
               formParams[pair[0] + '_op'] = 'in'
@@ -413,7 +413,7 @@ export default {
       left:-1px;
       padding:10px;
       background: rgba(0, 0, 0, .4);
-      visibility:visible;
+      visibility:hidden;
       text-align: center;
       border-radius: 6px;
       button{
