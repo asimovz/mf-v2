@@ -10,7 +10,7 @@
         <div class="scroll-wrap">
           <div v-for="(item, index) in card" :key="index">
             <div :class="{
-              card: item.replyType && item.title,
+              card: item.replyType,
               horizontal: item.cardOrientation === 'HORIZONTAL'
             }">
               <div class="main">
@@ -90,6 +90,7 @@ export default {
     async getData (data) {
       try {
         if (data) {
+          this.standard = data.messageType === 'standard'
           this.cards = this.filterData(data)
         } else {
           const { data } = await this.$root.$http.get(this.api, {
@@ -98,16 +99,23 @@ export default {
             }
           })
           this.standard = data.messageType === 'standard'
-          this.cards = this.filterData(data)
+          this.cards = this.standard ? this.filterData(data.data) : this.filterData(data.result.massMessage)
         }
       } catch (err) {
         console.log('request err', err)
       }
     },
-    filterData (data) {
-      let cards = []
+    filterData (massMessage) {
+      let [cards, dataJson] = [[], {}]
+
+      if (typeof massMessage === 'object') {
+        massMessage.replyCollection = JSON.parse(massMessage.replyCollection)
+        dataJson = massMessage
+      } else {
+        dataJson = JSON.parse(massMessage)
+      }
+
       if (this.standard) {
-        const dataJson = JSON.parse(data.data)
         let card = dataJson.map(item => {
           return {
             content: item.content,
@@ -116,15 +124,13 @@ export default {
         })
         cards.push(card)
       } else {
-        const dataJson = JSON.parse(data.result.massMessage)
-
-        this.buttons = dataJson.buttons
+        this.buttons = typeof dataJson.buttons === 'string' ? JSON.parse(dataJson.buttons) : dataJson.buttons
 
         dataJson.replyCollection.forEach(item => {
           if (['text', 'voice', 'video', 'image'].includes(item.replyType)) {
             cards.push([
               {
-                content: item.replyType === 'text' ? (item.originalMessage || item.reply.content || '') : item.reply.mediaUrl,
+                content: item.replyType === 'text' ? (item.originalMessage || (item.reply && item.reply.content) || '') : item.reply.mediaUrl,
                 type: item.replyType
               }
             ])
