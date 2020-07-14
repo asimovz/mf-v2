@@ -351,7 +351,7 @@ export default {
       // 添加素材后中间区域显示最底部
       this.$nextTick(() => {
         let wrapper = document.querySelector('.body-content')
-        wrapper.scrollTop = wrapper.scrollHeight - wrapper.clientHeight - 15
+        wrapper.scrollTop = wrapper.scrollHeight - wrapper.clientHeight
       })
     },
 
