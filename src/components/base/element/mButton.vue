@@ -131,7 +131,7 @@ export default {
         let obj = document.querySelector(`input[name='${value}']`)
         param[value] = obj.value;
       });
-      return param
+      return Object.assign(param,this.formParam)
     },
     confirm (callback) {
       this.handleConfirm({

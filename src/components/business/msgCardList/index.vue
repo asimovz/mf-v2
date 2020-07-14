@@ -134,8 +134,6 @@ export default {
     }
   },
   created () {
-    this.standard = location.href.indexOf('StandardFiveGMessage') >= 0
-
     this.$root.eventBus.$on('pageChangeByMsgCardList', data => {
       this.page.pageIndex = data.pageIndex
       this.page.pageSize = data.pageSize
@@ -222,6 +220,8 @@ export default {
             pageSize: this.page.pageSize
           }
         })
+
+        this.standard = data.messageType === 'standard'
         this.page.count = data.count
         this.items = data.data
       } catch (err) {
@@ -310,6 +310,7 @@ export default {
       position: relative;
       border-radius: 6px;
       border: 1px solid rgba(0,0,0,0.15);
+      min-height: 200px;
       &.blank{
         border:none
       }
