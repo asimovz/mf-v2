@@ -298,7 +298,7 @@ export default {
   }
 
   .el-tabs__header .el-tabs__item {
-    border-left: 1px solid #cfd7e5;
+    border-left-color: #cfd7e5!important;
     background-color: rgba(0, 0, 0, .03);
     user-select: none;
   }
