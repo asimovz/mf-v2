@@ -126,7 +126,7 @@ export default {
   },
   computed: {
     blanks () {
-      return this.items.length % 5
+      return 5 - (this.items.length + 1) % 5
     },
     pageMaxIndex () {
       let p = this.page.count / this.page.pageSize
