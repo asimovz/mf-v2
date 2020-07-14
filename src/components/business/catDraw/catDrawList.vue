@@ -77,6 +77,7 @@
 	import catChoose from './catChoose/catChoose'  //素材的弹窗
 	import { AboutMaterial } from './catChoose/aboutMaterial.js' //选择素材的弹窗
 	import { CatDrawJudge } from './catDrawJudge' //判断条件的处理
+	import { AbuotQuote } from '../catDraw/abuotQuote' //引用的内容替和id的转换
 
 	//初始化数据
 	class Reply {
@@ -226,6 +227,7 @@
 			//监听可添加的最多10个
 		  eventList: {
 		      handler(newName, oldName) {
+						console.log('eventList',newName)
 		      			var maxNumber = this.drawListMaxNumber 
 							if(newName && newName.inputContents) {
 								var inputContents = newName.inputContents || []

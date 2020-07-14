@@ -250,6 +250,7 @@
 				cards.forEach((item) => {
 					item.media.height = val  //设置到界面中去
 				})
+				this.reply.cardHeight  = val
 			},
 			playVideo() {
 			},

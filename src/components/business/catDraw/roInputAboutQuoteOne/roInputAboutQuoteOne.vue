@@ -137,28 +137,31 @@
 
 //			//新增监听input改变值
 			onChangeInput(val) {
+				console.log(8888,val,emojiCharStringLen(val),this.maxlength)
 				//如果没有，不用去设置了
-				if(!this.maxlength) {
-					return
-				}
-
+				// if(!this.maxlength) {
+				// 	return
+				// }
+				
 				// var value = event.target.value
 				var value = val
 
 				var len = emojiCharStringLen(value)
 				//需要取截取长度
-				if(len <= this.maxlength) {
+				if(len > this.maxlength) {
 					return
 				}
-
+				console.log(7777,val)
 				var result = emojiCharStringSubstr(value, 0, this.maxlength) //截取实际的长度
 				var emojiInput = this.inputId //获取的id
 				var elInput = document.getElementById(emojiInput); //根据id选择器选中对象
 				elInput.value = result; // 赋值给input的value
 
 				//处理没有触发input的值
-				const inputEvent = new Event('input')
-				elInput.dispatchEvent(inputEvent)
+				// const inputEvent = new Event('input')
+				// elInput.dispatchEvent(inputEvent)
+				
+				this.inputAboutQuoteOne[this.quoteKey] = val
 			},
 			//新增添加emoji表情
 			addCatEmoji(data) {
