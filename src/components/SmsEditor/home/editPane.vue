@@ -105,10 +105,10 @@
 				deep: true,
 				immediate: true
 			},
-			isVideoEdit(visible){
+			isImgEdit(visible){
 				if(!visible) this.editDataImg = {}
 			},
-			isImgEdit(visible){
+			isVideoEdit(visible){
 				if(!visible) this.editDataVideo = {}
 			},
 			'currentData.poster': {
