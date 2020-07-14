@@ -23,7 +23,7 @@ export default {
   },
   data() {
     return {
-      f_imgSrc: '',
+      // f_imgSrc: '',
       uploadLoing: false
     }
   },
@@ -38,6 +38,14 @@ export default {
   computed: {
     uploadUrl() {
       return `${this.mmsConfig.file}`
+    },
+    f_imgSrc: {
+      get(){
+        return this.value
+      },
+      set(val){
+        this.$emit('input', val)
+      }
     }
   },
   methods: {
