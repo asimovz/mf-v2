@@ -112,14 +112,6 @@ export default {
       },
       deep: true
     },
-    items: {
-      handler (newV, oldV) {
-        if (newV.length !== 0) {
-          this.btn = {...newV[this.index]}
-        }
-      },
-      deep: true
-    }
   },
   methods: {
     handleChange(){
