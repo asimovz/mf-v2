@@ -82,8 +82,6 @@ export default {
   },
   created () {
     this.$root.eventBus.$on('m_send_fields_data', data => {
-      console.log(data,"-=-=");
-      
       this.getData(data)
     })
     this.api && this.getData()

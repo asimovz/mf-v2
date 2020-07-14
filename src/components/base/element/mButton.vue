@@ -176,7 +176,9 @@ export default {
         }
         if (this.fields && this.fields != '') {
           let fieldData = this.getFieldData()
-          this.$root.eventBus.$emit("m_send_fields_data",fieldData)
+          this.$nextTick(function(){
+            this.$root.eventBus.$emit("m_send_fields_data",fieldData)
+          })
         }
 
       }
