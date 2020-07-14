@@ -275,19 +275,22 @@ export default {
         const { type } = this.confirmModal
         const api = type === 'del' ? this.delUrl : this.verifyUrl
 
-        await this.$root.$http.post(api, {
+        const res = await this.$root.$http.post(api, {
           messageId: this.activeData.msgId
         })
 
-        if (type === 'verify') {
-          this.activeData.statusId = 'MmsSubmit'
-        } else {
-          this.page.pageIndex = 0
-          this.getData()
-          // this.items.splice(this.activeIndex, 1)
+        if (res.type === 'success') {
+          if (type === 'verify') {
+            this.activeData.statusId = 'MmsSubmit'
+          } else {
+            this.page.pageIndex = 0
+            this.getData()
+            // this.items.splice(this.activeIndex, 1)
+          }
+          this.handleMessage(res.messages, res.type)
         }
       } catch (err) {
-        console.log('request err', err)
+        this.handleMessage(err.messages, err.type)
       }
     }
   },
