@@ -272,7 +272,6 @@
 				// this.$root.eventBus.$emit("modal_visible_change_" + this.id)
 			},
 			rejectConfirm() {
-				console.log(11111,this.fileList)
 				if(!this.fileList.checked) {
 					
 					this.handleNotice('未选择素材','info')

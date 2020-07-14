@@ -2,12 +2,13 @@
 	<div class="flex-center" style="position: relative;" :style="inputQuoteStyle">
 			<div class="txt-limit-div" :class="{'handle-text-blocking' : maxlength }" style="position: relative; width: 100%;">
   					<!-- <Input v-model="inputAboutQuoteOne[quoteKey]" @on-change="onChangeInput($event)" :type="type" :rows="1" :placeholder="placeholder" :id="inputId" :size="size" /> -->
-  					<m-input :value="inputAboutQuoteOne[quoteKey]" :maxlength="maxlength" @input="onChangeInput" :type="type" :rows="1" :placeholder="placeholder" :id="inputId" :size="size" />
-  					<!-- <template v-if="maxlength">
+  					<!-- <m-input v-model="inputText"  @input="onChangeInput" :type="type" :rows="1" :placeholder="placeholder" :id="inputId" :size="size" /> -->
+  					<el-input v-model="inputText"  @input="onChangeInput" :type="type" :rows="1" :placeholder="placeholder" :id="inputId" size="mini" />
+  					<template v-if="maxlength">
   						<span v-if="size=='small'" class="txt-limit1" >{{calculateStringActualLength(inputAboutQuoteOne[quoteKey])}}/{{maxlength}}</span>
 
   						<span v-else class="txt-limit">{{calculateStringActualLength(inputAboutQuoteOne[quoteKey])}}/{{maxlength}}</span>
-  					</template> -->
+  					</template>
   				</div>
 
 			<!--新增emoji输入-->
@@ -84,6 +85,7 @@
 			return {
 				inputId: getUUID(),
 				index: 0,
+				inputText: this.inputAboutQuoteOne[this.quoteKey]
 			}
 		},
 		computed:{
@@ -137,7 +139,8 @@
 
 //			//新增监听input改变值
 			onChangeInput(val) {
-				console.log(8888,val,emojiCharStringLen(val),this.maxlength)
+				var emojiInput = this.inputId //获取的id
+				var elInput = document.getElementById(emojiInput); //根据id选择器选中对象
 				//如果没有，不用去设置了
 				// if(!this.maxlength) {
 				// 	return
@@ -149,18 +152,9 @@
 				var len = emojiCharStringLen(value)
 				//需要取截取长度
 				if(len > this.maxlength) {
+					this.inputText = this.inputAboutQuoteOne[this.quoteKey]
 					return
 				}
-				console.log(7777,val)
-				var result = emojiCharStringSubstr(value, 0, this.maxlength) //截取实际的长度
-				var emojiInput = this.inputId //获取的id
-				var elInput = document.getElementById(emojiInput); //根据id选择器选中对象
-				elInput.value = result; // 赋值给input的value
-
-				//处理没有触发input的值
-				// const inputEvent = new Event('input')
-				// elInput.dispatchEvent(inputEvent)
-				
 				this.inputAboutQuoteOne[this.quoteKey] = val
 			},
 			//新增添加emoji表情

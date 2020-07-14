@@ -28,7 +28,7 @@
 				<div v-if="item.replyType == 'text'" class="instance-input">
 					<!--这里不使用自带的限制长度-->
 					<!-- <Input v-model="item.originalMessage" @on-change="onChangeInput($event, index)" :id="'emojiInputList' + index" class="instance-top-input" show-word-limit type="textarea" placeholder="请输入" /> -->
-					<m-input :value="item.originalMessage" @input="onChangeInput(...arguments, index)" :id="'emojiInputList' + index" class="instance-top-input" type="textarea" placeholder="请输入"></m-input>
+					<el-input v-model="item.originalMessage" @input="onChangeInput(...arguments, index)" :id="'emojiInputList' + index"  class="instance-top-input" type="textarea" placeholder="请输入"></el-input>
 				</div>
 
 				<!--图片，音频和视频上传-->
@@ -44,17 +44,14 @@
 		</div>
 		<catChoose ref="catChooseMedia" :visible.sync="showCatChoose" :id="catChooseId" :materialList="materialList"></catChoose>
 		<input 
-			type="hidden" 
+			type="hidden"
+			v-validate="validate"
+      :data-vv-as="fieldTitle"
+      :data-vv-name="name"
 			:name="paramName" 
 			:form="form" 
 			v-model="formValue"/>
-		<!-- <input 
-			type="hidden"
-			v-validate="'required'"
-      :data-vv-as="fieldTitle"
-      :data-vv-name="name"  
-			v-model="checkValidate"/> -->
-		<span v-if="checkValidate" class="m-form-error-tip">
+		<span v-if="errors.has(name)" class="m-form-error-tip">
 			{{ validateMsg?validateMsg:errors.first(name) }}
 		</span>
 	</div>
@@ -77,7 +74,7 @@
 	import catChoose from './catChoose/catChoose'  //素材的弹窗
 	import { AboutMaterial } from './catChoose/aboutMaterial.js' //选择素材的弹窗
 	import { CatDrawJudge } from './catDrawJudge' //判断条件的处理
-	import { AbuotQuote } from '../catDraw/abuotQuote' //引用的内容替和id的转换
+	import { AbuotQuote } from './abuotQuote' //引用的内容替和id的转换
 
 	//初始化数据
 	class Reply {
@@ -162,7 +159,10 @@
 				type: String,
 				default: ""
 			},
-			validate:[String,Object],
+			validate: {
+				type: [String,Object],
+				default: 'checkMsgEditor'
+			},
 		},
 		components: {
 			catDrawPoptip,
@@ -203,13 +203,12 @@
 					showVideo: true, //显示视频
 				},
 				validateMsg: '发送内容 字段为必填项.',
-				checkValidate: false
 			}
 		},
 		computed:{
 			formValue() {
 				// if(!this.catDrawJudge.judgeEmpty(this.eventList.inputContents)) return ''
-				return this.eventList.inputContents.length>0 ? JSON.stringify(this.eventList.inputContents) : ''
+				return this.eventList.inputContents.length>0 ? JSON.stringify(this.abuotQuote.replaceStringIntoIdArr([], this.eventList.inputContents, false)) : ''
 			},
 		  //改变备注的长度，长度大于14位就用...代替剩余内容
 		  calculateStringActualLength(){
@@ -227,7 +226,6 @@
 			//监听可添加的最多10个
 		  eventList: {
 		      handler(newName, oldName) {
-						console.log('eventList',newName)
 		      			var maxNumber = this.drawListMaxNumber 
 							if(newName && newName.inputContents) {
 								var inputContents = newName.inputContents || []
@@ -238,7 +236,6 @@
 									this.showMaxMenus = false  //显示上限按钮
 								}
 							}
-							this.checkValidate = !this.catDrawJudge.judgeEmpty(this.eventList.inputContents)
 		      },
 		      // immediate: true,
 		      deep: true
@@ -355,11 +352,17 @@
 		},
 		created() {
 			this.aboutMaterial = new AboutMaterial(this)
+			this.abuotQuote = new AbuotQuote(this)
 			if(this.botId) this.getAllMaterial().then(() => {})
 			this.catDrawJudge = new CatDrawJudge(this)
 			this.catDrawJudge.warning = (content) => {
 				this.validateMsg = content
 			}
+			this.$validator.extend('checkMsgEditor', {
+				validate: value => {
+					return this.catDrawJudge.judgeEmpty(this.eventList.inputContents)
+				},
+			})
 		},
 		mounted() {
 			this.$root.eventBus.$on("modal_material_modal", (obj) => {
@@ -378,6 +381,10 @@
 					modalId: obj.modalId,
 				})
 			})
+			
+			// this.$root.eventBus.$on("AddOrEditMessageForm", (func) => {
+			// 	func()
+			// })
 		},
 		destroyed() {
 			document.body.style.overflow = 'auto' //处理弹窗导致无法关闭的bug
