@@ -312,7 +312,8 @@ export default {
       border: 1px solid rgba(0,0,0,0.15);
       min-height: 200px;
       &.blank{
-        border:none
+        border:none;
+        background:none;
       }
       &:hover{
         .mask{
