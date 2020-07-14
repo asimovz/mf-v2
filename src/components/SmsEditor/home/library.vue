@@ -385,7 +385,13 @@ export default {
       this._http(this.mmsConfig.library, { type, pageIndex: pageIndex - 1, pageSize })
         .then(res => {
           if (res.error === 0) {
-            this.dataList = [...res.data]
+            this.dataList = res.data || []
+            // this.dataList = (res.data || []).map(dt => {
+            //   return {
+            //     ...dt, 
+            //     name: dt.name.split('.').slice(0, -1) + ''
+            //   }
+            // })
           }
         }).finally(end => {
           this.fetchLoading = false
