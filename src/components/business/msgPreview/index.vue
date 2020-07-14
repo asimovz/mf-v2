@@ -6,41 +6,47 @@
     }">
     <div class="title">消息名称</div>
     <m-carousel class="carousel" height="445px" trigger="click" :loop="false" :autoplay="false" indicator-position="outside">
-      <m-carousel-item v-for="item in 1" :key="item">
+      <m-carousel-item v-for="(card, index) in cards" :key="index">
         <div class="scroll-wrap">
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
-          <span>这是一段信息</span><br>
+          <div v-for="(item, index) in card" :key="index">
+            <div :class="{
+              card: item.replyType && item.title,
+              horizontal: item.cardOrientation === 'HORIZONTAL'
+            }">
+              <div class="main">
+                <div class="resources">
+                  <p v-if="item.type === 'text'">{{item.content}}</p>
+                  <div v-if="item.type === 'image' || item.type === 'pic'">
+                    <img :src="item.content" />
+                  </div>
+                  <div v-if="item.type === 'video'" class="media-bg">
+                    <img v-if="item.cardOrientation === 'HORIZONTAL'" src="./video.svg" />
+                    <video v-else controls :src="item.content" preload="metadata"></video>
+                  </div>
+                  <div v-if="item.type === 'audio' || item.type === 'voice'" class="media-bg">
+                    <img v-if="item.cardOrientation === 'HORIZONTAL'" src="./audio.svg" />
+                    <audio v-else controls :src="item.content"></audio>
+                  </div>
+                </div>
+
+                <div class="desc" v-if="item.title">
+                  <h3>{{item.title}}</h3>
+                  <p>{{item.desc}}</p>
+                </div>
+              </div>
+
+              <div class="inner-btns" v-if="item.buttons">
+                <span v-for="(btn, index) in item.buttons" :key="index">{{btn.description}}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </m-carousel-item>
     </m-carousel>
     
+    <div class="btns">
+      <span v-for="(btn, index) in buttons" :key="index">{{btn.description}}</span>
+    </div>
   </div>
 </template>
 <script>
@@ -48,7 +54,9 @@ export default {
   name: 'msgPreview',
   data () {
     return {
-      jsonData: []
+      standard: true,
+      cards: [],
+      buttons: []
     }
   },
   props: {
@@ -73,21 +81,83 @@ export default {
     }
   },
   created () {
-    this.getData()
+    this.$root.eventBus.$on('m_send_fields_data', data => {
+      this.getData(data)
+    })
+    this.api && this.getData()
   },
   methods: {
-    async getData () {
+    async getData (data) {
       try {
-        const { data } = await this.$root.$http.get(this.api, {
-          params: {
-            messageId: this.messageId
-          }
-        })
-        this.jsonData = JSON.parse(data.data)
-        console.log(this.jsonData)
+        if (data) {
+          this.cards = this.filterData(data)
+        } else {
+          const { data } = await this.$root.$http.get(this.api, {
+            params: {
+              messageId: this.messageId
+            }
+          })
+          this.standard = data.messageType === 'standard'
+          this.cards = this.filterData(data)
+        }
       } catch (err) {
         console.log('request err', err)
       }
+    },
+    filterData (data) {
+      let cards = []
+      if (this.standard) {
+        const dataJson = JSON.parse(data.data)
+        let card = dataJson.map(item => {
+          return {
+            content: item.content,
+            type: item.type
+          }
+        })
+        cards.push(card)
+      } else {
+        const dataJson = JSON.parse(data.result.massMessage)
+
+        this.buttons = dataJson.buttons
+
+        dataJson.replyCollection.forEach(item => {
+          if (['text', 'voice', 'video', 'image'].includes(item.replyType)) {
+            cards.push([
+              {
+                content: item.replyType === 'text' ? item.reply.content : item.reply.mediaUrl,
+                type: item.replyType
+              }
+            ])
+          } else if (item.replyType === 'singleCard') {
+            const {originalTitle, description, buttons} = item.reply.card
+            const {mediaUrl, mediaType} = item.reply.card.media
+            cards.push([{
+              content: mediaUrl,
+              title: originalTitle,
+              desc: description,
+              buttons,
+              replyType: item.replyType,
+              type: mediaType,
+              cardOrientation: item.reply.cardOrientation
+            }])
+          } else {
+            item.reply.cards.forEach(card => {
+              cards.push([
+                {
+                  content: card.media.mediaUrl,
+                  title: card.originalTitle,
+                  desc: card.description,
+                  buttons: card.buttons,
+                  replyType: item.replyType,
+                  type: card.media.mediaType
+                }
+              ])
+            })
+          }
+        })
+      }
+
+      return cards
     }
   },
   beforeDestroy () {
@@ -104,6 +174,16 @@ export default {
   background-size: cover;
   font-size: 12px;
   color:#606266;
+  position: relative;
+  .media-bg, audio::-webkit-media-controls-panel{
+    background: #f1f3f4;
+  }
+  .media-bg{
+    text-align: center;
+    img{
+      width: 60%;
+    }
+  }
   .title{
     padding: 0 10px 10px;
     border-bottom: 1px solid #ebeef5;
@@ -114,6 +194,12 @@ export default {
     padding:10px;
     overflow-x: hidden;
     overflow-y: auto;
+    img{
+      vertical-align: bottom;
+    }
+    video,audio,img{
+      max-width: 100%;
+    }
     &::-webkit-scrollbar {
       width: 4px;
       height: 1px;
@@ -132,6 +218,62 @@ export default {
     width:100%;
     .el-carousel__indicator--horizontal{
       padding: 8px 4px 12px;   
+    }
+  }
+
+  .card{
+    background: #fff;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, .1);
+    .desc{
+      padding:.5em 1em;
+    }
+    h3{
+      font-weight: normal;
+    }
+
+    &.horizontal{
+      .main{
+        display: flex;
+        flex-direction: row-reverse;
+      }
+      .desc{
+        flex:1;
+      }
+      .resources{
+        width: 80px;
+      }
+    }
+  }
+
+  .btns{
+    position: absolute;
+    bottom:35px;
+    right:15px;
+    padding:10px;
+    z-index: 5;
+    span{
+      display: inline-block;
+      padding: 0 12px;
+      background: #f1f1f1;
+      border-radius: 4px;
+      height: 36px;
+      line-height: 36px;
+      font-size: 12px;
+      color: #4a90e2;
+      margin-left: 10px;
+    }
+  }
+  .inner-btns{
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 24px;
+    text-align: center;
+    margin-bottom: 8px;
+    span{
+      display: block;
+      padding: 5px 10px;
+      cursor: pointer;
+      color: #4a90e2;
     }
   }
 }

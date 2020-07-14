@@ -93,7 +93,8 @@ export default {
     disabled: {
       type: Boolean,
       default: false
-    }
+    },
+    fields: String
   },
 
   data () {
@@ -123,6 +124,15 @@ export default {
     }
   },
   methods: {
+    getFieldData() {
+      let fields = this.fields.split(",");
+      let param = {};
+      fields.forEach(function(value, key) {
+        let obj = document.querySelector(`input[name='${value}']`)
+        param[value] = obj.value;
+      });
+      return Object.assign(param,this.formParam)
+    },
     confirm (callback) {
       this.handleConfirm({
         title: this.text,
@@ -143,6 +153,7 @@ export default {
         this.BoxInstance && this.BoxInstance.close()
         return
       }
+
       // 关联表格的multi操作
       if (this.targetList) {
         let params = {
@@ -163,6 +174,13 @@ export default {
           this.toggle == 'linkFormLink' && this.$root.eventBus.$emit('m_form_submit_' + this.form)
           if (this.targetModal || this.targetDrawer) this.$root.eventBus.$emit(this.outEventName)
         }
+        if (this.fields && this.fields != '') {
+          let fieldData = this.getFieldData()
+          this.$nextTick(function(){
+            this.$root.eventBus.$emit("m_send_fields_data",fieldData)
+          })
+        }
+
       }
     },
 

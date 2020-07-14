@@ -7,64 +7,24 @@
       <div class="c"></div>
     </div>
   </div>
-  <!-- <catDrawList v-else :selectOnlyOne="true" :hiddenAddMenuBottom="true" :hiddenModeLabel="true" :nodeList="data.nodeList"  :listStyle="{width: '480px'}" :acceptUrl="acceptUrl"></catDrawList> -->
   <component v-else v-bind:is="currentView" @updateView="updateView"></component>
 </template>
 <script>
 import index from "./index";
 import login from "./login";
 import store from "./assets/js/localStorage";
-import catDrawList from "./components/business/catDraw/catDrawList"
 
 export default {
   name: "App",
   data() {
     return {
       currentView: "login",
-      loading: true,
-      aboutReply: {
-        onceReplyModeLabel: '随机发送一条',
-        onceReplyMode: 1,
-        inputContents: [
-//						{
-//							originalMessage: '',
-//						}
-        ],
-        //新增固定快捷按钮
-        buttons: [
-//						{
-//							"type": "url",
-//		          "description": "文案",
-//		          "content": "回复内容/链接",
-//						}
-        ],
-//					replyModeLabel: '只在默认回复中显示',  //是否在默认回复中显示，还是在全部中显示
-        buttonRange: '1',  //默认显示默认回复
-      },
-      data: {
-        nodeList: [], //设置列表数据
-      },
-      acceptUrl: {
-				type: Object,
-				default: function() {
-					return {
-				    'uploadFiles': '/apps/ChatbotInfoManage/uploadMedia',  ////上传的地址
-				    'cancelBackUrl': '/coapps/ChatbotManages', //  //放弃后返回地址
-				    'getChatbotInfo': '/apps/ChatbotInfoManage/getChatbotInfo', ////获取chatbot信息
-				    'updatePlatChatbot': '/apps/ChatbotInfoManage/updatePlatChatbot', //更新chatbot信息
-				    'getReferenceNodes': '/apps/ChatbotInfoManage/getReferenceNodes', //查询引用节点数据
-				    'addChatbotExperience': '/apps/ChatbotInfoManage/addExperience',  //获取体验机器人
-				    'queryMaterialsByType': '/apps/ChatbotInfoManage/queryMaterialsByType', //获取素材
-					}
-				},
-			},
+      loading: true
     };
   },
   components: {
     login: login,
     index: index,
-    catDrawList
-    // mLoading: mLoading
   },
   methods: {
     updateView() {

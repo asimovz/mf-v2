@@ -21,6 +21,7 @@
       :loading-text="loadingText"
       @change="handleChange"
       @input.native="queryChange"
+      @remove-tag="removeTag"
       v-validate="validate"
       :data-vv-as="fieldTitle"
       :data-vv-name="name"
@@ -261,6 +262,9 @@ export default {
     },
     resetValue() {
       this.selectValue = this.initValue
+    },
+    removeTag(data) {
+      this.$emit("on-remove-tag",data)
     },
     handleChange: function (value) {
       this.$emit('on-change', value)
