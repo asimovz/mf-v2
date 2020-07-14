@@ -135,12 +135,12 @@ export default {
               }
             ])
           } else if (item.replyType === 'singleCard') {
-            const {originalTitle, description, buttons} = item.reply.card
+            const {originalTitle, description, buttons, originalDescription} = item.reply.card
             const {mediaUrl, mediaType} = item.reply.card.media
             cards.push([{
               content: mediaUrl,
               title: originalTitle,
-              desc: description,
+              desc: description || originalDescription,
               buttons,
               replyType: item.replyType,
               type: mediaType,
@@ -152,7 +152,7 @@ export default {
                 {
                   content: card.media.mediaUrl,
                   title: card.originalTitle,
-                  desc: card.description,
+                  desc: card.description || card.originalDescription,
                   buttons: card.buttons,
                   replyType: item.replyType,
                   type: card.media.mediaType

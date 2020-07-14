@@ -2,7 +2,7 @@
 	<div class="flex-center" style="position: relative;" :style="inputQuoteStyle">
 			<div class="txt-limit-div" :class="{'handle-text-blocking' : maxlength }" style="position: relative; width: 100%;">
   					<!-- <Input v-model="inputAboutQuoteOne[quoteKey]" @on-change="onChangeInput($event)" :type="type" :rows="1" :placeholder="placeholder" :id="inputId" :size="size" /> -->
-  					<m-input :value="inputAboutQuoteOne[quoteKey]" :maxlength="maxlength" @input="onChangeInput" :type="type" :rows="1" :placeholder="placeholder" :id="inputId" :size="size" />
+  					<m-input v-model="inputAboutQuoteOne[quoteKey]" :maxlength="maxlength" @input="onChangeInput" :type="type" :rows="1" :placeholder="placeholder" :id="inputId" :size="size" />
   					<!-- <template v-if="maxlength">
   						<span v-if="size=='small'" class="txt-limit1" >{{calculateStringActualLength(inputAboutQuoteOne[quoteKey])}}/{{maxlength}}</span>
 
