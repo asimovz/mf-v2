@@ -8,7 +8,7 @@ class NextTimeButton extends Button {
   }
   createEl (tag = 'div', props = {}, attributes = {}) {
     const el = super.createEl(tag, {
-      innerHTML: '<span class="iconfont icon-kuaijin"></span>',
+      innerHTML: '<span class="meiconfont meicon-kuaijin"></span>',
       className: this.buildCSSClass(),
       tabIndex: 0
     }, attributes)
