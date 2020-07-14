@@ -636,13 +636,31 @@ export default {
     },
     submit(fd) {
       this._http(this.mmsSave, fd).then(res => {
-        this.$message.success('保存成功')
+        // 保存后的处理
+        this.handleRes(res)
       }).catch(err => {
         this.$message.error('请求失败')
       }).finally(end => {
         this.$refs.windowBody.classList.remove('isCapture')
         this.saveLoading = false
       })
+    },
+
+    handleRes(resp){
+      if (resp && this.$root.moqui.isPlainObject(resp)) {
+        this.$root.moqui.notifyMessages(resp.messageInfos, resp.errors);
+
+        if (resp.screenUrl && resp.screenUrl.length > 0) {
+          setTimeout(() => {
+            this.$root.setUrl(resp.screenUrl);
+          }, 1200)
+        } else if (resp.redirectUrl && resp.redirectUrl.length > 0) {
+          window.location.href = resp.redirectUrl;
+        }
+      } else {
+        this.$message.error('保存错误')
+        console.warn('m-form no response or non-JSON response: ' + JSON.stringify(resp))
+      }
     }
   },
 
