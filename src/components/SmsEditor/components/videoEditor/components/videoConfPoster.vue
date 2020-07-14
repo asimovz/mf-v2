@@ -39,7 +39,7 @@ export default {
   data () {
     return {
       imgs: [],
-      currentPoster: '',
+      // currentPoster: '',
       loading: false,
       loaded: false,
       loadErr: false,
@@ -59,14 +59,14 @@ export default {
       return this.parent.mediaInfo.uri
     },
 
-    // currentPoster: {
-    //   get(){
-    //     return this.parent.mediaInfo.poster || ''
-    //   },
-    //   set(val){
-    //     this.parent.mediaInfo.poster = val
-    //   }
-    // }
+    currentPoster: {
+      get(){
+        return this.parent.mediaInfo.poster || ''
+      },
+      set(val){
+        this.parent.mediaInfo.poster = val
+      }
+    }
   },
   watch: {
     currentPoster (v) {
@@ -84,7 +84,7 @@ export default {
   methods: {
     init(){
       this.imgs = []
-      this.currentPoster = ''
+      this.currentPoster = this.parent.mediaInfo.poster || ''
       this.loaded = false
       this.loadErr = false
       this.form.type = 'recommend'
