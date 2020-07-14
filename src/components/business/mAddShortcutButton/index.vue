@@ -14,7 +14,7 @@
     <div v-if="items.length == max" class="addButton grayBTN">
       + 快捷按钮和设置中的固定按钮总和不能超过{{max}}个
     </div>
-    <input type="hidden" :id="id" :form="form" :name="name" :value="JSON.stringify(data)"/>
+    <input type="hidden" :id="id" :form="form" :name="name" :value="JSON.stringify(dataTemp)"/>
   </div>
 </template>
 <script>
@@ -23,7 +23,7 @@ import childContent from './childContent'
 export default {
   name: 'm-addshortcutbutton',
   props: {
-    data:[],
+    data:{},
     name: {
       type: String,
       default:''
@@ -43,6 +43,7 @@ export default {
   },
   data () {
     return {
+      dataTemp:this.data,
       items: [],
       showData:false
     }
@@ -66,14 +67,14 @@ export default {
     },
     del(index){
       this.items.splice(index, 1)
-      this.data = [{}]
-      this.data = this.items
+      this.dataTemp = [{}]
+      this.dataTemp = this.items
     },
     getData(val) {
       let index = val.index
-      this.data = [{}]
       this.items[index] = val.data
-      this.data = this.items
+      this.dataTemp = [{}]
+      this.dataTemp = this.items
     }
   }
 }
