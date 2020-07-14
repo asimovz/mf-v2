@@ -28,6 +28,7 @@ import mButtonGroup from './mButtonGroup'
 import mBadge from './mBadge'
 import mCarousel from './mCarousel'
 import mCarouselItem from './mCarouselItem'
+import mIcon from './mIcon'
 
 // 数据录入
 import mInput from './mInput'
@@ -176,7 +177,8 @@ const component = [
   Row,
   Col,
   mCarousel,
-  mCarouselItem
+  mCarouselItem,
+  mIcon
 ]
 
 export default component

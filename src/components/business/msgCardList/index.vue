@@ -3,11 +3,11 @@
     <ul class="list-wrap">
       <li class="item btn-add">
         <div class="inner-wrap" v-if="standard" @click="standardCreate">
-          <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
+          <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
         </div>
         <m-link v-else :href="editUrl">
           <div class="inner-wrap">
-            <div class="control"><i class="el-icon-plus"></i> 新建消息</div>
+            <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
           </div>
         </m-link>
       </li>
@@ -28,17 +28,21 @@
           <div class="control">
             <div v-show="item.statusId !== 'MmsSubmit'">
               <m-link :href="editUrlItem(item)">
-                <m-button type="default" size="small">编辑</m-button>
+                <img class="icon icon-edit" src="./icons/icon-edit.svg">
+                <span>编辑</span>
               </m-link>
             </div>
-            <div v-show="item.statusId === 'MmsOpen'">
-              <m-button type="default" size="small" @click.native="verifyBefore(item, index)">提交</m-button>
+            <div v-show="item.statusId === 'MmsOpen'" @click="verifyBefore(item, index)">
+              <img class="icon icon-submit" src="./icons/icon-submit.svg">
+              <span>提交</span>
             </div>
-            <div>
-              <m-button type="default" size="small" @click.native="preview(item, index)">预览</m-button>
+            <div @click="preview(item, index)">
+              <img class="icon icon-preview" src="./icons/icon-preview.svg">
+              <span>预览</span>
             </div>
-            <div v-show="!standard">
-              <m-button type="default" size="small" @click.native="delBefore(item, index)">删除</m-button>
+            <div v-show="!standard" @click="delBefore(item, index)">
+              <img class="icon icon-del" src="./icons/icon-del.svg">
+              <span>删除</span>
             </div>
           </div>
         </div>
@@ -50,6 +54,7 @@
           </m-tooltip>
         </div>
       </li>
+      <li class="item blank" v-for="item in blanks" :key="item"></li>
     </ul>
     <div class="pagination_box">
       <m-page 
@@ -60,18 +65,6 @@
         :pageSizeOpts="[30,60,90]"
         page-change="pageChangeByMsgCardList" />
     </div>
-
-    <m-modal
-      id="confirmModal"
-      :width="300"
-      :title="confirmModal.title"
-      v-model="confirmModal.visible">
-      <p>{{confirmModal.desc}}</p>
-      <div slot="footer" class="dialog-footer" align="center">
-        <el-button size="mini" @click="confirmModal.visible = false">取消</el-button>
-        <el-button size="mini" type="primary" @click="confirm">确认</el-button>
-      </div>
-    </m-modal>
 
     <m-modal
       title="预览"
@@ -90,7 +83,6 @@ export default {
       previewVisible: false,
       confirmModal: {
         type: '',
-        visible: false,
         title: '',
         desc: ''
       },
@@ -133,6 +125,9 @@ export default {
     searchForm: String
   },
   computed: {
+    blanks () {
+      return this.items.length % 5
+    },
     pageMaxIndex () {
       let p = this.page.count / this.page.pageSize
       return p < 1 ? 1 : Math.ceil(p) + 1
@@ -154,7 +149,7 @@ export default {
           for (let pair of data.entries()) {
             let key = pair[0]
             let value = pair[1]
-            if (value == '' || key === 'moquiSessionToken' || key === 'moquiFormName') continue
+            if (value === '' || key === 'moquiSessionToken' || key === 'moquiFormName') continue
             formParams[key] = value
             if (value.split(',').length > 1) {
               formParams[pair[0] + '_op'] = 'in'
@@ -248,23 +243,32 @@ export default {
       this.confirmModal = {
         type: 'verify',
         title: '提交审核',
-        desc: '确认提交审核',
-        visible: true
+        desc: '确认提交审核'
       }
 
       this.activeIndex = index
       this.activeData = item
+      this.alertConfirm()
     },
     delBefore (item, index) {
       this.confirmModal = {
         type: 'del',
         title: '删除',
-        desc: '确认删除消息',
-        visible: true
+        desc: '确认删除消息'
       }
 
       this.activeIndex = index
       this.activeData = item
+      this.alertConfirm()
+    },
+    alertConfirm () {
+      this.handleConfirm({
+        title: this.confirmModal.title,
+        content: this.confirmModal.desc,
+        onOk: () => {
+          this.confirm()
+        }
+      })
     },
     async confirm () {
       try {
@@ -282,8 +286,6 @@ export default {
           this.getData()
           // this.items.splice(this.activeIndex, 1)
         }
-
-        this.confirmModal.visible = false
       } catch (err) {
         console.log('request err', err)
       }
@@ -306,8 +308,11 @@ export default {
       background: #fff;
       margin-bottom: 20px;
       position: relative;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid rgba(0,0,0,0.15);
+      &.blank{
+        border:none
+      }
       &:hover{
         .mask{
           visibility:visible;
@@ -316,7 +321,9 @@ export default {
     }
 
     .btn-add{
+      font-size: 12px;
       .inner-wrap{
+        color:#C0C4CC;
         cursor: pointer;
         position: absolute;
         top:0;
@@ -331,7 +338,8 @@ export default {
       position: relative;
       height: 120px;
       overflow: hidden;
-      border-radius: 8px 8px 0 0;
+      border-radius: 6px 6px 0 0;
+      margin: -1px;
       .img{
         width: 100%;
         position: absolute;
@@ -374,7 +382,7 @@ export default {
       padding:.5em 1em;
       width: 108px;
       text-align: center;
-      border-radius: 8px 0 4px 0;
+      border-radius: 6px 0 3px 0;
       .tooltip{
         font-size: 1.2em;
         position: absolute;
@@ -407,7 +415,7 @@ export default {
       background: rgba(0, 0, 0, .4);
       visibility:hidden;
       text-align: center;
-      border-radius: 8px;
+      border-radius: 6px;
       button{
         width: 95px;
         margin-bottom: 15px;
@@ -416,10 +424,56 @@ export default {
     }
 
     .control{
+      text-align: center;
       position: absolute;
+      width: 100%;
       top:50%;
       left:50%;
       transform: translate(-50%, -50%);
+      .icon{
+        width:12px;
+        height: 12px;
+      }
+      .icon-add{
+        width: 24px;
+        height: 24px;
+      }
+      span{
+        display: none;
+        font-size: 10px;
+      }
+      div{
+        width:30px;
+        height:30px;
+        line-height: 30px;
+        background: #fff;
+        display: inline-block;
+        border-radius: 50%;
+        cursor: pointer;
+        color: #fff;
+        position: relative;
+        a:hover{
+          color:#fff;
+        }
+        span{
+          width:100%;
+        }
+        img,span{
+          position: absolute;
+          top:50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+        &:hover{
+          background: #3c64b9;
+          span{
+            display: inline;
+          }
+          .icon{
+            display: none;
+          }
+        }
+      }
     }
   }
 }
