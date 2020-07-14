@@ -124,7 +124,7 @@ export default {
           if (['text', 'voice', 'video', 'image'].includes(item.replyType)) {
             cards.push([
               {
-                content: item.replyType === 'text' ? item.reply.content : item.reply.mediaUrl,
+                content: item.replyType === 'text' ? (item.originalMessage || item.reply.content || '') : item.reply.mediaUrl,
                 type: item.replyType
               }
             ])
