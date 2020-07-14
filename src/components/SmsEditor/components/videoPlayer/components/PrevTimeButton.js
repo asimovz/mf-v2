@@ -8,7 +8,7 @@ class PrevTimeButton extends Button {
   }
   createEl (tag = 'div', props = {}, attributes = {}) {
     const el = super.createEl(tag, {
-      innerHTML: '<span class="iconfont icon-kuaitui"></span>',
+      innerHTML: '<span class="meiconfont meicon-kuaitui"></span>',
       className: this.buildCSSClass(),
       tabIndex: 0
     }, attributes)

@@ -1,5 +1,5 @@
 <template>
-	<span :class="['iconfont',iconClas]" :style="iconStyle"></span>
+	<span :class="['meiconfont', iconClas]" :style="iconStyle"></span>
 </template>
 
 <script>
@@ -29,7 +29,7 @@
 		},
 		computed: {
 			iconClas(){
-				return `icon-${this.name}`
+				return `meicon-${this.name}`
 			},
 			fontSize(){
 				return typeof this.size === 'string' ? (this.size.split('px')[0] + 'px') : `${this.size}px`
