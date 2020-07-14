@@ -279,7 +279,7 @@ export default {
       })
     },
     goBack() {
-      this.$confirm('即将丢失所有修改，确认返回?', '提示', {
+      this.$confirm('未保存修改将丢失，确认返回?', '提示', {
         type: 'warning'
       }).then(res => {
         window.history.back()
