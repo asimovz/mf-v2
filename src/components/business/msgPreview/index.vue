@@ -9,33 +9,44 @@
       <m-carousel-item v-for="(card, index) in cards" :key="index">
         <div class="scroll-wrap">
           <div v-for="(item, index) in card" :key="index">
-            <div v-if="item.type === 'card'" class="card">
-              <video v-if="item.mediaType === 'video'" controls :src="item.content" preload="metadata"></video>
-              <img v-if="item.mediaType === 'pic'" :src="item.content" />
-              <audio controls v-if="item.mediaType === 'voice'" :src="item.content"></audio>
-              <div class="desc" v-if="card.title">
-                <h3>{{card.title}}</h3>
-                <p>{{card.desc}}</p>
+            <div :class="{
+              card: item.replyType && item.title,
+              horizontal: item.cardOrientation === 'HORIZONTAL'
+            }">
+              <div class="main">
+                <div class="resources">
+                  <p v-if="item.type === 'text'">{{item.content}}</p>
+                  <div v-if="item.type === 'image' || item.type === 'pic'">
+                    <img :src="item.content" />
+                  </div>
+                  <div v-if="item.type === 'video'" class="media-bg">
+                    <img v-if="item.cardOrientation === 'HORIZONTAL'" src="./video.svg" />
+                    <video v-else controls :src="item.content" preload="metadata"></video>
+                  </div>
+                  <div v-if="item.type === 'audio' || item.type === 'voice'" class="media-bg">
+                    <img v-if="item.cardOrientation === 'HORIZONTAL'" src="./audio.svg" />
+                    <audio v-else controls :src="item.content"></audio>
+                  </div>
+                </div>
+
+                <div class="desc" v-if="item.title">
+                  <h3>{{item.title}}</h3>
+                  <p>{{item.desc}}</p>
+                </div>
               </div>
-              <div class="btns" v-if="card.buttons">
-                <span v-for="(btn, index) in card.buttons" :key="index">{{btn.description}}</span>
+
+              <div class="inner-btns" v-if="item.buttons">
+                <span v-for="(btn, index) in item.buttons" :key="index">{{btn.description}}</span>
               </div>
-            </div>
-            <p v-if="item.type === 'text'">{{item.content}}</p>
-            <div v-if="item.type === 'image'">
-              <img :src="item.content" />
-            </div>
-            <div v-if="item.type === 'video'">
-              <video controls :src="item.content" preload="metadata"></video>
-            </div>
-            <div v-if="item.type === 'audio' || item.type === 'voice'">
-              <audio controls :src="item.content"></audio>
             </div>
           </div>
         </div>
       </m-carousel-item>
     </m-carousel>
     
+    <div class="btns">
+      <span v-for="(btn, index) in buttons" :key="index">{{btn.description}}</span>
+    </div>
   </div>
 </template>
 <script>
@@ -44,7 +55,8 @@ export default {
   data () {
     return {
       standard: true,
-      cards: []
+      cards: [],
+      buttons: []
     }
   },
   props: {
@@ -52,7 +64,6 @@ export default {
       type: String,
       default: ''
     },
-    data: String,
     messageId: {
       type: String,
       default: ''
@@ -70,20 +81,23 @@ export default {
     }
   },
   created () {
-    this.standard = location.href.indexOf('StandardFiveGMessage') >= 0
-    this.getData()
+    this.$root.eventBus.$on('m_send_fields_data', data => {
+      this.getData(data)
+    })
+    this.api && this.getData()
   },
   methods: {
-    async getData () {
+    async getData (data) {
       try {
-        if (this.data) {
-          this.cards = this.filterData(this.data)
+        if (data) {
+          this.cards = this.filterData(data)
         } else {
           const { data } = await this.$root.$http.get(this.api, {
             params: {
               messageId: this.messageId
             }
           })
+          this.standard = data.messageType === 'standard'
           this.cards = this.filterData(data)
         }
       } catch (err) {
@@ -93,7 +107,8 @@ export default {
     filterData (data) {
       let cards = []
       if (this.standard) {
-        let card = data.data.map(item => {
+        const dataJson = JSON.parse(data.data)
+        let card = dataJson.map(item => {
           return {
             content: item.content,
             type: item.type
@@ -102,6 +117,8 @@ export default {
         cards.push(card)
       } else {
         const dataJson = JSON.parse(data.result.massMessage)
+
+        this.buttons = dataJson.buttons
 
         dataJson.replyCollection.forEach(item => {
           if (['text', 'voice', 'video', 'image'].includes(item.replyType)) {
@@ -112,7 +129,6 @@ export default {
               }
             ])
           } else if (item.replyType === 'singleCard') {
-            console.log(item.reply.card)
             const {originalTitle, description, buttons} = item.reply.card
             const {mediaUrl, mediaType} = item.reply.card.media
             cards.push([{
@@ -120,8 +136,9 @@ export default {
               title: originalTitle,
               desc: description,
               buttons,
-              mediaType,
-              type: 'card'
+              replyType: item.replyType,
+              type: mediaType,
+              cardOrientation: item.reply.cardOrientation
             }])
           } else {
             item.reply.cards.forEach(card => {
@@ -131,8 +148,8 @@ export default {
                   title: card.originalTitle,
                   desc: card.description,
                   buttons: card.buttons,
-                  mediaType: card.media.mediaType,
-                  type: 'card'
+                  replyType: item.replyType,
+                  type: card.media.mediaType
                 }
               ])
             })
@@ -157,6 +174,16 @@ export default {
   background-size: cover;
   font-size: 12px;
   color:#606266;
+  position: relative;
+  .media-bg, audio::-webkit-media-controls-panel{
+    background: #f1f3f4;
+  }
+  .media-bg{
+    text-align: center;
+    img{
+      width: 60%;
+    }
+  }
   .title{
     padding: 0 10px 10px;
     border-bottom: 1px solid #ebeef5;
@@ -203,22 +230,50 @@ export default {
     h3{
       font-weight: normal;
     }
-    .btns{
-      position: absolute;
-      bottom:0;
-      right:0;
-      padding:10px;
-      span{
-        display: inline-block;
-        padding: 0 12px;
-        background: #f1f1f1;
-        border-radius: 4px;
-        height: 36px;
-        line-height: 36px;
-        font-size: 12px;
-        color: #4a90e2;
-        margin-left: 10px;
+
+    &.horizontal{
+      .main{
+        display: flex;
+        flex-direction: row-reverse;
       }
+      .desc{
+        flex:1;
+      }
+      .resources{
+        width: 80px;
+      }
+    }
+  }
+
+  .btns{
+    position: absolute;
+    bottom:35px;
+    right:15px;
+    padding:10px;
+    z-index: 5;
+    span{
+      display: inline-block;
+      padding: 0 12px;
+      background: #f1f1f1;
+      border-radius: 4px;
+      height: 36px;
+      line-height: 36px;
+      font-size: 12px;
+      color: #4a90e2;
+      margin-left: 10px;
+    }
+  }
+  .inner-btns{
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 24px;
+    text-align: center;
+    margin-bottom: 8px;
+    span{
+      display: block;
+      padding: 5px 10px;
+      cursor: pointer;
+      color: #4a90e2;
     }
   }
 }
