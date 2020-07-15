@@ -305,6 +305,7 @@ export default {
   .list-wrap{
     display: flex;
     flex-wrap: wrap;
+    margin:0 -10px;
     .item{
       flex: 0 0 20%;
       margin-bottom: 20px;
@@ -349,7 +350,6 @@ export default {
       height: 120px;
       overflow: hidden;
       border-radius: 6px 6px 0 0;
-      margin: -1px;
       .img{
         width: 100%;
         vertical-align: bottom;

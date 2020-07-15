@@ -104,14 +104,13 @@ import saveConfirm from './saveConfirm'
 import '../assets/css/home.less'
 
 function getRandomId() {
+
   let maxNumber = 99999999
   let minNumber = 1000000
   let range = maxNumber - minNumber; //取值范围的差
   let random = Math.random(); //小于1的随机数
   return minNumber + Math.round(random * range);
 }
-
-
 
 function dataURLtoFile(dataurl, filename) {
   var arr = dataurl.split(','),
@@ -279,7 +278,7 @@ export default {
       })
     },
     goBack() {
-      this.$confirm('即将丢失所有修改，确认返回?', '提示', {
+      this.$confirm('未保存修改将丢失，确认返回?', '提示', {
         type: 'warning'
       }).then(res => {
         window.history.back()
@@ -351,7 +350,7 @@ export default {
       // 添加素材后中间区域显示最底部
       this.$nextTick(() => {
         let wrapper = document.querySelector('.body-content')
-        wrapper.scrollTop = wrapper.scrollHeight - wrapper.clientHeight - 15
+        wrapper.scrollTop = wrapper.scrollHeight - wrapper.clientHeight
       })
     },
 
@@ -582,7 +581,7 @@ export default {
         return _item
       })
 
-      if(!this.submitValidate(newList)){
+      if (!this.submitValidate(newList)) {
         this.$message.warning('模板必须包含文本');
         return
       }
@@ -592,7 +591,7 @@ export default {
       this.captrue(_data)
     },
 
-    submitValidate(datas){
+    submitValidate(datas) {
       return datas.some(data => data.type === 'text')
     },
 
@@ -619,8 +618,6 @@ export default {
         let dataURL = canvas.toDataURL('image/png')
         let file = dataURLtoFile(dataURL, getRandomId() + '.png')
 
-        // this.mmsData.list = oldList
-
         let fdata = new FormData()
         fdata.append('mmsTemplateCover', file)
 
@@ -636,13 +633,31 @@ export default {
     },
     submit(fd) {
       this._http(this.mmsSave, fd).then(res => {
-        this.$message.success('保存成功')
+        // 保存后的处理
+        this.handleRes(res)
       }).catch(err => {
         this.$message.error('请求失败')
       }).finally(end => {
         this.$refs.windowBody.classList.remove('isCapture')
         this.saveLoading = false
       })
+    },
+
+    handleRes(resp) {
+      if (resp && this.$root.moqui.isPlainObject(resp)) {
+        this.$root.moqui.notifyMessages(resp.messageInfos, resp.errors);
+
+        if (resp.screenUrl && resp.screenUrl.length > 0) {
+          setTimeout(() => {
+            this.$root.setUrl(resp.screenUrl);
+          }, 1200)
+        } else if (resp.redirectUrl && resp.redirectUrl.length > 0) {
+          window.location.href = resp.redirectUrl;
+        }
+      } else {
+        this.$message.error('保存错误')
+        console.warn('m-form no response or non-JSON response: ' + JSON.stringify(resp))
+      }
     }
   },
 

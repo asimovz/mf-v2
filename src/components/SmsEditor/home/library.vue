@@ -20,13 +20,7 @@
         <input style="display: none;" ref="file" type="file" :accept="currentAccept" name="upload" @change="fileChanged" />
       </template>
     </div>
-    <div class="library--content scrollbar"
-      :class="{'no-data': !dataList.length}"
-      v-loading="fetchLoading || isUpLoading"
-      :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''"
-      :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''"
-      :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''"
-    >
+    <div class="library--content scrollbar" :class="{'no-data': !dataList.length}" v-loading="fetchLoading || isUpLoading" :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''" :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''" :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''">
       <transition-group name="fade" tag="div" class="lib-list" :class="{'isCheckable': isCheckAble}">
         <div :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in dataList" :key="item.resourceId" :class="[
             'lib-item',
@@ -37,11 +31,10 @@
           ]" @click="libAdd(item, index, $event)">
           <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
           <div class="lib-preview">
-            <img :src="item.uri" v-if="type['type'] === 'image'" />
+            <img :src="item.uri" v-if="type['type'] === 'image'" crossorigin="*" />
             <template v-else-if="type['type'] === 'video'">
-              <img v-if="item.poster" :src="item.poster" />
+              <img v-if="item.poster" :src="item.poster" crossorigin="*" />
               <video v-else :src="item.uri"></video>
-              <!-- <widget-video v-else :data="{...item, uri: item.src}" :showControls="false"></widget-video> -->
             </template>
             <template v-else>
               <widget-audio :showPlusBtn="true" :data="{ uri: item.uri }" @click.native="audioClick">
@@ -62,12 +55,6 @@
   </div>
 </template>
 <script>
-/*<div class="lib-name" :title="isCheckAble ? '' : '双击可编辑'"
-  :contenteditable="isEditAble"
-  @dblclick="evt => libNameFocus(evt, item)"
-  @blur="evt => libNameBlur(evt, item)"
->{{item.name}}</div>*/
-
 import widgetVideo from '../components/widget-comps/video.vue'
 import widgetAudio from '../components/widget-comps/audio.vue'
 import '../assets/css/library.less'
@@ -90,15 +77,15 @@ function selectText(el) {
   }
 }
 
-function getRandomId(){
+function getRandomId() {
   let maxNumber = 99999999
   let minNumber = 1000000
   let range = maxNumber - minNumber; //取值范围的差
   let random = Math.random(); //小于1的随机数
-  return minNumber + Math.round(random * range); 
+  return minNumber + Math.round(random * range);
 }
 
-function movetoEnd(el){
+function movetoEnd(el) {
   let range = window.getSelection()
   range.selectAllChildren(el)
   range.collapseToEnd()
@@ -305,7 +292,7 @@ export default {
       // 允许上传的 格式
       let accepts = input.getAttribute('accept')
 
-      if(!this.isTypeValidated(_fileType)) {
+      if (!this.isTypeValidated(_fileType)) {
         this.$message.warning('请上传正确格式的素材')
         input.value = ''
         return
@@ -339,10 +326,9 @@ export default {
     },
 
     // 验证文件格式
-    isTypeValidated(type){
+    isTypeValidated(type) {
       return this.currentAccept.includes(type)
     },
-
 
     // 更新素材
     updateLib(fd) {
@@ -385,7 +371,7 @@ export default {
       this._http(this.mmsConfig.library, { type, pageIndex: pageIndex - 1, pageSize })
         .then(res => {
           if (res.error === 0) {
-            this.dataList = [...res.data]
+            this.dataList = res.data || []
           }
         }).finally(end => {
           this.fetchLoading = false

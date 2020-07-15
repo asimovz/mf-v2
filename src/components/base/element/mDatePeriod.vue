@@ -129,6 +129,8 @@ export default {
       this.selectDate = []
     },
     changeDate(data){
+      console.log(data,"-=-=-");
+      
       let newVal
       if(data) {
         this.startDateTime = new Date(data[0]).Format(this.format)
@@ -136,6 +138,8 @@ export default {
         newVal = [this.startDateTime,this.endDateTime]
       } else {
         newVal = []
+        this.startDateTime = ""
+        this.endDateTime = ""
       }
       this.$emit("on-ok",newVal)
       this.$emit("input",newVal)

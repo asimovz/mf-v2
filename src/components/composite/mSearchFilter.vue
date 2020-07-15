@@ -48,10 +48,12 @@ export default {
       data.map(item => {
         let fieldEl = document.querySelector(`[data-for='${item}']`)
         fieldEl.style.display = param
-        let inputArr = Array.from(fieldEl.querySelectorAll(`input[name='${item}']`))
+        let inputArr = Array.from(fieldEl.querySelectorAll(`input`))
         inputArr.map(child => {
-            child.disabled = param == "" ? false : true
-          })
+          if(param == "none") {
+            child.value = ""
+          }
+        })
       })
     }
   }

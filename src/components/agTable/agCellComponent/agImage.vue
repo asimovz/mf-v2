@@ -95,7 +95,7 @@ export default {
       this.imgDiv = document.createElement("div");
       this.imgDiv.classList.add("table-img")
       this.imgDiv.style.cssText = `position: absolute;left:${offsetX}px;top:${offsetY}px;z-index:999;background: #ffffff;border-radius: 8px;box-shadow: 0px 0px 16px 0px rgba(0,0,0,.15);padding:16px`;
-      this.imgDiv.innerHTML = `<img src='${this.imgUrl}' width="${imgWidth}" />`;
+      this.imgDiv.innerHTML = `<img src='${this.imgUrl}' width="${imgWidth}" height="${imgHeight}" />`;
       document.body.appendChild(this.imgDiv);
       let _slef = this
       document.onclick = function() {
