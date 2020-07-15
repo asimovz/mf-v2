@@ -530,8 +530,6 @@ export default {
         xhr.send();
       } else {
         img.src = this.img;
-        // 修复 base64 跨域缓存请求失败
-        // img.src = this.img.substr(0, 4) === "data" ? this.img : (this.img + `?v=${+new Date()}`);
       }
     },
     // 当按下鼠标键
