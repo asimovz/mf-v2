@@ -253,20 +253,37 @@ export default {
 
   .btns{
     position: absolute;
-    bottom:35px;
-    right:15px;
-    padding:10px;
+    bottom: 45px;
+    right: 15px;
+    padding-right: 10px;
+    padding-bottom: 5px;
     z-index: 5;
+    overflow: auto;
+    white-space: nowrap;
+    width: 250px;
+    z-index: 5;
+    text-align: right;
+    &::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      box-shadow: inset 0 0 0 2px #dedede;
+      border-radius: 20px;
+    }
+    &::-webkit-scrollbar-track {
+      background: none;
+    }
     span{
       display: inline-block;
-      padding: 0 12px;
+      padding: 0 8px;
       background: #f1f1f1;
       border-radius: 4px;
-      height: 36px;
-      line-height: 36px;
+      line-height: 30px;
       font-size: 12px;
       color: #4a90e2;
-      margin-left: 10px;
+      margin-right: 10px;
     }
   }
   .inner-btns{
