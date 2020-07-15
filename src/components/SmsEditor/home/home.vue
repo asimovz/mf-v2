@@ -70,7 +70,7 @@
             <div :class="['phone-window_body',''] " ref="windowBody">
               <!--body--empty -->
               <div class="body-content scrollbar">
-                <editor-draggable style="padding-bottom: 15px" :data="mmsData" :select-widget-id="selectWidgetId" @on-del-group="deleteGroup"></editor-draggable>
+                <editor-draggable class="body-scrollbar" style="padding-bottom: 15px" :data="mmsData" :select-widget-id="selectWidgetId" @on-del-group="deleteGroup"></editor-draggable>
                 <div v-show="!mmsData.list" class="widget-empty">asdasda</div>
               </div>
             </div>
@@ -606,13 +606,15 @@ export default {
 
       await this.beforeCaptrue()
 
-      let wBody = this.$refs.windowBody
-      let height = wBody.clientHeight
-      let width = wBody.clientWidth
+      let bodyScrollbar = document.querySelector('.body-scrollbar')
+      let height = this.$refs.windowBody.offsetHeight
+      let width = bodyScrollbar.offsetWidth
 
-      html2canvas(wBody, {
+      html2canvas(bodyScrollbar, {
         width,
         height,
+        windowWidth: document.body.scrollWidth,
+        windowHeight: document.body.scrollHeight,
         useCORS: true
       }).then(canvas => {
         let dataURL = canvas.toDataURL('image/png')
@@ -628,7 +630,6 @@ export default {
         fdata.append('mmsOriginalTemplate', JSON.stringify(this.mmsData.list))
 
         this.submit(fdata)
-
       })
     },
     submit(fd) {

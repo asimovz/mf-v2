@@ -1,6 +1,6 @@
 <template>
 	<div class="widget-image--wrapper">
-  	<img class="image" :src="data.uri" crossorigin="*">
+  	<img class="image" :src="data.uri" crossorigin="anonymous">
   </div>
 </template>
 

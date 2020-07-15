@@ -31,9 +31,9 @@
           ]" @click="libAdd(item, index, $event)">
           <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
           <div class="lib-preview">
-            <img :src="item.uri" v-if="type['type'] === 'image'" crossorigin="*" />
+            <img :src="item.uri" v-if="type['type'] === 'image'" crossorigin="anonymous" />
             <template v-else-if="type['type'] === 'video'">
-              <img v-if="item.poster" :src="item.poster" crossorigin="*" />
+              <img v-if="item.poster" :src="item.poster" crossorigin="anonymous" />
               <video v-else :src="item.uri"></video>
             </template>
             <template v-else>
