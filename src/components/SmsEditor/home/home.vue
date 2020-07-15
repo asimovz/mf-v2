@@ -104,14 +104,13 @@ import saveConfirm from './saveConfirm'
 import '../assets/css/home.less'
 
 function getRandomId() {
+
   let maxNumber = 99999999
   let minNumber = 1000000
   let range = maxNumber - minNumber; //取值范围的差
   let random = Math.random(); //小于1的随机数
   return minNumber + Math.round(random * range);
 }
-
-
 
 function dataURLtoFile(dataurl, filename) {
   var arr = dataurl.split(','),
@@ -582,7 +581,7 @@ export default {
         return _item
       })
 
-      if(!this.submitValidate(newList)){
+      if (!this.submitValidate(newList)) {
         this.$message.warning('模板必须包含文本');
         return
       }
@@ -592,7 +591,7 @@ export default {
       this.captrue(_data)
     },
 
-    submitValidate(datas){
+    submitValidate(datas) {
       return datas.some(data => data.type === 'text')
     },
 
@@ -619,8 +618,6 @@ export default {
         let dataURL = canvas.toDataURL('image/png')
         let file = dataURLtoFile(dataURL, getRandomId() + '.png')
 
-        // this.mmsData.list = oldList
-
         let fdata = new FormData()
         fdata.append('mmsTemplateCover', file)
 
@@ -646,7 +643,7 @@ export default {
       })
     },
 
-    handleRes(resp){
+    handleRes(resp) {
       if (resp && this.$root.moqui.isPlainObject(resp)) {
         this.$root.moqui.notifyMessages(resp.messageInfos, resp.errors);
 
