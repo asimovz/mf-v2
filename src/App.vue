@@ -85,13 +85,12 @@ export default {
 
           //初始化和注册监听websocket消息通知
           setTimeout(() => {
-            this.$root.notificationClient = new this.$root.moqui.NotificationClient(
-              (location.protocol === "https:" ? "wss://" : "ws://") + this.$root.appHost + this.$root.appRootPath + "/notws"
-            );
-
-            // init the NotificationClient and register 'displayNotify' as the default listener
-            this.$root.notificationClient.registerListener("ALL");
-
+            if(this.$root.notificationClient == null) {
+              this.$root.notificationClient = new this.$root.moqui.NotificationClient(
+                (location.protocol === "https:" ? "wss://" : "ws://") + this.$root.appHost + this.$root.appRootPath + "/notws"
+              );
+              this.$root.notificationClient.registerListener("ALL");
+            }
             // request Notification permission on load if not already granted or denied
             if (
               window.Notification &&
