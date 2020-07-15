@@ -36,7 +36,7 @@
               </div>
 
               <div class="inner-btns" v-if="item.buttons">
-                <span v-for="(btn, index) in item.buttons" :key="index">{{btn.description}}</span>
+                <span v-for="(btn, index) in item.buttons" :key="index">{{btn.description || btn.originalDescription}}</span>
               </div>
             </div>
           </div>
