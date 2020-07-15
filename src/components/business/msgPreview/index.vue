@@ -5,7 +5,7 @@
       margin: alignCenter !== undefined ? '0 auto' : 0
     }">
     <div class="title">消息名称</div>
-    <m-carousel class="carousel" height="445px" trigger="click" :loop="false" :autoplay="false" indicator-position="outside">
+    <m-carousel class="carousel" height="445px" trigger="click" :loop="false" :autoplay="false" :indicator-position="cards.length > 1 ? 'outside' : 'none'">
       <m-carousel-item v-for="(card, index) in cards" :key="index">
         <div class="scroll-wrap">
           <div v-for="(item, index) in card" :key="index">
