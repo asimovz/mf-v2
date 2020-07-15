@@ -129,8 +129,6 @@ export default {
       this.selectDate = []
     },
     changeDate(data){
-      console.log(data,"-=-=-");
-      
       let newVal
       if(data) {
         this.startDateTime = new Date(data[0]).Format(this.format)
