@@ -32,4 +32,4 @@ export const typesList = [
   }
 ]
 
-export const fileMaxSize = '3M'
+export const fileMaxSize = '2M'
