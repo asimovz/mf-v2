@@ -1,6 +1,6 @@
 <template>
 	<div class="widget-image--wrapper">
-  	<img class="image" :src="data.uri" crossOrigin="*">
+  	<img class="image" :src="data.uri" crossorigin="*">
   </div>
 </template>
 
