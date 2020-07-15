@@ -2,59 +2,63 @@
   <div class="msgCardList">
     <ul class="list-wrap">
       <li class="item btn-add">
-        <div class="inner-wrap" v-if="standard" @click="standardCreate">
-          <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
-        </div>
-        <m-link v-else :href="editUrl">
-          <div class="inner-wrap">
+        <div class="item-content">
+          <div class="inner-wrap" v-if="standard" @click="standardCreate">
             <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
           </div>
-        </m-link>
+          <m-link v-else :href="editUrl">
+            <div class="inner-wrap">
+              <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
+            </div>
+          </m-link>
+        </div>
       </li>
       <li class="item" v-for="(item, index) in items" :key="item.msgId">
-        <div class="preview">
-          <img class="img" :src="item.thumb">
-        </div>
-        <div class="main">
-          <div class="title" :title="item.title">{{item.title}}</div>
-          <div class="other">
-            <p><label>消息ID：</label>{{item.msgId}}</p>
-            <p><label>场景名称：</label>{{item.sceneName}}</p>
-            <p v-show="item.botName"><label>机器人：</label>{{item.botName}}</p>
+        <div class="item-content">
+          <div class="preview">
+            <img class="img" :src="item.thumb">
           </div>
-        </div>
-
-        <div class="mask">
-          <div class="control">
-            <div v-show="item.statusId !== 'MmsSubmit'">
-              <m-link :href="editUrlItem(item)">
-                <img class="icon icon-edit" src="./icons/icon-edit.svg">
-                <span>编辑</span>
-              </m-link>
-            </div>
-            <div v-show="item.statusId === 'MmsOpen'" @click="verifyBefore(item, index)">
-              <img class="icon icon-submit" src="./icons/icon-submit.svg">
-              <span>提交</span>
-            </div>
-            <div @click="preview(item, index)">
-              <img class="icon icon-preview" src="./icons/icon-preview.svg">
-              <span>预览</span>
-            </div>
-            <div v-show="!standard" @click="delBefore(item, index)">
-              <img class="icon icon-del" src="./icons/icon-del.svg">
-              <span>删除</span>
+          <div class="main">
+            <div class="title" :title="item.title">{{item.title}}</div>
+            <div class="other">
+              <p><label>消息ID：</label>{{item.msgId}}</p>
+              <p><label>场景名称：</label>{{item.sceneName}}</p>
+              <p v-show="item.botName"><label>机器人：</label>{{item.botName}}</p>
             </div>
           </div>
-        </div>
 
-        <div class="flag" v-if="standard" :class="item.statusId | stateFormat">
-          {{item.statusId | stateName}}
-          <m-tooltip class="tooltip" v-if="item.desc" :title="item.desc">
-              <span class="el-icon-warning-outline"></span>
-          </m-tooltip>
+          <div class="mask">
+            <div class="control">
+              <div v-show="item.statusId !== 'MmsSubmit'">
+                <m-link :href="editUrlItem(item)">
+                  <img class="icon icon-edit" src="./icons/icon-edit.svg">
+                  <span>编辑</span>
+                </m-link>
+              </div>
+              <div v-show="item.statusId === 'MmsOpen'" @click="verifyBefore(item, index)">
+                <img class="icon icon-submit" src="./icons/icon-submit.svg">
+                <span>提交</span>
+              </div>
+              <div @click="preview(item, index)">
+                <img class="icon icon-preview" src="./icons/icon-preview.svg">
+                <span>预览</span>
+              </div>
+              <div v-show="!standard" @click="delBefore(item, index)">
+                <img class="icon icon-del" src="./icons/icon-del.svg">
+                <span>删除</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flag" v-if="standard" :class="item.statusId | stateFormat">
+            {{item.statusId | stateName}}
+            <m-tooltip class="tooltip" v-if="item.desc" :title="item.desc">
+                <span class="el-icon-warning-outline"></span>
+            </m-tooltip>
+          </div>
         </div>
       </li>
-      <li class="item blank" v-for="item in blanks" :key="item"></li>
+      <li class="item blank" style="flex:1"></li>
     </ul>
     <div class="pagination_box">
       <m-page 
@@ -304,16 +308,20 @@ export default {
   .list-wrap{
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     .item{
-      color:#303133;
-      flex: 0 0 19%;
-      background: #fff;
+      flex: 0 0 20%;
       margin-bottom: 20px;
+      overflow: hidden;
+      min-height: 200px;
+    }
+    .item-content{
+      margin: 0 10px;
       position: relative;
       border-radius: 6px;
       border: 1px solid rgba(0,0,0,0.15);
-      min-height: 200px;
+      height:100%;
+      background: #fff;
+      color:#303133;
       &.blank{
         border:none;
         background:none;
@@ -347,10 +355,6 @@ export default {
       margin: -1px;
       .img{
         width: 100%;
-        position: absolute;
-        top:50%;
-        left:50%;
-        transform: translate(-50%, -50%);
         vertical-align: bottom;
       }
     }
