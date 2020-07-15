@@ -45,10 +45,8 @@ class CatDrawJudge {
 					break
 				}
 			} else if(addMediaType == 'singleCard') {
-				console.log(2222,inputContents)
 //				if(!addMedia.reply.card.title) {
 				if(!addMedia.reply.card.originalTitle) {
-					console.log(333,inputContents)
 					res = false
 					this.warning('单卡信息不能为空')
 					break

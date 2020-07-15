@@ -178,6 +178,7 @@
 		methods: {
 			onChange(val) {
 				this.reply.card.media.height = val  //设置到界面中去
+				this.reply.height = val
 			},
 			onChangeCardOrientations(val) {
 				//横向的时候，给一个默认值，因为终端不用去设置，但是机器人那里需要展示

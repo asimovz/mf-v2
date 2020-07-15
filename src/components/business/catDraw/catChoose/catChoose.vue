@@ -272,7 +272,6 @@
 				// this.$root.eventBus.$emit("modal_visible_change_" + this.id)
 			},
 			rejectConfirm() {
-				console.log(11111,this.fileList)
 				if(!this.fileList.checked) {
 					
 					this.handleNotice('未选择素材','info')
@@ -284,7 +283,6 @@
 				}
 
 				this.confirmDelete() //关闭当前的弹窗
-
 				 //0609新增弹窗
 				this.$root.eventBus.$emit("modal_material_modal_media", {
 					materialObj: this.picResponse.materialFileProperty || new catDrawListData.CatMedia(), //选择的素材obj
