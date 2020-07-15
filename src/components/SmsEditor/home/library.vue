@@ -39,7 +39,8 @@
           <div class="lib-preview">
             <img :src="item.uri" v-if="type['type'] === 'image'" />
             <template v-else-if="type['type'] === 'video'">
-              <img v-if="item.poster" :src="item.poster" />
+
+              <img v-if="item.poster" :src="item.poster" crossOrigin="*" />
               <video v-else :src="item.uri"></video>
               <!-- <widget-video v-else :data="{...item, uri: item.src}" :showControls="false"></widget-video> -->
             </template>
