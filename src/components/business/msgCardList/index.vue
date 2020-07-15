@@ -58,7 +58,6 @@
           </div>
         </div>
       </li>
-      <li class="item blank" style="flex:1"></li>
     </ul>
     <div class="pagination_box">
       <m-page 
@@ -129,9 +128,6 @@ export default {
     searchForm: String
   },
   computed: {
-    blanks () {
-      return 5 - (this.items.length + 1) % 5
-    },
     pageMaxIndex () {
       let p = this.page.count / this.page.pageSize
       return p < 1 ? 1 : Math.ceil(p) + 1
