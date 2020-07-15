@@ -275,20 +275,21 @@ export default {
         const { type } = this.confirmModal
         const api = type === 'del' ? this.delUrl : this.verifyUrl
 
-        const res = await this.$root.$http.post(api, {
+        const { data } = await this.$root.$http.post(api, {
           messageId: this.activeData.msgId
         })
 
-        if (res.type === 'success') {
+        if (data.type === 'success') {
           if (type === 'verify') {
-            this.activeData.statusId = 'MmsSubmit'
+            this.activeData.statusId = data.statusId
           } else {
             this.page.pageIndex = 0
             this.getData()
             // this.items.splice(this.activeIndex, 1)
           }
-          this.handleMessage(res.messages, res.type)
         }
+
+        this.handleMessage(data.messages, data.type)
       } catch (err) {
         this.handleMessage(err.messages, err.type)
       }
