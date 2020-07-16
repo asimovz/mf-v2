@@ -46,8 +46,8 @@
           <div class="lib-name" v-if="item.name" :title="item.name">
             <!-- @dblclick="nameEdit" -->
             <div class="lib-name-word">{{ item.name }}</div>
-            <span title="重新命名" class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
-            <input class="lib-name-input" :value="item.name" @blur="(evt) => nameEdited(evt, item)" />
+            <span title="重命名" class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
+            <input class="lib-name-input" :value="item.name" @keyup.enter="enter2blur" @blur="(evt) => nameEdited(evt, item)" />
           </div>
         </div>
       </transition-group>
@@ -257,6 +257,11 @@ export default {
         movetoEnd(input)
       })
     },
+    // enter 触发 blur
+    enter2blur(evt){
+      let target = evt.target
+      target.blur()
+    },
 
     // 文件名编辑结束
     async nameEdited(evt, item) {
@@ -265,8 +270,10 @@ export default {
 
       parent.classList.remove('isEdit')
 
-      let value = target.value
-      if (value !== item.name) {
+      let oldVal = item.name
+      let value = item.name = target.value
+      
+      if (value !== oldVal) {
         console.log('名称修改过')
 
         let fd = new FormData()
@@ -279,7 +286,7 @@ export default {
           await this.updateLib(fd)
           item.name = value
         }catch(err){
-          target.value = item.name
+          item.name = target.value = oldVal
         }
 
       }
