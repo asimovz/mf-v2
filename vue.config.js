@@ -2,10 +2,8 @@ const path = require("path")
 const webpack = require('webpack')
 const resolve = dir => path.join(__dirname, dir)
 const baseThemeConfig = require('./config/theme.config')
-// webpack4去除了这个内置插件，需要自己下
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
-const BabiliPlugin=require("babili-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 
@@ -42,9 +40,6 @@ module.exports = {
         //   presets: ['es2015']
         // }
       },
-    )
-    config.plugins.push(
-      new BabiliPlugin()
     )
     config.plugins.push(
       new webpack.DefinePlugin({
