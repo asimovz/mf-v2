@@ -5,6 +5,8 @@ const baseThemeConfig = require('./config/theme.config')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 
 const host = 'http://10.0.80.16:8082/'
@@ -12,7 +14,7 @@ const host = 'http://10.0.80.16:8082/'
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production' ? 'http://op-fe.mfexcel.com/' : '/',
   outputDir: process.env.outputDir || 'dist', 
-  assetsDir: "./public",
+  assetsDir: "static",
   lintOnSave: false,
   productionSourceMap: false,
   configureWebpack: config => {
@@ -35,18 +37,48 @@ module.exports = {
           resolve('test'), 
           resolve('node_modules/vue-echarts'), 
           resolve('node_modules/resize-detector')
-        ],
-        // options: {
-        //   presets: ['es2015']
-        // }
+        ]
       },
     )
+    config.module.rules.push(
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: path.posix.join('', './img/[name].[ext]')
+        }
+      },
+    )
+    config.module.rules.push(
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: path.posix.join('', './media/[ame].[ext]')
+        }
+      },
+    )
+    config.module.rules.push(
+      {
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: path.posix.join('', './fonts/[name].[ext]')
+        }
+      }
+    )
+    
+
     config.plugins.push(
       new webpack.DefinePlugin({
         '$THEME': baseThemeConfig,
         '__webpack_define_cdn__': 'http://op-fe.mfexcel.com/'
       }),
     )
+    
     // 如果是开发环境，webpack配置
     if (process.env.NODE_ENV === 'development') {
       config.mode = 'development'
@@ -57,7 +89,27 @@ module.exports = {
       config.mode = 'production'
       config.output.filename = '[name].min.js'
       config.output.chunkFilename = '[name].min.js'
-      
+      config.optimization.usedExports = true
+      config.optimization.runtimeChunk = {
+        name: "manifest",
+      },
+      config.optimization.splitChunks = {
+        cacheGroups:{
+          vendor:{
+            name: 'vendors',
+            test: function (module) {
+              // any required modules inside node_modules are extracted to vendor
+              return (
+                module.resource &&
+                /\.js$/.test(module.resource) &&
+                module.resource.indexOf(
+                  path.join(__dirname, '../node_modules')
+                ) === 0
+              )
+            }
+          },
+        }
+      }
       config.optimization.minimizer.push(
         new TerserWebpackPlugin({
           terserOptions: {
@@ -73,37 +125,34 @@ module.exports = {
           extractComments: false,
           parallel: true,  // 启用并行压缩
           cache: true,    // 启用缓存
-       })
-        // new UglifyJSPlugin({
-        //   // exclude: /node_modules/,
-        //   uglifyOptions:{
-        //     warnings: "verbose",
-        //     output: {
-        //       comments: false,
-        //     },
-        //     //是否启用文件缓存，用来加快压缩速度。启用后js文件名不变并且内容不变就会读取缓存文件，不重新压缩。
-        //     cache: true,
-        //     //去掉注释
-        //     // comments: false,
-        //     //打包过滤console，debugger等配置
-        //     compress: {
-        //       drop_console: true,
-        //       drop_debugger: true
-        //     },
-        //     sourceMap: false,
-        //     //使用多进程并行运行来提高构建速度
-        //     parallel: true
-        //     }
-        // }),
+        })
       )
       config.plugins.push(
-        new CopyWebpackPlugin([
-          {
-            from: path.resolve(__dirname, './public'),
-            to: './static',
-            ignore: ['.*']
+        new webpack.optimize.ModuleConcatenationPlugin(),
+      )
+      config.plugins.push(
+        new OptimizeCSSPlugin({
+          cssProcessorOptions: {
+            safe: true
           }
-        ])
+        }),
+      )
+      // config.plugins.push(
+      //   new ExtractTextPlugin({
+      //     filename:  '[name].css',
+      //   }),
+      // )
+      // config.plugins.push(
+      //   new CopyWebpackPlugin([
+      //     {
+      //       from: path.resolve(__dirname, './public'),
+      //       to: './static',
+      //       ignore: ['.*']
+      //     }
+      //   ])
+      // )
+      config.plugins.push(
+        new webpack.HashedModuleIdsPlugin(),
       )
       config.plugins.push(
         new CompressionWebpackPlugin({

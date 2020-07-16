@@ -8,7 +8,7 @@
     "element": "cross-env component=element  vue-cli-service serve --mode development",
     "build": "vue-cli-service build",
     "build:iview": "cross-env component=iview NODE_OPTIONS=--max_old_space_size=4096 vue-cli-service build",
-    "build:element": "cross-env component=element NODE_OPTIONS=--max_old_space_size=4096 vue-cli-service build --inline --progress",
+    "build:element": "cross-env component=element NODE_OPTIONS=--max_old_space_size=4096 vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -83,7 +83,7 @@
     "node-notifier": "^5.1.2",
     "node-sass": "^4.12.0",
     "open-browser-webpack-plugin": "^0.0.5",
-    "optimize-css-assets-webpack-plugin": "^3.2.0",
+    "optimize-css-assets-webpack-plugin": "^3.2.1",
     "ora": "^1.2.0",
     "postcss-loader": "^2.0.8",
     "prettier": "^1.19.1",
