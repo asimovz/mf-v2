@@ -313,11 +313,11 @@ export default {
     .vjs-control-bar{
       height: 30px;
     }
-    .vjs-tech {
+    .vjs-tech, .vjs-poster {
       pointer-events: none;
     }
     &.pointerEvents{
-      .vjs-tech {
+      .vjs-tech, .vjs-poster {
         pointer-events: auto;
       }
     }
