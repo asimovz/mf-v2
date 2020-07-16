@@ -20,7 +20,7 @@ import mRow from './mRow'
 import mCol from './mCol'
 //兼容老模板版本
 import Row from './Row'
-import Col from './Col'
+import Col from './col'
 
 //导航组件
 import mStep from './mStep'
