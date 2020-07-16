@@ -5,7 +5,7 @@
       margin: alignCenter !== undefined ? '0 auto' : 0
     }">
     <div class="title">消息名称</div>
-    <m-carousel class="carousel" height="445px" trigger="click" :loop="false" :autoplay="false" :indicator-position="cards.length > 1 ? 'outside' : 'none'">
+    <m-carousel class="carousel" height="445px" trigger="click" :loop="false" :autoplay="false" :indicator-position="cards.length > 1 ? 'outside' : 'none'" v-loading="loading">
       <m-carousel-item v-for="(card, index) in cards" :key="index">
         <div class="scroll-wrap">
           <div v-for="(item, index) in card" :key="index">
@@ -54,6 +54,7 @@ export default {
   name: 'msgPreview',
   data () {
     return {
+      loading: false,
       standard: true,
       cards: [],
       buttons: []
@@ -88,6 +89,10 @@ export default {
   },
   methods: {
     async getData (data) {
+      this.loading = true
+      this.cards = []
+      this.buttons = []
+
       try {
         if (data) {
           this.standard = data.messageType === 'standard'
@@ -101,7 +106,9 @@ export default {
           this.standard = data.messageType === 'standard'
           this.cards = this.standard ? this.filterData(data.data) : this.filterData(data.result.massMessage)
         }
+        this.loading = false
       } catch (err) {
+        this.loading = false
         console.log('request err', err)
       }
     },
