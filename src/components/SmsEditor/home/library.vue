@@ -20,6 +20,8 @@
         <input style="display: none;" ref="file" type="file" :accept="currentAccept" name="upload" @change="fileChanged" />
       </template>
     </div>
+
+     <!-- v-infinite-scroll="loadMore" -->
     <div class="library--content scrollbar" :class="{'no-data': !dataList.length}" v-loading="fetchLoading || isUpLoading" :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''" :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''" :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''">
       <transition-group name="fade" tag="div" class="lib-list" :class="{'isCheckable': isCheckAble}">
         <div :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in dataList" :key="item.resourceId" :class="[
@@ -51,6 +53,12 @@
           </div>
         </div>
       </transition-group>
+
+      <transition name="el-fade-in">
+        <div style="width: 100%;padding: 0 10px;" v-if="!canMore && showNoMore" ref="noMoreDom">
+          <div class="bottom-deliver"><span>到底啦</span></div>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -107,6 +115,9 @@ export default {
     return {
       fetchLoading: false,
       dataList: [],
+
+      canMore: true,  // 是否加载更多
+      showNoMore: true, // 是否显示无数据标识
 
       pager: {
         pageSize: 20,
@@ -166,7 +177,7 @@ export default {
         }
 
       },
-      deep: true
+      deep: true,
     },
 
     isCheckAble(visible) {
@@ -178,6 +189,14 @@ export default {
           checked: false
         }
       })
+    },
+
+    canMore(val){
+      if(!val){
+        setTimeout(() => {
+          this.showNoMore = false
+        }, 1000)
+      }
     }
   },
   methods: {
@@ -272,7 +291,7 @@ export default {
 
       let oldVal = item.name
       let value = item.name = target.value
-      
+
       if (value !== oldVal) {
         console.log('名称修改过')
 
@@ -377,9 +396,18 @@ export default {
         })
     },
 
+    loadMore(){
+      if(!this.dataList.length || !this.canMore) return
+
+      this.pager.pageIndex ++
+      this.fetchData(this.type['type'], true)
+    },
+
     // 获取素材库数据
-    async fetchData(type) {
-      this.dataList = []
+    async fetchData(type, isMore) {
+      // 非加载更多，清空数据 => 切换 type
+      if(!isMore) this.dataList = []
+
       this.fetchLoading = true
 
       let { pageIndex, pageSize } = this.pager
@@ -387,7 +415,18 @@ export default {
       this._http(this.mmsConfig.library, { type, pageIndex: pageIndex - 1, pageSize })
         .then(res => {
           if (res.error === 0) {
-            this.dataList = res.data || []
+            let _data = res.data || []
+
+            if(isMore){
+              this.dataList = this.dataList.concat(_data)
+
+              if(!_data.length){
+                this.pager.pageIndex --
+                this.canMore = false
+              }
+            }else{
+              this.dataList = _data
+            }
           }
         }).finally(end => {
           this.fetchLoading = false
