@@ -12,7 +12,6 @@
   </div>
 </template>
 <script>
-let _imgSrc = ''
 export default {
   name: 'upLoadImage',
   props: {
@@ -23,7 +22,6 @@ export default {
   },
   data() {
     return {
-      // f_imgSrc: '',
       uploadLoing: false
     }
   },
@@ -59,8 +57,6 @@ export default {
       let target = evt.target
       let file = target.files[0]
 
-      _imgSrc = URL.createObjectURL(file)
-
       let fd = new FormData()
       fd.append('file', file)
       fd.append('actionType', 'upload')
@@ -79,11 +75,9 @@ export default {
         })
 
         if(res.type === 'success'){
-          this.f_imgSrc = _imgSrc
           this.$emit('input', res.data.uri)
         }
       }).finally(end => {
-        _imgSrc = ''
         this.$refs.file.value = ''
         this.uploadLoing = false
       })

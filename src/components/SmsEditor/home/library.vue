@@ -31,9 +31,9 @@
           ]" @click="libAdd(item, index, $event)">
           <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
           <div class="lib-preview">
-            <img :src="item.uri" v-if="type['type'] === 'image'" crossorigin="anonymous" />
+            <img :src="item.uri" v-if="type['type'] === 'image'" crossorigin="*" />
             <template v-else-if="type['type'] === 'video'">
-              <img v-if="item.poster" :src="item.poster" crossorigin="anonymous" />
+              <img v-if="item.poster" :src="item.poster" crossorigin="*" />
               <video v-else :src="item.uri"></video>
             </template>
             <template v-else>
@@ -211,8 +211,8 @@ export default {
         let fd = new FormData()
         fd.append('actionType', 'delete')
         fd.append('resourceIds', id)
-        await this.updateLib(fd)
 
+        await this.updateLib(fd)
 
         this.dataList = this.dataList.filter(item =>
           Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
@@ -259,7 +259,7 @@ export default {
     },
 
     // 文件名编辑结束
-    nameEdited(evt, item) {
+    async nameEdited(evt, item) {
       let target = evt.target
       let parent = target.offsetParent
 
@@ -271,12 +271,17 @@ export default {
 
         let fd = new FormData()
         fd.append('actionType', 'rename')
+        fd.append('type', this.type['type'])
         fd.append('resourceId', item.resourceId)
         fd.append('newFileName', value)
 
-        this.updateLib(fd)
+        try{
+          await this.updateLib(fd)
+          item.name = value
+        }catch(err){
+          target.value = item.name
+        }
 
-        item.name = value
       }
     },
 
@@ -332,7 +337,7 @@ export default {
 
     // 更新素材
     updateLib(fd) {
-      this._http(this.mmsConfig.file, fd, { timeout: 90000 })
+      return this._http(this.mmsConfig.file, fd, { timeout: 90000 })
         .then(res => {
           let actionType = fd.get('actionType')
 
@@ -350,6 +355,10 @@ export default {
                 type: res.error === '0' ? 'success' : 'error',
                 message: res.message
               });
+
+              if(res.error !== '0'){
+                throw new Error(res.message)
+              }
               break;
             default:
               break;

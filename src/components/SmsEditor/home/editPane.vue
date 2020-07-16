@@ -7,7 +7,7 @@
     <div class="editPane-content">
       <div class="editPane-preview">
         <template v-if="currentData.type === 'image'">
-          <img :src="currentData.uri" crossorigin="anonymous">
+          <img :src="currentData.uri" crossorigin="*">
         </template>
         <template v-if="currentData.type === 'video'">
           <videoPlayer ref="videoPlayer" showMediaInfo :options="videoOptions" />
@@ -102,7 +102,7 @@ export default {
     },
     'currentData.poster': {
       handler(nVal, oVal) {
-        nVal && this.$refs.videoPlayer && this.$refs.videoPlayer.showPoster()
+        this.$refs.videoPlayer && this.$refs.videoPlayer.showPoster()
       }
     }
   },

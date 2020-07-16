@@ -7,7 +7,7 @@
       :options="videoOptions" />
 
     <div class="video-poster">
-      <img :src="data.poster" crossorigin="anonymous">
+      <img :src="data.poster" crossorigin="*">
       <span class="video-playBtn"></span>
     </div>
   </div>
