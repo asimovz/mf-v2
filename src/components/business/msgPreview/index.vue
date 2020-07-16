@@ -21,7 +21,7 @@
                   </div>
                   <div v-if="item.type === 'video'" class="media-bg">
                     <img v-if="item.cardOrientation === 'HORIZONTAL'" src="./video.svg" />
-                    <video v-else controls :src="item.content" preload="metadata"></video>
+                    <video v-else controls :src="item.content" preload="metadata" :poster="item.poster"></video>
                   </div>
                   <div v-if="item.type === 'audio' || item.type === 'voice'" class="media-bg">
                     <img v-if="item.cardOrientation === 'HORIZONTAL'" src="./audio.svg" />
@@ -126,7 +126,8 @@ export default {
         let card = dataJson.map(item => {
           return {
             content: item.content,
-            type: item.type
+            type: item.type,
+            poster: item.poster
           }
         })
         cards.push(card)
@@ -138,12 +139,13 @@ export default {
             cards.push([
               {
                 content: item.replyType === 'text' ? (item.originalMessage || (item.reply && item.reply.content) || '') : item.reply.mediaUrl,
-                type: item.replyType
+                type: item.replyType,
+                poster: item.reply.thumbnailMediaUrl
               }
             ])
           } else if (item.replyType === 'singleCard') {
             const {originalTitle, description, buttons, originalDescription} = item.reply.card
-            const {mediaUrl, mediaType} = item.reply.card.media
+            const {mediaUrl, mediaType, thumbnailMediaUrl} = item.reply.card.media
             cards.push([{
               content: mediaUrl,
               title: originalTitle,
@@ -151,6 +153,7 @@ export default {
               buttons,
               replyType: item.replyType,
               type: mediaType,
+              poster: thumbnailMediaUrl,
               cardOrientation: item.reply.cardOrientation
             }])
           } else {
@@ -162,7 +165,8 @@ export default {
                   desc: card.description || card.originalDescription,
                   buttons: card.buttons,
                   replyType: item.replyType,
-                  type: card.media.mediaType
+                  type: card.media.mediaType,
+                  poster: card.media.thumbnailMediaUrl
                 }
               ])
             })
