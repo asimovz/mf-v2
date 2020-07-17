@@ -2,22 +2,24 @@ const path = require("path")
 const webpack = require('webpack')
 const resolve = dir => path.join(__dirname, dir)
 const baseThemeConfig = require('./config/theme.config')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 
 const host = 'http://10.0.80.16:8082/'
+// const host = 'http://10.0.81.220:8090/'
 
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production' ? 'http://op-fe.mfexcel.com/' : '/',
   outputDir: process.env.outputDir || 'dist', 
-  assetsDir: "static",
-  lintOnSave: false,
+  assetsDir: "/",
   productionSourceMap: false,
+  lintOnSave: false,
   configureWebpack: config => {
+    config.context = path.resolve(__dirname, './'),
     config.output.libraryTarget = "umd"
     config.externals= {
       jquery: "jQuery"
@@ -40,37 +42,6 @@ module.exports = {
         ]
       },
     )
-    config.module.rules.push(
-      {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: path.posix.join('', './img/[name].[ext]')
-        }
-      },
-    )
-    config.module.rules.push(
-      {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: path.posix.join('', './media/[ame].[ext]')
-        }
-      },
-    )
-    config.module.rules.push(
-      {
-        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: path.posix.join('', './fonts/[name].[ext]')
-        }
-      }
-    )
-    
 
     config.plugins.push(
       new webpack.DefinePlugin({
@@ -84,6 +55,14 @@ module.exports = {
       config.mode = 'development'
       config.output.filename = '[name].js'
       config.output.chunkFilename = '[name].[hash:8].js'
+      config.plugins.push(
+        new HtmlWebpackPlugin({
+          filename: 'index.html',
+          template: 'index.html',
+          inject: true,
+          chunks:['app']
+        }),
+      )
     }else if (process.env.NODE_ENV === 'production'){
       // 如果是生产环境，webpack配置
       config.mode = 'production'
@@ -93,23 +72,6 @@ module.exports = {
       config.optimization.runtimeChunk = {
         name: "manifest",
       },
-      config.optimization.splitChunks = {
-        cacheGroups:{
-          vendor:{
-            name: 'vendors',
-            test: function (module) {
-              // any required modules inside node_modules are extracted to vendor
-              return (
-                module.resource &&
-                /\.js$/.test(module.resource) &&
-                module.resource.indexOf(
-                  path.join(__dirname, '../node_modules')
-                ) === 0
-              )
-            }
-          },
-        }
-      }
       config.optimization.minimizer.push(
         new TerserWebpackPlugin({
           terserOptions: {
@@ -137,20 +99,15 @@ module.exports = {
           }
         }),
       )
-      // config.plugins.push(
-      //   new ExtractTextPlugin({
-      //     filename:  '[name].css',
-      //   }),
-      // )
-      // config.plugins.push(
-      //   new CopyWebpackPlugin([
-      //     {
-      //       from: path.resolve(__dirname, './public'),
-      //       to: './static',
-      //       ignore: ['.*']
-      //     }
-      //   ])
-      // )
+      config.plugins.push(
+        new CopyWebpackPlugin([
+          {
+            from: path.resolve(__dirname, './static'),
+            to: './static',
+            ignore: ['.*']
+          }
+        ])
+      )
       config.plugins.push(
         new webpack.HashedModuleIdsPlugin(),
       )
@@ -175,13 +132,20 @@ module.exports = {
   },
 
   chainWebpack: config => {
+    if (process.env.NODE_ENV === 'production'){
+      // 不生成html文件
+      config.plugins.delete('html')
+      config.plugins.delete('preload')
+      config.plugins.delete('prefetch')
+    }
+    
     // 修复HMR
     config.resolve.symlinks(true)
     // 添加别名
     config.resolve.alias
       .set("vue$", "vue/dist/vue.esm.js")
       .set("@", resolve("src"))
-      .set("static", resolve("public"))
+      .set("static", resolve("static"))
       .set("assets", path.resolve(__dirname, './src/assets'),)
       .set("utils", path.resolve(__dirname, './src/components/baseComponent/iview/utils'))
       .set("node_modules", path.resolve(__dirname, './node_modules'))

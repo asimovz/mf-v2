@@ -57,7 +57,7 @@ const statusColor = {
   WeCancelled: "#bbb2ff"
 };
 
-const $ = require("../../../../public/js/jquery-3.1.1.min");
+const $ = require("jquery");
 export default {
   name: "m-full-calendar",
   props: {
