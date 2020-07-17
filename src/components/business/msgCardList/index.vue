@@ -240,6 +240,7 @@ export default {
     },
     standardCreate (item) {
       this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`, {
+        title: item ? '编辑' : '新建',
         href: item ? `${this.editUrl}?messageId=${item.msgId}` : this.editUrl
       })
       // this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
