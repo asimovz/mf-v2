@@ -19,7 +19,7 @@ export default {
     audioOptions() {
       return {
         muted: false,
-        name: this.data.uri,
+        name: this.data.name,
         src: this.data.uri
       }
     }
