@@ -27,7 +27,7 @@
           </el-select>
         </div>
         <div>
-          <el-color-picker @active-change="colorChange" v-model="markOpts.fontColor"></el-color-picker>
+          <el-color-picker v-model="markOpts.fontColor"></el-color-picker>
         </div>
       </div>
     </div>
@@ -128,9 +128,6 @@ export default {
       this.markOpts = isEmpty(this.value)
         ? {...defaultOpts}
         : Object.assign({}, defaultOpts, this.value)
-    },
-    colorChange (e) {
-      this.markOpts.fontColor = e
     },
     async launch () {
       let ops = this.markOpts
