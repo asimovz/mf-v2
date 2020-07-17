@@ -219,6 +219,7 @@ export default {
       vertical-align: bottom;
     }
     video,audio,img{
+      width:100%;
       max-width: 100%;
     }
     &::-webkit-scrollbar {
