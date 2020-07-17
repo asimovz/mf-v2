@@ -15,7 +15,7 @@ const host = 'http://10.0.80.16:8082/'
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production' ? 'http://op-fe.mfexcel.com/' : '/',
   outputDir: process.env.outputDir || 'dist', 
-  assetsDir: "/",
+  // assetsDir: "static",
   productionSourceMap: false,
   lintOnSave: false,
   configureWebpack: config => {
