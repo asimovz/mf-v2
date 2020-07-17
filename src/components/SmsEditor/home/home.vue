@@ -648,13 +648,17 @@ export default {
       if (resp && this.$root.moqui.isPlainObject(resp)) {
         this.$root.moqui.notifyMessages(resp.messageInfos, resp.errors);
 
-        if (resp.screenUrl && resp.screenUrl.length > 0) {
-          setTimeout(() => {
-            this.$root.setUrl(resp.screenUrl);
-          }, 1200)
-        } else if (resp.redirectUrl && resp.redirectUrl.length > 0) {
-          window.location.href = resp.redirectUrl;
-        }
+        this.initParams.messageId = resp.screenParameters.messageId
+
+        // 跳转页面
+        // if (resp.screenUrl && resp.screenUrl.length > 0) {
+        //   setTimeout(() => {
+        //     this.$root.setUrl(resp.screenUrl);
+        //   })
+        // } else if (resp.redirectUrl && resp.redirectUrl.length > 0) {
+        //   window.location.href = resp.redirectUrl;
+        // }
+        
       } else {
         this.$message.error('保存错误')
         console.warn('m-form no response or non-JSON response: ' + JSON.stringify(resp))
