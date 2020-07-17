@@ -18,6 +18,10 @@ export default {
     value: {
       type: String,
       default: ''
+    },
+    size: {
+      type: [String, Number],
+      default: 0
     }
   },
   data() {
@@ -44,6 +48,19 @@ export default {
       set(val){
         this.$emit('input', val)
       }
+    },
+    maxSize(){
+      if(typeof this.size === 'string'){
+        let unit = this.size.slice(-1)
+        if(['k', 'K'].includes(unit)){
+          return parseInt(this.size)
+        }
+        if(['m', 'M'].includes(unit)){
+          return parseInt(this.size) * 1024
+        }
+      }else{
+        return this.zise
+      }
     }
   },
   methods: {
@@ -57,6 +74,13 @@ export default {
       let target = evt.target
       let file = target.files[0]
 
+      if(this.size && !this.isSizeValidated(file.size)){
+        this.$message.warning(`大小不得超过 ${typeof this.size === 'string' ? this.size : (this.maxSize + 'k')}`)
+        this.uploadLoing = false
+        return false
+      }
+
+
       let fd = new FormData()
       fd.append('file', file)
       fd.append('actionType', 'upload')
@@ -64,6 +88,10 @@ export default {
       fd.append('type', 'image')
 
       this.upload(fd)
+    },
+
+    isSizeValidated(size){
+      return this.maxSize * 1024 >= size
     },
 
     upload(fd) {
