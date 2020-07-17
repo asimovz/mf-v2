@@ -85,6 +85,10 @@ export default {
     this.$root.eventBus.$on('m_send_fields_data', data => {
       this.getData(data)
     })
+    this.$once('hook:beforeDestroy', function () {
+      this.$root.eventBus.$off("m_send_fields_data")
+    })
+
     this.api && this.getData()
   },
   methods: {
@@ -176,9 +180,6 @@ export default {
 
       return cards
     }
-  },
-  beforeDestroy () {
-
   }
 }
 </script>
