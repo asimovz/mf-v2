@@ -31,7 +31,11 @@
           <div class="mask">
             <div class="control">
               <div v-show="item.statusId !== 'MmsSubmit'">
-                <m-link :href="editUrlItem(item)">
+                <div v-if="standard" @click="standardCreate(item)">
+                  <img class="icon icon-edit" src="./icons/icon-edit.svg">
+                  <span>编辑</span>
+                </div>
+                <m-link v-else :href="editUrlItem(item)">
                   <img class="icon icon-edit" src="./icons/icon-edit.svg">
                   <span>编辑</span>
                 </m-link>
@@ -234,8 +238,11 @@ export default {
       this.activeIndex = index
       this.activeData = item
     },
-    standardCreate () {
-      this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
+    standardCreate (item) {
+      this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`, {
+        href: item ? `${this.editUrl}?messageId=${item.msgId}` : this.editUrl
+      })
+      // this.$root.eventBus.$emit(`dynamic_visible_change_${this.targetModal}`)
     },
     editUrlItem (item) {
       return `${this.editUrl}?messageId=${item.msgId}`

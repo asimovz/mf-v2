@@ -13,7 +13,7 @@
 </template>
 <script>
 export default {
-  name: "dynamic-dialog",
+  name: 'dynamic-dialog',
   props: {
     id: {
       type: String,
@@ -29,42 +29,42 @@ export default {
       default: 600
     },
     url: {
-      type: String, 
+      type: String
     },
     dynamicParams: {
       type: Object,
       default: null
     }
   },
-  data() {
+  data () {
     return {
       visible: false,
       loadUrl: this.url,
       dialogTitle: this.title
-    };
+    }
   },
-  provide() {
+  provide () {
     return {
-      BoxInstance:this
+      BoxInstance: this
     }
   },
   methods: {
-    close() {
+    close () {
       this.visible = false
     }
   },
-  mounted: function() {
-    this.$root.eventBus.$on("dynamic_visible_change_" + this.id, resp => {
-      if( resp && resp.href && resp.href != "") {
-        this.dialogTitle = resp.title
+  mounted: function () {
+    this.$root.eventBus.$on('dynamic_visible_change_' + this.id, resp => {
+      if (resp && resp.href && resp.href != '') {
+        resp.title && (this.dialogTitle = resp.title)
         this.loadUrl = resp.href
       }
       this.visible = true
     })
   },
-  beforeDestroy() {
-    this.$root.eventBus.$off("dynamic_visible_change_" + this.id)
+  beforeDestroy () {
+    this.$root.eventBus.$off('dynamic_visible_change_' + this.id)
   }
-};
+}
 </script>
 
