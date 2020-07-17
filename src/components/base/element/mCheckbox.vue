@@ -51,11 +51,6 @@ export default {
       return this.sizeConfig[this.size];
     }
   },
-
-  mounted: function() {
-    console.log(1)
-  },
-
   watch: {
     value(newVal){
       this.selectValue = newVal

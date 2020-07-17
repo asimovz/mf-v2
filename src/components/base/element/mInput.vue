@@ -160,7 +160,7 @@ export default {
         currentValue: this.washValue(this.value),
         initValue: this.washValue(this.value),
         timer:null,
-        sizeType: 'small'//sizeConfig[this.size]
+        sizeType: this.size == "small" ? "mini":'small'//sizeConfig[this.size]
     };
   },
 

@@ -10,28 +10,27 @@ import 'static/element.css'
 // }
 
 import VueI18n from 'vue-i18n'
-Vue.use(ElementUI)
-Vue.use(VueI18n)
 
-
-
-//布局组件
+// 布局组件
 import mRow from './mRow'
 import mCol from './mCol'
-//兼容老模板版本
+// 兼容老模板版本
 import Row from './Row'
 import Col from './Col'
 
-//导航组件
+// 导航组件
 import mStep from './mStep'
 import mPage from './mPage'
 
-//基础组件
+// 基础组件
 import mButton from './mButton'
 import mButtonGroup from './mButtonGroup'
 import mBadge from './mBadge'
+import mCarousel from './mCarousel'
+import mCarouselItem from './mCarouselItem'
+import mIcon from './mIcon'
 
-//数据录入
+// 数据录入
 import mInput from './mInput'
 import mRadio from './mRadio'
 import mCheckbox from './mCheckbox'
@@ -50,9 +49,7 @@ import mFile from './mFile'
 import mColor from './mColor'
 import mSwitch from './mSwitch'
 
-
-
-//数据展示
+// 数据展示
 import mTable from './mTable/'
 import mTooltip from './mTooltip'
 import mPopover from './mPopover'
@@ -65,12 +62,21 @@ import mDropDown from './mDropDown'
 import mDropDownItem from './mDropDownItem'
 import containerBox from './containerBox'
 
-
-//反馈组件
+// 反馈组件
 import mLoading from './mLoad'
 import mModal from './mModal'
 import mDrawer from './mDrawer'
 
+/*  ===== 第三方插件 ======== */
+
+// 模态框拖动
+import iviewExt from './directives'
+
+// 表单字段验证插件
+import VeeValidate from 'vee-validate'
+import zh_CN from './utils/vee-zh_CN'
+Vue.use(ElementUI)
+Vue.use(VueI18n)
 
 // 定义通知提醒框
 Vue.prototype.handleNotice = function (msg = '操作成功!', type = 'info') {
@@ -114,23 +120,9 @@ Vue.prototype.handleConfirm = function (options) {
     }
   })
 }
-
-
-
-
-
-
-/*  ===== 第三方插件 ======== */ 
-
-//模态框拖动
-import iviewExt from './directives'
 Vue.use(iviewExt)
-
-//表单字段验证插件
-import VeeValidate from 'vee-validate'
-import zh_CN from './utils/vee-zh_CN'
 const i18n_zh = new VueI18n({
-	locale: 'zh_CN',
+  locale: 'zh_CN'
 })
 
 const config = {
@@ -138,10 +130,10 @@ const config = {
     zh_CN
   },
   fieldsBagName: 'validFields',
-  i18n: i18n_zh , // the vue-i18n plugin instance
-  i18nRootKey: 'validation' ,// the nested key under which the validation messsages will be located
-};
-Vue.use(VeeValidate, config);
+  i18n: i18n_zh, // the vue-i18n plugin instance
+  i18nRootKey: 'validation'  // the nested key under which the validation messsages will be located
+}
+Vue.use(VeeValidate, config)
 
 const component = [
   mRow,
@@ -184,6 +176,9 @@ const component = [
   containerBox,
   Row,
   Col,
+  mCarousel,
+  mCarouselItem,
+  mIcon
 ]
 
 export default component

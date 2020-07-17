@@ -6,7 +6,7 @@ import store from '../assets/js/localStorage'
 const Axios = axios.create({
   baseURL: "/",
   // 设置请求的超时时间，默认为25s
-  timeout: 25000,
+  timeout: 90000,
   withCredentials: false, // 是否允许带cookie这些
   headers: {
     // 'Accept':'*/*',

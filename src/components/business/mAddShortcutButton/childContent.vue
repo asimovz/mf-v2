@@ -7,7 +7,7 @@
     </div>
 
     <div class="btnMatch" v-if="btn.type=='url'">
-      <m-input class="matchInput" v-model="btn.url" size="small" placeholder="链接需以http(s)://开头（必填）" name="_NA_" :validate="{regex:/^(http[s]{0,1}:\/\/)/i}" validate-msg="请输入正确链接" />
+      <m-input class="matchInput" v-model="btn.content" size="small" placeholder="链接需以http(s)://开头（必填）" name="_NA_" :validate="{regex:/^(http[s]{0,1}:\/\/)/i,required:true}" validate-msg="请输入正确链接" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='openApp'">
@@ -15,7 +15,7 @@
     </div>
 
     <div class="btnMatch" v-if="btn.type=='call'">
-      <m-input class="matchInput" v-model="btn.phoneNum" size="small" placeholder="请输入电话号码（必填）" name="_NA_" :validate="{regex:/^[\d\-\s\+]+$/}" validate-msg="请输入正确电话号码" />
+      <m-input class="matchInput" v-model="btn.callPhone" size="small" placeholder="请输入电话号码（必填）" name="_NA_" :validate="{regex:/^[\d\-\s\+]+$/}" validate-msg="请输入正确电话号码" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='addressLocation'">
@@ -87,10 +87,10 @@ export default {
       btn:{
         type:'reply',
         description:'',
-        url:'',
+        content:'',
         openAppAndroid:'',
         openAppIos:'',
-        phoneNum:'',
+        callPhone:'',
         sendAddressPlaceName:'',
         sendAddressLongitude:'',
         sendAddressLatitude:'',
@@ -102,24 +102,10 @@ export default {
   created(){
     this.btn = this.data
   },
-  computed: {
-
-  },
   watch: {
-    btn: {
-      handler (newV, oldV) {
-        this.$emit('uploadData', {index: this.index, data: newV})
-      },
-      deep: true
+    data(newVal){
+      this.btn = newVal
     },
-    items: {
-      handler (newV, oldV) {
-        if (newV.length !== 0) {
-          this.btn = {...newV[this.index]}
-        }
-      },
-      deep: true
-    }
   },
   methods: {
     handleChange(){

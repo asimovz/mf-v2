@@ -660,7 +660,7 @@ export default {
 }
 
 </script>
-<style scoped lang="less">
+<style lang="less">
 .eleTable-wrapper {
   position: relative;
   &.show-custom:before {
@@ -673,12 +673,7 @@ export default {
     background-color: rgba(0, 0, 0, 0.06);
     z-index: 9
   }
-}
 
-
-</style>
-<style lang="less">
-.eleTable-wrapper {
 
   .el-table__body {
     // 使表格兼容safari，不错位
@@ -695,6 +690,13 @@ export default {
   .cell-word-break .cell {
     white-space: nowrap;
     word-break: break-all;
+  }
+
+  .el-table th.gutter{
+      display: table-cell!important;
+  }
+  .el-table colgroup.gutter{
+      display: table-cell!important;
   }
 }
 

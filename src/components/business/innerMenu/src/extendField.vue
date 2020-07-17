@@ -4,7 +4,7 @@
       <div v-for="(item, index) in options" :key="index + '-' + item.name + '_' + index" :class="['extend-val', {'text-require': item.required}]" :style="{'flex-basis': ((item.type === 'select' && item.r_type === '0') || item.type === 'textarea' || item.type === 'selectTable') ? '100%' : '50%'}">
 
         <template v-if="(item.type === 'select' && item.r_type === '0') || item.type === 'selectTable'">
-          <m-select-table :name="item.name" :data="item.value" :valueField="keyField" :keyField="valueField" :placeholder="item.name" searchField="searchField" :fieldTitle="`选择${item.name}`" :value="currentData[item.name]" @on-change="e => onChange(e, item, index)" :column="columns" :page-size="20" :max-select="10" pagination></m-select-table>
+        <m-select-table :name="item.name" :data="item.value" :valueField="keyField" :keyField="valueField" :placeholder="item.name" searchField="searchField" :fieldTitle="`选择${item.name}`" :value="currentData[item.name]" @on-change="e => onChange(e, item, index)" :column="columns" :page-size="20" :max-select="10" pagination></m-select-table>
           <m-input v-show="readonlys[`name_${index}`]" diabled style="margin-top: 10px;" readonly :value="readonlys[`name_${index}`]" placeholder="只读" />
         </template>
 
