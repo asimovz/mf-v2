@@ -39,7 +39,7 @@
               <video v-else :src="item.uri"></video>
             </template>
             <template v-else>
-              <widget-audio :showPlusBtn="true" :data="{ uri: item.uri }" @click.native="audioClick">
+              <widget-audio :showPlusBtn="true" :data="item" @click.native="audioClick">
                 <div class="lib-add el-icon-plus" :title="`${isCheckAble ? '选中' : '添加音频素材'}`" @click.stop="libAdd(item, index)"></div>
               </widget-audio>
             </template>
@@ -358,7 +358,7 @@ export default {
 
     // 验证文件格式
     isTypeValidated(type) {
-      return this.currentAccept.includes(type)
+      return this.currentAccept.includes(type.toLowerCase())
     },
 
     // 更新素材
