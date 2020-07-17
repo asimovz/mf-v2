@@ -4,8 +4,8 @@
     :style="{
       margin: alignCenter !== undefined ? '0 auto' : 0
     }">
-    <div class="title">消息名称</div>
-    <m-carousel class="carousel" height="445px" trigger="click" :loop="false" :autoplay="false" :indicator-position="cards.length > 1 ? 'outside' : 'none'" v-loading="loading">
+    <div class="title">{{messageName}}</div>
+    <m-carousel class="carousel" trigger="click" :loop="false" :autoplay="false" :indicator-position="cards.length > 1 ? 'outside' : 'none'" v-loading="loading">
       <m-carousel-item v-for="(card, index) in cards" :key="index">
         <div class="scroll-wrap">
           <div v-for="(item, index) in card" :key="index">
@@ -57,7 +57,8 @@ export default {
       loading: false,
       standard: true,
       cards: [],
-      buttons: []
+      buttons: [],
+      messageName: ''
     }
   },
   props: {
@@ -107,7 +108,9 @@ export default {
               messageId: this.messageId
             }
           })
+
           this.standard = data.messageType === 'standard'
+          this.messageName = this.standard ? data.messageName : data.result.topic
           this.cards = this.standard ? this.filterData(data.data) : this.filterData(data.result.massMessage)
         }
         this.loading = false
@@ -190,12 +193,14 @@ export default {
 .msgPreview {
   width:280px;
   height:560px;
-  padding:40px 15px;
+  padding:40px 15px 50px;
   background:url('./phone-bg.png') 0 0 no-repeat;
   background-size: cover;
   font-size: 12px;
   color:#606266;
   position: relative;
+  display: flex;
+  flex-direction:column;
   .media-bg, audio::-webkit-media-controls-panel{
     background: #f1f3f4;
   }
@@ -211,7 +216,7 @@ export default {
   }
   .scroll-wrap{
     width:100%;
-    height:445px;
+    height:100%;
     padding:10px;
     overflow-x: hidden;
     overflow-y: auto;
@@ -238,6 +243,13 @@ export default {
 
   .carousel{
     width:100%;
+    flex:1;
+    .el-carousel__container{
+      height: 100%;
+    }
+    .el-carousel--horizontal{
+      overflow-x: initial;
+    }
     .el-carousel__indicator--horizontal{
       padding: 8px 4px 12px;   
     }
