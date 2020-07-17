@@ -90,7 +90,7 @@
 			name: String,
 			form: String,
 			paramName: String,
-			botId: String,
+			chatbotId: String,
 			//0528修改上传的地址
 			// 素材上传接口
 			acceptUrl: {
@@ -163,6 +163,7 @@
 				type: [String,Object],
 				default: 'checkMsgEditor'
 			},
+			dependsOn: String,
 		},
 		components: {
 			catDrawPoptip,
@@ -182,6 +183,7 @@
 				// 	1: '随机发送一条',
 				// 	2: '发送所有',
 				// },
+				botId: this.chatbotId,
 				eventList: this.eventArray,
 				replysList: [
 					{value:1,label:'随机发送一条'},
@@ -365,6 +367,11 @@
 			})
 		},
 		mounted() {
+			this.$root.eventBus.$on(this.dependsOn+'_value_change', res => {
+				this.$nextTick(function(){
+					this.botId = res[this.dependsOn]
+				})
+			})
 			this.$root.eventBus.$on("modal_material_modal", (obj) => {
 
 				if(!this.botId) {
