@@ -7,7 +7,7 @@
     </div>
 
     <div class="btnMatch" v-if="btn.type=='url'">
-      <m-input class="matchInput" v-model="btn.content" size="small" placeholder="链接需以http(s)://开头（必填）" name="_NA_" :validate="{regex:/^(http[s]{0,1}:\/\/)/i}" validate-msg="请输入正确链接" />
+      <m-input class="matchInput" v-model="btn.content" size="small" placeholder="链接需以http(s)://开头（必填）" name="_NA_" :validate="{regex:/^(http[s]{0,1}:\/\/)/i,required:true}" validate-msg="请输入正确链接" />
     </div>
 
     <div class="btnMatch" v-if="btn.type=='openApp'">
@@ -102,15 +102,9 @@ export default {
   created(){
     this.btn = this.data
   },
-  computed: {
-
-  },
   watch: {
-    btn: {
-      handler (newV, oldV) {
-        this.$emit('uploadData', {index: this.index, data: newV})
-      },
-      deep: true
+    data(newVal){
+      this.btn = newVal
     },
   },
   methods: {
