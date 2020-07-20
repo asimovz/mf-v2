@@ -1,6 +1,7 @@
 <template>
   <el-dialog
     class="aw-modal"
+    :class="customClass"
     ref="modal"
     :id="id"
     :title="title"
@@ -67,7 +68,10 @@ export default {
       type: Boolean,
       default: true
     },
-
+    customClass: {
+      type: String,
+      default: ''
+    }
   },
   provide () {
     return { boxInstance: this }

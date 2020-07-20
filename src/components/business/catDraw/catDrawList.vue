@@ -396,6 +396,7 @@
 		destroyed() {
 			document.body.style.overflow = 'auto' //处理弹窗导致无法关闭的bug
 			this.$root.eventBus.$off("modal_material_modal")
+			this.$root.eventBus.$off(this.dependsOn+'_value_change')
 		},
 	}
 </script>
