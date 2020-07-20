@@ -247,7 +247,7 @@
 						this.aboutMaterial = new AboutMaterial(this)
 		      	if(val) this.getAllMaterial().then(() => {})
 		      },
-		      immediate: true,
+		      // immediate: true,
 		      deep: true
 		  },
 		},
