@@ -1,6 +1,6 @@
 <template>
 	<!--选择素材的弹窗-->
-	<m-modal :id="id" :value="visible" :showClose="false" :title="modalTitle" :width="780" :height="600">
+	<m-modal :id="id" :value="visible" customClass="catChoose" :showClose="false" :title="modalTitle" :width="780" :height="600">
 		<div v-if="showListArr.length">
 				<div v-if="showListArr.length > 1" class="ivu-tabs-nav-scroll" style="margin-bottom: 10px;">
 			   <div v-for="(item,index) in showListArr" :key="index"  @click="changTab(item)" :class="{'ivu-tabs-tab-focused' : (materialType == item), 'ivu-tabs-tab-active' : (materialType == item),}" class="ivu-tabs-nav">
@@ -621,5 +621,10 @@
 		position: absolute;
 		right: -33px;
     top: 2px;
+	}
+</style>
+<style>
+	.catChoose .el-dialog__body{
+		overflow-y: hidden;
 	}
 </style>
