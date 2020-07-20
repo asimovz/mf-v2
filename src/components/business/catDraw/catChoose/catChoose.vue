@@ -105,7 +105,7 @@
 								<div class="template-li" v-bind:class="{ 'template-li-checked':img.checked}">
 									<div class="template-litop-img">
 										<!--<img class="template-litop-img" :src="img.materialUrl" />-->
-										<img v-if="img.thumbnailMediaUrl" class="template-litop-img" :src="img.thumbnailMediaUrl">
+										<img v-if="img.thumbnailMediaUrl" class="template-litop-img" :src="img.imosThumbnailMediaUrl || img.thumbnailMediaUrl">
 										<video v-else class="template-litop-img" :src="img.materialUrl"></video>
 
 										<div class="chat-detail-cover"></div>

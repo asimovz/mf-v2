@@ -22,13 +22,13 @@
 								<div @click="openMaterialModal" class="flex-center" style="width: 141px; height: 78px; flex-direction: column; background: #FAFAFA;">
 									<!--已上传后显示-->
 									<template v-if='reply.card.media && reply.card.media.mediaUrl || reply.card.media.thumbnailMediaUrl'>
-										<img v-if="reply.card.media.mediaType == 'pic'" class="upload-img" :src="reply.card.media.mediaUrl" />
+										<img v-if="reply.card.media.mediaType == 'pic'" class="upload-img" :src="reply.card.media.imosMediaUrl || reply.card.media.mediaUrl" />
 										<img v-else-if="reply.card.media.mediaType == 'voice'" class="upload-img" src="http://down3.bizport.cn/rcs/chatbot/images/20200318/audioIcon.png" />
 										<!--<img v-else-if="reply.card.media.mediaType == 'video'" class="upload-img" :src="reply.card.media.thumbnailMediaUrl"></img>-->
 										
 										<!--0630新增视频提示-->
 										<div v-else-if="reply.card.media.mediaType == 'video'" class="upload-img" style="position: relative;">
-											<img class="upload-img" :src="reply.card.media.thumbnailMediaUrl"></img>
+											<img class="upload-img" :src="reply.card.media.imosThumbnailMediaUrl || reply.card.media.thumbnailMediaUrl"></img>
 											<!-- 视频蒙层 -->
 						          <div class="play-icon">
 						            <img class="loop-card-play" src="http://down3.bizport.cn/rcs/chatbot/images/1583822558310/cardPlay.png" alt="" />

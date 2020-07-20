@@ -6,10 +6,10 @@
 					<div @click="openMaterialModal" class="flex-center" style="width: 278px; height: 166px; flex-direction: column; background: #FAFAFA;">
 						<template v-if='item.reply && item.reply.fileName'>
 							<div class="upload-img">
-								<img v-if="item.replyType == 'image'" class="upload-img" :src="item.reply.mediaUrl" />
+								<img v-if="item.replyType == 'image'" class="upload-img" :src="item.reply.imosMediaUrl || item.reply.mediaUrl" />
 								<img v-else-if="item.replyType == 'voice'" class="upload-img" src="http://down3.bizport.cn/rcs/chatbot/images/20200318/audioIcon.png" />
 								<!--如果是视频，需显示封面图-->
-								<img v-else-if="item.replyType == 'video' && item.reply.thumbnailMediaUrl" class="upload-img" :src="item.reply.thumbnailMediaUrl"></img>
+								<img v-else-if="item.replyType == 'video' && item.reply.thumbnailMediaUrl" class="upload-img" :src="item.reply.imosThumbnailMediaUrl || item.reply.thumbnailMediaUrl"></img>
 								<!-- 视频蒙层 -->
 			          <div v-if="item.replyType == 'video'" class="play-icon">
 			            <img class="loop-card-play" src="http://down3.bizport.cn/rcs/chatbot/images/1583822558310/cardPlay.png" alt="" />
