@@ -24,6 +24,7 @@
               <p><label>消息ID：</label>{{item.msgId}}</p>
               <p><label>场景名称：</label>{{item.sceneName}}</p>
               <p v-show="item.botName"><label>机器人：</label>{{item.botName}}</p>
+              <p v-show="item.signature"><label>签名：</label>{{item.signature}}</p>
             </div>
           </div>
 
