@@ -34,7 +34,7 @@
 						</div>-->
 						<div v-else class="handle-text-blocking txt-limit-div" style="position: relative; padding-right: 16px; flex-grow: 1">
 							<!-- <Input v-model="item.description" @on-change="buttonInputOnChange($event, item)" :maxlength="10" placeholder="按钮文案" size="small" /> -->
-							<m-input :value="item.description" @input="buttonInputOnChange(...arguments, item)" :maxlength="10" placeholder="按钮文案" size="small" />
+							<m-input v-model="item.description" @input="buttonInputOnChange(...arguments, item)" :maxlength="10" placeholder="按钮文案" size="small" />
 							<!-- <span class="txt-limit1" style="right: 21px;">{{item.description && item.description.length || 0}} / 10</span> -->
 						</div>
 					</template>
@@ -77,7 +77,7 @@
 						</div>-->
 						<div v-else class="handle-text-blocking txt-limit-div line-break-one" >
 							<!-- <Input v-model="item.description" @on-change="buttonInputOnChange($event, item)" :maxlength="10" placeholder="按钮文案" size="small" /> -->
-							<m-input :value="item.description" @input="buttonInputOnChange(...arguments, item)" :maxlength="10" placeholder="按钮文案" size="small" />
+							<m-input v-model="item.description" @input="buttonInputOnChange(...arguments, item)" :maxlength="10" placeholder="按钮文案" size="small" />
 							<!-- <span class="txt-limit1" style="right: 30px;">{{item.description && item.description.length || 0}} / 10</span> -->
 						</div>
 					</template>
@@ -98,7 +98,7 @@
 					
 					<!--拍摄按钮-->
 					<template v-if="item.type == 'screen'">
-						<m-input :value="item.targetContact" class="line-break-one" placeholder="目标联系人" size="small" />
+						<m-input v-model="item.targetContact" class="line-break-one" placeholder="目标联系人" size="small" />
 						<!-- <Input v-model="item.targetContact" class="line-break-one" size="small" placeholder="目标联系人"   /> -->
 					</template>
 				
@@ -106,18 +106,18 @@
 				<template v-if="item.type == 'openApp'">
 					<!-- <Input v-model="item.openAppAndroid" class="line-break-one" placeholder="[Android]请输入正确调起地址"  size="small" />
 					<Input v-model="item.openAppIos" class="line-break-one" placeholder="[ios]请输入正确调起地址"  size="small" /> -->
-					<m-input :value="item.openAppAndroid" class="line-break-one" placeholder="[Android]请输入正确调起地址" size="small" />
-					<m-input :value="item.openAppIos" class="line-break-one" placeholder="[ios]请输入正确调起地址" size="small" />
+					<m-input v-model="item.openAppAndroid" class="line-break-one" placeholder="[Android]请输入正确调起地址" size="small" />
+					<m-input v-model="item.openAppIos" class="line-break-one" placeholder="[ios]请输入正确调起地址" size="small" />
 				</template>
 				
 				<!--调起指定联系人-->
 				<template v-if="item.type == 'bringUp'">
 					<!-- <Input v-model="item.targetContact" class="handle-text-blocking1 line-break-one" placeholder="目标联系人" :maxlength="600" size="small" /> -->
-					<m-input :value="item.targetContact" class="handle-text-blocking1 line-break-one" placeholder="目标联系人" :maxlength="600" size="small" />
+					<m-input v-model="item.targetContact" class="handle-text-blocking1 line-break-one" placeholder="目标联系人" :maxlength="600" size="small" />
 					<div  class="handle-text-blocking1 presend-content line-break-one" >
 							<!--<Input v-model="item.presendContent" placeholder="预发送内容" :maxlength="600" style="padding-right: 27px; width: 100%;" size="small" />-->
 							<!-- <Input v-model="item.presendContent" type="textarea"  :rows="1"  placeholder="预发送内容" :maxlength="600"  size="small" /> -->
-							<m-input :value="item.presendContent" type="textarea" :rows="1"  placeholder="预发送内容" :maxlength="600" size="small" />
+							<m-input v-model="item.presendContent" type="textarea" :rows="1"  placeholder="预发送内容" :maxlength="600" size="small" />
 							<!-- <span class="txt-limit1" style="right: 31px;">{{item.presendContent && item.presendContent.length || 0}} / 600</span> -->
 					</div>
 					<!--<Input v-model="item.presendContent" placeholder="预发送内容" style="margin-top: 8px; padding-right: 27px; width: 100%;" size="small" />-->
@@ -128,13 +128,13 @@
 					<!--<Input v-model="item.sendAddressPlaceName" placeholder="地点名称" :maxlength="10" style="margin-top: 8px; padding-right: 27px; width: 100%;" size="small" />-->
 					<div class="handle-text-blocking line-break-one">
 							<!-- <Input v-model="item.sendAddressPlaceName" placeholder="地点名称" :maxlength="10"  size="small" /> -->
-							<m-input :value="item.sendAddressPlaceName"  placeholder="地点名称" :maxlength="10" size="small" />
+							<m-input v-model="item.sendAddressPlaceName"  placeholder="地点名称" :maxlength="10" size="small" />
 							<!-- <span class="txt-limit1" style="right: 31px;">{{item.sendAddressPlaceName && item.sendAddressPlaceName.length || 0}} / 10</span> -->
 					</div>
 					<!-- <Input v-model="item.sendAddressLongitude" class="line-break-one" placeholder="经度"  size="small" />
 					<Input v-model="item.sendAddressLatitude" class="line-break-one" placeholder="纬度"  size="small" /> -->
-					<m-input :value="item.sendAddressLongitude" class="line-break-one" placeholder="经度" size="small" />
-					<m-input :value="item.sendAddressLatitude" class="line-break-one" placeholder="纬度" size="small" />
+					<m-input v-model="item.sendAddressLongitude" class="line-break-one" placeholder="经度" size="small" />
+					<m-input v-model="item.sendAddressLatitude" class="line-break-one" placeholder="纬度" size="small" />
 				</template>
 			</div>
 		</div>
