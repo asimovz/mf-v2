@@ -15,7 +15,7 @@
       </li>
       <li class="item" v-for="(item, index) in items" :key="item.msgId">
         <div class="item-content">
-          <div class="preview">
+          <div class="preview" :class="{'perview-icon': !standard}">
             <img class="img" :src="item.thumb">
           </div>
           <div class="main">
@@ -351,9 +351,20 @@ export default {
       height: 120px;
       overflow: hidden;
       border-radius: 6px 6px 0 0;
+      text-align: center;
+      background: #ebeef5;
       .img{
         width: 100%;
         vertical-align: bottom;
+      }
+      &.perview-icon{
+        .img{
+          width: 60px;
+          position: absolute;
+          top:50%;
+          left:50%;
+          transform: translate(-50%, -50%);
+        }
       }
     }
 
