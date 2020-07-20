@@ -86,7 +86,7 @@ export default {
       this.getData(data)
     })
     this.$once('hook:beforeDestroy', function () {
-      this.$root.eventBus.$off("m_send_fields_data")
+      this.$root.eventBus.$off('m_send_fields_data')
     })
 
     this.api && this.getData()
@@ -142,35 +142,38 @@ export default {
           if (['text', 'voice', 'video', 'image'].includes(item.replyType)) {
             cards.push([
               {
-                content: item.replyType === 'text' ? (item.originalMessage || (item.reply && item.reply.content) || '') : item.reply.mediaUrl,
+                content: item.replyType === 'text'
+                  ? (item.originalMessage || (item.reply && item.reply.content) || '')
+                  : item.reply.imosMediaUrl || item.reply.mediaUrl,
                 type: item.replyType,
-                poster: item.reply.thumbnailMediaUrl
+                poster: item.reply.imosThumbnailMediaUrl || item.reply.thumbnailMediaUrl
               }
             ])
           } else if (item.replyType === 'singleCard') {
             const {originalTitle, description, buttons, originalDescription} = item.reply.card
-            const {mediaUrl, mediaType, thumbnailMediaUrl} = item.reply.card.media
+            const {mediaUrl, imosMediaUrl, mediaType, thumbnailMediaUrl, imosThumbnailMediaUrl} = item.reply.card.media
             cards.push([{
-              content: mediaUrl,
+              content: imosMediaUrl || mediaUrl,
               title: originalTitle,
               desc: description || originalDescription,
               buttons,
               replyType: item.replyType,
               type: mediaType,
-              poster: thumbnailMediaUrl,
+              poster: imosThumbnailMediaUrl || thumbnailMediaUrl,
               cardOrientation: item.reply.cardOrientation
             }])
           } else {
             item.reply.cards.forEach(card => {
+              const {mediaUrl, imosMediaUrl, mediaType, thumbnailMediaUrl, imosThumbnailMediaUrl} = card.media
               cards.push([
                 {
-                  content: card.media.mediaUrl,
+                  content: imosMediaUrl || mediaUrl,
                   title: card.originalTitle,
                   desc: card.description || card.originalDescription,
                   buttons: card.buttons,
                   replyType: item.replyType,
-                  type: card.media.mediaType,
-                  poster: card.media.thumbnailMediaUrl
+                  type: mediaType,
+                  poster: imosThumbnailMediaUrl || thumbnailMediaUrl
                 }
               ])
             })
