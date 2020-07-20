@@ -68,12 +68,12 @@
 								<div @click="openMaterialModal(index)" class="flex-center" style="width: 141px; height: 78px; flex-direction: column; background: #FAFAFA;">
 									<!--已上传后显示-->
 									<template v-if='item.media && item.media.mediaUrl || item.media.thumbnailMediaUrl'>
-										<img v-if="item.media.mediaType == 'pic'" class="upload-img" :src="item.media.mediaUrl" />
+										<img v-if="item.media.mediaType == 'pic'" class="upload-img" :src="item.media.imosMediaUrl || item.media.mediaUrl" />
 										<img v-else-if="item.media.mediaType == 'voice'" class="upload-img" src="http://down3.bizport.cn/rcs/chatbot/images/20200318/audioIcon.png" />
 										<!--<img v-else-if="item.media.mediaType == 'video'" class="upload-img" :src="item.media.thumbnailMediaUrl"></img>-->
 										<!--0630新增视频提示-->
 										<div v-else-if="item.media.mediaType == 'video'" class="upload-img" style="position: relative;">
-											<img class="upload-img" :src="item.media.thumbnailMediaUrl"></img>
+											<img class="upload-img" :src="item.media.imosThumbnailMediaUrl || item.media.thumbnailMediaUrl"></img>
 											<!-- 视频蒙层 -->
 						          <div class="play-icon">
 						            <img class="loop-card-play" src="http://down3.bizport.cn/rcs/chatbot/images/1583822558310/cardPlay.png" alt="" />
