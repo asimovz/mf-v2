@@ -3,6 +3,7 @@
     <div class="aw-editor-root" style="flex:1">
       <div class="editor-title">
         <span class="editor-title-back el-icon-arrow-left" title="返回" @click="goBack"></span> 消息名称:{{initParams.messageTitle}}
+        <m-link style="display: none;" ref="goBack" :href="backUrl" />
       </div>
       <div class="editor-pane-left">
         <ul class="basic-widgets">
@@ -151,6 +152,7 @@ export default {
     mmsTemplate: String, //模板数据接口
     mmsSave: String, //模板保存接口
     nodeUrl: String, //node服务接口
+    backUrl: String
   },
   data() {
     return {
@@ -281,7 +283,7 @@ export default {
       this.$confirm('未保存修改将丢失，确认返回?', '提示', {
         type: 'warning'
       }).then(res => {
-        window.history.back()
+        this.$refs.goBack.$el.click()
       })
     },
     replaceTextContent(val) {
