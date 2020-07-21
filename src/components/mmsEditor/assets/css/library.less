@@ -22,8 +22,17 @@
   }
 
   .operation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin: 10px;
-    text-align: right;
+
+    .op-input--search .el-input__inner{width: 100px;transition: all .2s;
+      &:focus{width: 185px;}
+    }
+    .op-btn--pager{padding: 6px 4px;margin: 0;
+      .el-pagination{text-align: right;}
+    }
   }
 
   &--content {
