@@ -366,7 +366,7 @@ export default {
       }
       &.perview-icon{
         .img{
-          width: 60px;
+          width: 72px;
           position: absolute;
           top:50%;
           left:50%;
