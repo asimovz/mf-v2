@@ -38,34 +38,16 @@
      <!-- v-infinite-scroll="loadMore" -->
     <div ref="libraryContent" class="library--content scrollbar" :class="{'no-data': !currentDataList.length}" v-loading="fetchLoading || isUpLoading" :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''" :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''" :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''">
       <div class="lib-list" :class="{'isCheckable': isCheckAble}">
-        <div :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in currentDataList" :key="item.resourceId" :class="[
-            'lib-item',
-            {
-              'lib-item--checked': item.checked,
-              'lib-item--audio': type.type === 'audio',
-            },
-          ]" @click="libAdd(item, index, $event)">
-          <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
-          <div class="lib-preview">
-            <img :src="item.uri" v-if="type['type'] === 'image'" crossorigin="*" />
-            <template v-else-if="type['type'] === 'video'">
-              <img v-if="item.poster" :src="item.poster" crossorigin="*" />
-              <video v-else :src="item.uri"></video>
-            </template>
-            <template v-else>
-              <widget-audio :showPlusBtn="true" :data="item" @click.native="audioClick">
-                <div class="lib-add el-icon-plus" :title="`${isCheckAble ? '选中' : '添加音频素材'}`" @click.stop="libAdd(item, index)"></div>
-              </widget-audio>
-            </template>
-          </div>
-          <!-- :title="isCheckAble || !isEditAble ? '' : '双击可编辑'" -->
-          <div class="lib-name" v-if="item.name" :title="item.name">
-            <!-- @dblclick="nameEdit" -->
-            <div class="lib-name-word">{{ item.name }}</div>
-            <span title="重命名" class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
-            <input class="lib-name-input" :value="item.name" @keyup.enter="enter2blur" @blur="(evt) => nameEdited(evt, item)" />
-          </div>
-        </div>
+        <lib-item
+          :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''"
+          v-for="(item, index) in currentDataList" :key="item.resourceId"
+          :type="type['type']"
+          :data="item"
+          @on-add="libAdd(item)"
+          @on-remove="libRemove(item.resourceId)"
+          @click.native="libAdd(item, $event)"
+        >
+        </lib-item>
       </div>
 
       <transition name="el-fade-in">
@@ -75,7 +57,7 @@
       </transition>
     </div>
 
-    <div class="op-pager--wrapper" ref="opPager" v-show="!isCheckAble && libraryType === 'library'">
+    <div class="library--pager" ref="opPager" v-show="!isCheckAble && libraryType === 'library'">
       <el-pagination
         :current-page.sync="pager.pageIndex"
         :page-size="pager.pageSize"
@@ -89,8 +71,9 @@
   </div>
 </template>
 <script>
-import widgetVideo from '../components/widget-comps/video.vue'
-import widgetAudio from '../components/widget-comps/audio.vue'
+import libItem from './libItem.vue'
+import { getObjectURL } from '../utils.js'
+
 import '../assets/css/library.less'
 
 function selectText(el) {
@@ -128,8 +111,7 @@ function movetoEnd(el) {
 
 export default {
   components: {
-    widgetVideo,
-    widgetAudio
+    libItem
   },
   props: {
     type: {
@@ -144,7 +126,11 @@ export default {
 
       fetchLoading: false,
       dataList: [],
-      localData: [],
+      localData: {
+        image: [],
+        video: [],
+        audio: []
+      },
 
       resourceStr: '',  // 素材搜索
 
@@ -180,18 +166,30 @@ export default {
     },
     // 选中的 id
     checkedId() {
-      return this.dataList.filter(item => item.checked).map(item => item.resourceId)
+      if(this.libraryType === 'local'){
+        return this.localData[this.type['type']].filter(item => item.checked).map(item => item.resourceId)
+      }else{
+        return this.dataList.filter(item => item.checked).map(item => item.resourceId)
+      }
     },
     // 半选
     isIndeterminate() {
-      return this.dataList.some(item => item.checked) && !this.dataList.every(item => item.checked)
+      if(this.libraryType === 'local'){
+        return this.localData[this.type['type']].some(item => item.checked) && !this.localData[this.type['type']].every(item => item.checked)
+      }else{
+        return this.dataList.some(item => item.checked) && !this.dataList.every(item => item.checked)
+      }
+
     },
 
+    currentLocalData(){
+      return this.localData[this.type['type']]
+    },
 
-    // 当前数据源
+    // 当前数据源 ( 可定义在 data 中，切换 libraryType 时赋值， 两种方式有和不同（性能）？？？ )
     currentDataList(){
-      return this.libraryType === 'local' ? this.localData : this.dataList
-    }
+      return this.libraryType === 'local' ? this.currentLocalData : this.dataList
+    },
   },
   inject: ['mmsConfig'],
   watch: {
@@ -206,7 +204,7 @@ export default {
     checkedId: {
       handler(val) {
         if (val.length) {
-          if (val.length === this.dataList.length) {
+          if (val.length === this.currentDataList.length) {
             this.checkAll = true
           }
         } else {
@@ -220,12 +218,21 @@ export default {
     isCheckAble(visible) {
       this.checkAll = false
 
-      this.dataList = this.dataList.map(item => {
-        return {
-          ...item,
-          checked: false
-        }
-      })
+      if(this.libraryType === 'local'){
+        this.localData[this.type['type']] = this.localData[this.type['type']].map(item => {
+          return {
+            ...item,
+            checked: false
+          }
+        })
+      }else{
+        this.dataList = this.dataList.map(item => {
+          return {
+            ...item,
+            checked: false
+          }
+        })
+      }
     },
 
     canMore(val){
@@ -271,16 +278,21 @@ export default {
       this.$confirm(`确定删除此${this.typeLabel}?`, '提示', {
         type: 'warning'
       }).then(async () => {
+        if(this.libraryType === 'local'){
+          this.localData[this.type['type']] = this.localData[this.type['type']].filter(item =>
+            Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
+          )
+        }else{
+          let fd = new FormData()
+          fd.append('actionType', 'delete')
+          fd.append('resourceIds', id)
 
-        let fd = new FormData()
-        fd.append('actionType', 'delete')
-        fd.append('resourceIds', id)
-
-        await this.updateLib(fd)
-
-        this.dataList = this.dataList.filter(item =>
-          Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
-        )
+          await this.updateLib(fd)
+          
+          this.dataList = this.dataList.filter(item =>
+            Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
+          )  
+        }
       })
     },
     // 处理点击音频
@@ -288,7 +300,7 @@ export default {
       if (!this.isCheckAble) event.stopPropagation()
     },
     // 选中/选择
-    libAdd(item, index, evt) {
+    libAdd(item, evt) {
       if (evt && evt.target.tagName === 'INPUT') return
 
       if (this.isCheckAble) {
@@ -300,7 +312,7 @@ export default {
 
     // 设置是否全选
     checkChanged(val) {
-      this.dataList.forEach(item => {
+      this.currentDataList.forEach(item => {
         item.checked = val
       })
     },
@@ -382,18 +394,28 @@ export default {
         return
       }
 
-      this.isUpLoading = true
-      let fd = new FormData()
 
-      fd.append('type', this.type['type'])
-      fd.append('saveResource', 'Y')
-      fd.append('file', file)
-      fd.append('actionType', 'upload')
-      if (this.type['type'] === 'video') {
-        fd.append('thumbnailGenratedUrl', this.mmsConfig.nodeUrl + this.mmsConfig.videoThumbnail)
+      if(this.type['type'] === 'image'){
+        this.localData[this.type['type']].push({
+          resourceId: getRandomId(),
+          name: file.name,
+          size: file.size,
+          uri: getObjectURL(file),
+        })
+      }else{
+        this.isUpLoading = true
+        let fd = new FormData()
+
+        fd.append('type', this.type['type'])
+        fd.append('saveResource', 'Y')
+        fd.append('file', file)
+        fd.append('actionType', 'upload')
+        if (this.type['type'] === 'video') {
+          fd.append('thumbnailGenratedUrl', this.mmsConfig.nodeUrl + this.mmsConfig.videoThumbnail)
+        }
+
+        this.updateLib(fd)
       }
-
-      this.updateLib(fd)
     },
 
     // 验证文件大小
