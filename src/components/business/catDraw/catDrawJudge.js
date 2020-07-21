@@ -48,7 +48,7 @@ class CatDrawJudge {
 //				if(!addMedia.reply.card.title) {
 				if(!addMedia.reply.card.originalTitle) {
 					res = false
-					this.warning('单卡信息不能为空')
+					this.warning('单卡标题不能为空')
 					break
 				} else if(!addMedia.reply.cardOrientation) {
 					res = false
@@ -92,7 +92,7 @@ class CatDrawJudge {
 //					if(!cards[j].title) {
 					if(!cards[j].originalTitle) {
 						res = false
-						this.warning('多卡信息不能为空')
+						this.warning('多卡标题不能为空')
 						break
 					}
 					if(!this.judgeEmptyButtons(cards[j].buttons)) {
@@ -155,50 +155,50 @@ class CatDrawJudge {
 				}
 				noEmpty(needs)
 //      4.24去除这个限制，因为加上了引用，先不做这么麻烦
-//				if(!button.originalContent) {
-//					res = false
-//					this.warning('跳转链接不能为空')
-//					break
-//				} else if(!removeEmojiHttpsChinese.test(button.originalContent)) {
-//					res = false
-//					this.warning('跳转链接需以http(s)://开头，且不能包含空格或emoji或中文')
-//					break
-//				}
-//				if(!button.content) {
-//					res = false
-//					this.warning('跳转链接不能为空')
-//					break
-//				} else if(!removeEmojiHttpsChinese.test(button.content)) {
-//					res = false
-//					this.warning('跳转链接需以http(s)://开头，且不能包含空格或emoji或中文')
-//					break
-//				}
+				if(!button.originalContent) {
+					res = false
+					this.warning('跳转链接不能为空')
+					break
+				} else if(!removeEmojiHttpsChinese.test(button.originalContent)) {
+					res = false
+					this.warning('跳转链接需以http(s)://开头，且不能包含空格或emoji或中文')
+					break
+				}
+				if(!button.content) {
+					res = false
+					this.warning('跳转链接不能为空')
+					break
+				} else if(!removeEmojiHttpsChinese.test(button.content)) {
+					res = false
+					this.warning('跳转链接需以http(s)://开头，且不能包含空格或emoji或中文')
+					break
+				}
 			} else if(button.type == 'openApp') {
 				var needs = {
-//					'openAppIos': 'ios调起地址',  //0615修改，去除这个必填的限制
+					'openAppIos': 'ios调起地址',  //0615修改，去除这个必填的限制
 					'openAppAndroid': 'Android调起地址',
 				}
 				noEmpty(needs)
 			} else if(button.type == 'call') {
 //				//打电话按钮
-//				var needs = {
-//					'callPhone': '电话号码',
-//				}
+				var needs = {
+					'callPhone': '电话号码',
+				}
 				//打电话按钮
 				var needs = {
 					'originalCallPhone': '电话号码',
 				}
 				noEmpty(needs)
-//				if(!res) {
-//					break
-//				}
-//				//号码匹配规则，可以匹配到+号的--4.24去除这个限制，因为加上了引用，先不做这么麻烦
-//				var verificationPhone = /(\d|\+)(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d| 2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]| 4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/
-//				if(!verificationPhone.test(button.callPhone)) {
-//					res = false
-//					this.warning('电话号码不正确')
-//					break
-//				}
+				if(!res) {
+					break
+				}
+				//号码匹配规则，可以匹配到+号的--4.24去除这个限制，因为加上了引用，先不做这么麻烦
+				var verificationPhone = /(\d|\+)(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d| 2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]| 4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/
+				if(!verificationPhone.test(button.callPhone)) {
+					res = false
+					this.warning('电话号码不正确')
+					break
+				}
 			} else if(button.type == 'addressLocation') {
 				//地址定位按钮
 				var needs = {
