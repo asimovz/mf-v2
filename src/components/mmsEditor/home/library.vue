@@ -2,27 +2,37 @@
   <div class="library library--wrapper">
     <div class="header">
       <el-radio-group size="small" v-model="libraryType">
-        <el-radio-button label="local">本地</el-radio-button>
         <el-radio-button label="library">素材库</el-radio-button>
+        <el-radio-button label="local">本地</el-radio-button>
       </el-radio-group>
 
       <span class="close" @click="$emit('on-close')"><i class="el-icon-close"></i></span>
     </div>
     <div class="operation">
-      <!-- 选择模式 -->
-      <template v-if="isCheckAble">
-        <el-checkbox :indeterminate="isIndeterminate" style="float: left;margin-top: 5px;" :value="checkAll" @change="checkChanged">全选</el-checkbox>
-        <el-button size="small" type="danger" :disabled="!checkedId.length " @click="libRemove(checkedId)">删除</el-button>
-        <el-button size="small" type="primary" @click="isCheckAble = false">取消</el-button>
-      </template>
-      <!-- 编辑模式 -->
-      <template v-else>
-        <el-button size="small" :disabled="isUpLoading" @click="isCheckAble = true">批量操作</el-button>
-        <el-popover style="margin-left: 10px;" placement="bottom" trigger="hover" :content="popoverContent">
-          <el-button slot="reference" type="primary" size="small" :disabled="isUpLoading" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">上传{{ typeLabel }}</el-button>
-        </el-popover>
-        <input style="display: none;" ref="file" type="file" :accept="currentAccept" name="upload" @change="fileChanged" />
-      </template>
+      <div>
+        <el-button v-if="!isCheckAble" size="small" :disabled="isUpLoading" @click="isCheckAble = true">批量操作</el-button>
+        <el-checkbox v-else :indeterminate="isIndeterminate" :value="checkAll" @change="checkChanged">全选</el-checkbox>
+      </div>
+
+      <div>
+        <template v-if="isCheckAble">
+          <el-button size="small" type="danger" :disabled="!checkedId.length " @click="libRemove(checkedId)">删除</el-button>
+          <el-button size="small" type="primary" @click="isCheckAble = false">取消</el-button>
+        </template>
+
+        <template v-else>
+          <el-input class="op-input--search" v-show="libraryType === 'library'" size="small"suffix-icon="el-icon-search" placeholder="回车搜索素材库" v-model="resourceStr" @focus="libInput(true)" @blur="libInput(false)" />
+
+          <template v-if="libraryType === 'local'">
+            <el-popover style="margin-left: 10px;" placement="bottom" trigger="hover" :content="popoverContent">
+              <el-button slot="reference" type="primary" size="small" :disabled="isUpLoading" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">上传{{ typeLabel }}</el-button>
+            </el-popover>
+            <input style="display: none;" ref="file" type="file" :accept="currentAccept" name="upload" @change="fileChanged" />
+          </template>
+
+        </template>
+
+      </div>
     </div>
 
      <!-- v-infinite-scroll="loadMore" -->
@@ -63,6 +73,18 @@
           <div class="bottom-deliver"><span>到底啦</span></div>
         </div>
       </transition>
+    </div>
+
+    <div class="op-pager--wrapper" ref="opPager" v-show="!isCheckAble && libraryType === 'library'">
+      <el-pagination
+        :current-page.sync="pager.pageIndex"
+        :page-size="pager.pageSize"
+        :total="pager.total"
+        :page-count="pager.pageCount"
+        layout="prev, slot, next"
+      >
+        <span style="text-align: center;">{{pager.pageIndex}} / {{pager.pageCount}}</span>
+      </el-pagination>
     </div>
   </div>
 </template>
@@ -124,13 +146,14 @@ export default {
       dataList: [],
       localData: [],
 
+      resourceStr: '',  // 素材搜索
+
       canMore: true,  // 是否加载更多
       showNoMore: true, // 是否显示无数据标识
 
       pager: {
         pageSize: 20,
-        total: '',
-        pageCount: '',
+        total: 0,
         pageIndex: 1
       },
 
@@ -211,6 +234,10 @@ export default {
           this.showNoMore = false
         }, 1000)
       }
+    },
+
+    libraryType(){
+      this.isCheckAble = false
     }
   },
   methods: {
@@ -224,10 +251,14 @@ export default {
     initPager() {
       this.pager = {
         pageSize: 20,
-        total: '',
-        pageCount: '',
+        pageCount: 6,
+        total: 100,
         pageIndex: 1
       }
+    },
+
+    libInput(boolean){
+      this.$refs.opPager.style.display = boolean ? 'none' : 'block'
     },
 
     /**
@@ -420,6 +451,9 @@ export default {
     // 获取素材库数据
     async fetchData(type, isMore) {
       // 非加载更多，清空数据 => 切换 type
+      // 
+      this.libraryType = 'library'
+
       if(!isMore) this.dataList = []
 
       this.fetchLoading = true
@@ -442,7 +476,7 @@ export default {
               this.dataList = _data
             }
 
-            this.libraryType = 'library'
+            
             this.$nextTick(() => {
               this.$refs.libraryContent.scrollTop = 0
             })
