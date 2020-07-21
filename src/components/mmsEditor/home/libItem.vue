@@ -9,11 +9,11 @@
       </template>
       <template v-else>
         <!-- @click.native="audioClick" -->
-        <widget-audio :showPlusBtn="true" :data="data">
+        <widget-audio :showPlusBtn="true" :data="data" @click.native.stop>
           <div class="lib-add el-icon-plus" @click.stop="audioAdd()"></div>
         </widget-audio>
       </template>
-      <div class="lib-name2">{{ data.name }}</div>
+      <div class="lib-name ">{{ data.name }}</div>
     </div>
   </div>
 </template>

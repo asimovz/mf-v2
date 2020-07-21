@@ -103,15 +103,7 @@ import smsLibrary from './library'
 import editPane from './editPane'
 import saveConfirm from './saveConfirm'
 import '../assets/css/home.less'
-
-function getRandomId() {
-
-  let maxNumber = 99999999
-  let minNumber = 1000000
-  let range = maxNumber - minNumber; //取值范围的差
-  let random = Math.random(); //小于1的随机数
-  return minNumber + Math.round(random * range);
-}
+import { getRandomId } from '../utils.js'
 
 function dataURLtoFile(dataurl, filename) {
   var arr = dataurl.split(','),
@@ -162,6 +154,7 @@ export default {
         mmsTemplate: this.mmsTemplate,
         library: this.resourceInit,
         file: this.resourceAction,
+        uploadFile: '/upload/file',
         videoInfo: '/video/info', //视频信息接口
         videoCut: '/video/cut', //视频剪切接口
         videoThumbnail: '/video/thumbnail', //视频封面接口
@@ -588,6 +581,7 @@ export default {
         return
       }
 
+      newList = newList.concat({ type: 'text', content: '退订回复T, 此条短信免流', size: 1 })
       let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
       this.captrue(_data)
@@ -651,16 +645,6 @@ export default {
         this.$root.moqui.notifyMessages(resp.messageInfos, resp.errors);
 
         this.initParams.messageId = resp.screenParameters.messageId
-
-        // 跳转页面
-        // if (resp.screenUrl && resp.screenUrl.length > 0) {
-        //   setTimeout(() => {
-        //     this.$root.setUrl(resp.screenUrl);
-        //   })
-        // } else if (resp.redirectUrl && resp.redirectUrl.length > 0) {
-        //   window.location.href = resp.redirectUrl;
-        // }
-        
       } else {
         this.$message.error('保存错误')
         console.warn('m-form no response or non-JSON response: ' + JSON.stringify(resp))

@@ -72,7 +72,7 @@
 </template>
 <script>
 import libItem from './libItem.vue'
-import { getObjectURL } from '../utils.js'
+import { getObjectURL, getRandomId } from '../utils.js'
 
 import '../assets/css/library.less'
 
@@ -92,14 +92,6 @@ function selectText(el) {
   } else {
     console.log('不支持手动选择文本')
   }
-}
-
-function getRandomId() {
-  let maxNumber = 99999999
-  let minNumber = 1000000
-  let range = maxNumber - minNumber; //取值范围的差
-  let random = Math.random(); //小于1的随机数
-  return minNumber + Math.round(random * range);
 }
 
 function movetoEnd(el) {
@@ -122,11 +114,11 @@ export default {
   data() {
     return {
 
-      libraryType: 'library',
+      libraryType: 'library', // 素材类型
 
       fetchLoading: false,
-      dataList: [],
-      localData: {
+      libraryList: [],  // 素材库列表
+      localData: {      // 本地列表
         image: [],
         video: [],
         audio: []
@@ -169,7 +161,7 @@ export default {
       if(this.libraryType === 'local'){
         return this.localData[this.type['type']].filter(item => item.checked).map(item => item.resourceId)
       }else{
-        return this.dataList.filter(item => item.checked).map(item => item.resourceId)
+        return this.libraryList.filter(item => item.checked).map(item => item.resourceId)
       }
     },
     // 半选
@@ -177,7 +169,7 @@ export default {
       if(this.libraryType === 'local'){
         return this.localData[this.type['type']].some(item => item.checked) && !this.localData[this.type['type']].every(item => item.checked)
       }else{
-        return this.dataList.some(item => item.checked) && !this.dataList.every(item => item.checked)
+        return this.libraryList.some(item => item.checked) && !this.libraryList.every(item => item.checked)
       }
 
     },
@@ -188,7 +180,7 @@ export default {
 
     // 当前数据源 ( 可定义在 data 中，切换 libraryType 时赋值， 两种方式有和不同（性能）？？？ )
     currentDataList(){
-      return this.libraryType === 'local' ? this.currentLocalData : this.dataList
+      return this.libraryType === 'local' ? this.currentLocalData : this.libraryList
     },
   },
   inject: ['mmsConfig'],
@@ -226,7 +218,7 @@ export default {
           }
         })
       }else{
-        this.dataList = this.dataList.map(item => {
+        this.libraryList = this.libraryList.map(item => {
           return {
             ...item,
             checked: false
@@ -245,6 +237,7 @@ export default {
 
     libraryType(){
       this.isCheckAble = false
+      this.isUpLoading = false
     }
   },
   methods: {
@@ -289,7 +282,7 @@ export default {
 
           await this.updateLib(fd)
           
-          this.dataList = this.dataList.filter(item =>
+          this.libraryList = this.libraryList.filter(item =>
             Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
           )  
         }
@@ -396,7 +389,7 @@ export default {
 
 
       if(this.type['type'] === 'image'){
-        this.localData[this.type['type']].push({
+        this.localData[this.type['type']].unshift({
           resourceId: getRandomId(),
           name: file.name,
           size: file.size,
@@ -405,16 +398,9 @@ export default {
       }else{
         this.isUpLoading = true
         let fd = new FormData()
-
-        fd.append('type', this.type['type'])
-        fd.append('saveResource', 'Y')
         fd.append('file', file)
-        fd.append('actionType', 'upload')
-        if (this.type['type'] === 'video') {
-          fd.append('thumbnailGenratedUrl', this.mmsConfig.nodeUrl + this.mmsConfig.videoThumbnail)
-        }
-
-        this.updateLib(fd)
+        
+        this.updateLib(this.type['type'], fd)
       }
     },
 
@@ -429,34 +415,22 @@ export default {
     },
 
     // 更新素材
-    updateLib(fd) {
-      return this._http(this.mmsConfig.file, fd, { timeout: 90000 })
+    updateLib(type, fd) {
+      return this._http(this.mmsConfig.nodeUrl + this.mmsConfig.uploadFile, fd, { timeout: 90000 })
         .then(res => {
-          let actionType = fd.get('actionType')
+          this.$message({
+            type: res.error === 0 ? 'success' : 'error',
+            message: res.message
+          });
 
-          switch (actionType) {
-            case 'upload':
-              this.$message({
-                type: res.type || 'warning',
-                message: res.messages
-              });
-              res.type === 'success' && this.dataList.unshift(res.data)
-              break;
-            case 'delete':
-            case 'rename':
-              this.$message({
-                type: res.error === '0' ? 'success' : 'error',
-                message: res.message
-              });
-
-              if(res.error !== '0'){
-                throw new Error(res.message)
-              }
-              break;
-            default:
-              break;
+          if(type === 'video'){
+            res.data.poster = res.data.thumbnail
+            delete res.data.thumbnail
           }
 
+          res.data.resourceId = getRandomId()
+          
+          res.error === 0 && this.localData[type].unshift(res.data)
         }).finally(cb => {
           this.isUpLoading = false
           if (this.$refs.file) this.$refs.file.value = ''
@@ -464,7 +438,7 @@ export default {
     },
 
     loadMore(){
-      if(!this.dataList.length || !this.canMore) return
+      if(!this.libraryList.length || !this.canMore) return
 
       this.pager.pageIndex ++
       this.fetchData(this.type['type'], true)
@@ -476,7 +450,7 @@ export default {
       // 
       this.libraryType = 'library'
 
-      if(!isMore) this.dataList = []
+      if(!isMore) this.libraryList = []
 
       this.fetchLoading = true
 
@@ -488,14 +462,14 @@ export default {
             let _data = res.data || []
 
             if(isMore){
-              this.dataList = this.dataList.concat(_data)
+              this.libraryList = this.libraryList.concat(_data)
 
               if(!_data.length){
                 this.pager.pageIndex --
                 this.canMore = false
               }
             }else{
-              this.dataList = _data
+              this.libraryList = _data
             }
 
             
