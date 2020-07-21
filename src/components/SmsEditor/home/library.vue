@@ -1,7 +1,11 @@
 <template>
   <div class="library library--wrapper">
     <div class="header">
-      <span>我的{{typeLabel}}</span>
+      <el-radio-group size="small" v-model="libraryType">
+        <el-radio-button label="local">本地</el-radio-button>
+        <el-radio-button label="library">素材库</el-radio-button>
+      </el-radio-group>
+
       <span class="close" @click="$emit('on-close')"><i class="el-icon-close"></i></span>
     </div>
     <div class="operation">
@@ -22,9 +26,9 @@
     </div>
 
      <!-- v-infinite-scroll="loadMore" -->
-    <div class="library--content scrollbar" :class="{'no-data': !dataList.length}" v-loading="fetchLoading || isUpLoading" :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''" :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''" :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''">
-      <transition-group name="fade" tag="div" class="lib-list" :class="{'isCheckable': isCheckAble}">
-        <div :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in dataList" :key="item.resourceId" :class="[
+    <div ref="libraryContent" class="library--content scrollbar" :class="{'no-data': !currentDataList.length}" v-loading="fetchLoading || isUpLoading" :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''" :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''" :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''">
+      <div class="lib-list" :class="{'isCheckable': isCheckAble}">
+        <div :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in currentDataList" :key="item.resourceId" :class="[
             'lib-item',
             {
               'lib-item--checked': item.checked,
@@ -52,7 +56,7 @@
             <input class="lib-name-input" :value="item.name" @keyup.enter="enter2blur" @blur="(evt) => nameEdited(evt, item)" />
           </div>
         </div>
-      </transition-group>
+      </div>
 
       <transition name="el-fade-in">
         <div style="width: 100%;padding: 0 10px;" v-if="!canMore && showNoMore" ref="noMoreDom">
@@ -113,8 +117,12 @@ export default {
   },
   data() {
     return {
+
+      libraryType: 'library',
+
       fetchLoading: false,
       dataList: [],
+      localData: [],
 
       canMore: true,  // 是否加载更多
       showNoMore: true, // 是否显示无数据标识
@@ -154,6 +162,12 @@ export default {
     // 半选
     isIndeterminate() {
       return this.dataList.some(item => item.checked) && !this.dataList.every(item => item.checked)
+    },
+
+
+    // 当前数据源
+    currentDataList(){
+      return this.libraryType === 'local' ? this.localData : this.dataList
     }
   },
   inject: ['mmsConfig'],
@@ -427,6 +441,11 @@ export default {
             }else{
               this.dataList = _data
             }
+
+            this.libraryType = 'library'
+            this.$nextTick(() => {
+              this.$refs.libraryContent.scrollTop = 0
+            })
           }
         }).finally(end => {
           this.fetchLoading = false
