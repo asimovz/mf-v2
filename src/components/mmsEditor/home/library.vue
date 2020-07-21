@@ -179,8 +179,9 @@ export default {
     },
 
     // 当前数据源 ( 可定义在 data 中，切换 libraryType 时赋值， 两种方式有和不同（性能）？？？ )
+    // Object.freeze 有无必要？？？ 外层 冻结 与 内层 冻结？？？
     currentDataList(){
-      return this.libraryType === 'local' ? this.currentLocalData : this.libraryList
+      return this.libraryType === 'local' ? this.currentLocalData.map(item => Object.freeze(item)) : this.libraryList.map(item => Object.freeze(item))
     },
   },
   inject: ['mmsConfig'],
@@ -310,58 +311,6 @@ export default {
       })
     },
 
-    // 文件名编辑
-    nameEdit(evt) {
-      // if (!this.isEditAble) return
-
-      let target = evt.target
-      let parent = target.offsetParent
-
-      parent.classList.add('isEdit')
-
-      let input = target.parentElement.querySelector('input')
-      input.focus()
-
-      this.$nextTick(() => {
-        movetoEnd(input)
-      })
-    },
-    // enter 触发 blur
-    enter2blur(evt){
-      let target = evt.target
-      target.blur()
-    },
-
-    // 文件名编辑结束
-    async nameEdited(evt, item) {
-      let target = evt.target
-      let parent = target.offsetParent
-
-      parent.classList.remove('isEdit')
-
-      let oldVal = item.name
-      let value = item.name = target.value
-
-      if (value !== oldVal) {
-        console.log('名称修改过')
-
-        let fd = new FormData()
-        fd.append('actionType', 'rename')
-        fd.append('type', this.type['type'])
-        fd.append('resourceId', item.resourceId)
-        fd.append('newFileName', value)
-
-        try{
-          await this.updateLib(fd)
-          item.name = value
-        }catch(err){
-          item.name = target.value = oldVal
-        }
-
-      }
-    },
-
-
     // 选择文件
     fileChanged(evt) {
       let input = evt.target
@@ -387,7 +336,6 @@ export default {
         return
       }
 
-
       if(this.type['type'] === 'image'){
         this.localData[this.type['type']].unshift({
           resourceId: getRandomId(),
@@ -400,7 +348,7 @@ export default {
         let fd = new FormData()
         fd.append('file', file)
         
-        this.updateLib(this.type['type'], fd)
+        this.upload(fd)
       }
     },
 
@@ -415,25 +363,39 @@ export default {
     },
 
     // 更新素材
-    updateLib(type, fd) {
+    upload(fd) {
       return this._http(this.mmsConfig.nodeUrl + this.mmsConfig.uploadFile, fd, { timeout: 90000 })
         .then(res => {
+
           this.$message({
             type: res.error === 0 ? 'success' : 'error',
             message: res.message
           });
 
-          if(type === 'video'){
+          if(this.type['type'] === 'video'){
             res.data.poster = res.data.thumbnail
             delete res.data.thumbnail
           }
 
           res.data.resourceId = getRandomId()
           
-          res.error === 0 && this.localData[type].unshift(res.data)
+          res.error === 0 && this.localData[this.type['type']].unshift(res.data)
         }).finally(cb => {
           this.isUpLoading = false
           if (this.$refs.file) this.$refs.file.value = ''
+        })
+    },
+
+    updateLib(fd){
+      return this._http(this.mmsConfig.file, fd)
+        .then(res => {
+          this.$message({
+            type: res.error === '0' ? 'success' : 'error',
+            message: res.message
+          });
+          if (res.error !== '0') {
+            throw new Error(res.message)
+          }
         })
     },
 
