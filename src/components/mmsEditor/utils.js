@@ -1,3 +1,11 @@
+function getRandomId() {
+  let maxNumber = 99999999
+  let minNumber = 1000000
+  let range = maxNumber - minNumber; //取值范围的差
+  let random = Math.random(); //小于1的随机数
+  return minNumber + Math.round(random * range);
+}
+
 // 文件转Blob (url)
 function getObjectURL(file) {
   if (window.createObjcectURL != undefined) {
@@ -81,6 +89,7 @@ function blobToDataURL(blob, callback) {
 
 
 export {
+	getRandomId,
   getObjectURL,
   convertImgToBase64,
   dataURLtoBlob,

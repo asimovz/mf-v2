@@ -37,6 +37,7 @@
   }
 
   &--content {
+    position: relative;
     flex: 1;
     overflow: auto;
     margin-bottom: 10px;
@@ -81,7 +82,7 @@
           .lib-name-icon {
             display: block;
           }
-          .lib-name2{display: block;}
+          .lib-name{display: block;}
         }
 
         &--checked {
@@ -173,28 +174,12 @@
           text-overflow: ellipsis;
         }
 
-        .lib-name {
-          flex: 1;
-          margin: 0 10px 0 15px;
-          padding: 0 10px 0 5px;
-          font-size: 14px;
-
-          &-word {
-            color: inherit;
-          }
-
-        }
-
         &:hover {
           box-shadow: 0 0 6px #f3e8e8;
 
           .lib-remove, .lib-add {
             color: #46a6ff;
             opacity: 1;
-          }
-
-          .lib-name {
-            border-bottom: 1px dashed #bebebe;
           }
 
         }
@@ -221,7 +206,7 @@
 
       }
 
-      &-name2{
+      &-name{
         display: none;
         position: absolute;
         bottom: 0;left: 0;width: 100%;padding: 0 4px;line-height: 25px;
@@ -231,60 +216,6 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-      }
-
-      &-name {
-        display: flex;
-        justify-content: space-between;
-        height: 26px;
-        padding: 0 5px;
-        align-items: center;
-
-        &-word {
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          color: #bbb9b9;
-        }
-
-        &-icon {
-          display: none;
-          margin-left: 6px;
-          padding: 3px;
-          color: #818182;
-          cursor: pointer;
-
-          &:hover {
-            color: #46a6ff;
-          }
-
-        }
-
-        &-input {
-          display: none;
-          width: 100%;
-          border: none;
-          height: 100%;
-          border-top: 1px solid #46a6ff;
-          border-radius: 0;
-          outline: none;
-          background-color: #fff;
-        }
-
-      }
-
-      &-item.isEdit, &-audio.isEdit {
-        .lib-name-word, .lib-name-icon {
-          display: none;
-        }
-
-        .lib-name-input {
-          display: block;
-          padding: 4px 6px;
-        }
-
-        .lib-name{padding: 0}
-
       }
 
       &-add {
