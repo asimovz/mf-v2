@@ -16,7 +16,7 @@
           <audioPlayer style="flex:1" :options="audioOptions" />
         </template>
         <template v-if="currentData.type === 'text'">
-          <text-editor></text-editor>
+          <text-editor :options.sync="currentData"></text-editor>
         </template>
       </div>
       <div class="editPane-operation">
@@ -82,6 +82,11 @@ export default {
       return {
         ...this.currentData,
         src: this.currentData.uri
+      }
+    },
+    textOptions() {
+      return {
+        ...this.currentData,
       }
     },
 
