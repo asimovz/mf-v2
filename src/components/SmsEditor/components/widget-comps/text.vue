@@ -83,9 +83,11 @@ export default {
       this.data.activeBtn(false)
       let text = this.$refs.text.innerHTML
       this.data.text = text
+      let index = 0
       text = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
+        index = index + 1
         let r =/(?<=value=").*?(?=")/
-        return '{'+data.match(r)[0]+'}'
+        return '{'+'text'+index+'}'
       })
       this.data.content = text
       if(this.data.text === "")  this.placeholder = "请填写"
