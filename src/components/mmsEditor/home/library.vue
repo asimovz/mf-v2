@@ -58,12 +58,13 @@
       </transition>
     </div>
 
-    <div class="library--pager" ref="opPager" v-show="!isCheckAble">
+    <div class="library--pager" ref="opPager" v-show="!isCheckAble && currentDataList.length">
       <el-pagination
         :current-page.sync="pager.pageIndex"
         :page-size="pager.pageSize"
         :page-count="pager.pageCount"
         layout="prev, slot, next"
+        @current-change="pageChange"
       >
         <span style="text-align: center;">{{pager.pageIndex}} / {{pager.pageCount}}</span>
       </el-pagination>
@@ -369,6 +370,10 @@ export default {
         })
     },
 
+    pageChange(page){
+      this.fetchData()
+    },
+
     // 素材搜索
     handleSearch: debounce(function() {
       let str = this.searchStr.trim()
@@ -380,8 +385,9 @@ export default {
     }, 500, true),
 
     // 获取素材库
-    async fetchData(type, str) {
+    async fetchData(type = this.type['type'], str) {
       this.libraryType = 'library'
+      this.libraryList = []
       this.fetchLoading = true
 
       let { pageIndex, pageSize } = this.pager
