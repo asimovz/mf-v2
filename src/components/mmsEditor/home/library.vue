@@ -8,10 +8,10 @@
 
       <span class="close" @click="$emit('on-close')"><i class="el-icon-close"></i></span>
     </div>
-    <div class="operation">
-      <div>
-        <el-button v-if="!isCheckAble" size="small" :disabled="isUpLoading" @click="isCheckAble = true">批量操作</el-button>
-        <el-checkbox v-else :indeterminate="isIndeterminate" :value="checkAll" @change="checkChanged">全选</el-checkbox>
+    <div class="operation" :style="{'justify-content': libraryType === 'library' ? 'flex-end' : 'space-between'}">
+      <div v-if="libraryType === 'local'">
+        <el-button v-show="!isCheckAble" size="small" :disabled="isUpLoading" @click="isCheckAble = true">批量操作</el-button>
+        <el-checkbox v-show="isCheckAble" :indeterminate="isIndeterminate" :value="checkAll" @change="checkChanged">全选</el-checkbox>
       </div>
 
       <div>
@@ -21,7 +21,7 @@
         </template>
 
         <template v-else>
-          <el-input class="op-input--search" v-show="libraryType === 'library'" size="small"suffix-icon="el-icon-search" placeholder="回车搜索素材库" v-model="resourceStr" @focus="libInput(true)" @blur="libInput(false)" />
+          <el-input class="op-input--search" v-show="libraryType === 'library'" size="small"suffix-icon="el-icon-search" placeholder="回车搜索素材库" @keyup.enter.native="handleSearch" v-model="searchStr" />
 
           <template v-if="libraryType === 'local'">
             <el-popover style="margin-left: 10px;" placement="bottom" trigger="hover" :content="popoverContent">
@@ -43,8 +43,9 @@
           v-for="(item, index) in currentDataList" :key="item.resourceId"
           :type="type['type']"
           :data="item"
+          :show-remove="libraryType === 'local'"
           @on-add="libAdd(item)"
-          @on-remove="libRemove(item.resourceId)"
+          @on-remove="libRemove(item.resourceId, index)"
           @click.native="libAdd(item, $event)"
         >
         </lib-item>
@@ -57,11 +58,10 @@
       </transition>
     </div>
 
-    <div class="library--pager" ref="opPager" v-show="!isCheckAble && libraryType === 'library'">
+    <div class="library--pager" ref="opPager" v-show="!isCheckAble">
       <el-pagination
         :current-page.sync="pager.pageIndex"
         :page-size="pager.pageSize"
-        :total="pager.total"
         :page-count="pager.pageCount"
         layout="prev, slot, next"
       >
@@ -72,7 +72,7 @@
 </template>
 <script>
 import libItem from './libItem.vue'
-import { getObjectURL, getRandomId } from '../utils.js'
+import { getObjectURL, getRandomId, debounce } from '../utils.js'
 
 import '../assets/css/library.less'
 
@@ -124,15 +124,16 @@ export default {
         audio: []
       },
 
-      resourceStr: '',  // 素材搜索
+      searchStr: '',  // 素材搜索
 
       canMore: true,  // 是否加载更多
       showNoMore: true, // 是否显示无数据标识
 
       pager: {
         pageSize: 20,
-        total: 0,
-        pageIndex: 1
+        pageCount: 0,
+        pageIndex: 1,
+        total: 0
       },
 
       isUpLoading: false, // 上传loading
@@ -181,7 +182,8 @@ export default {
     // 当前数据源 ( 可定义在 data 中，切换 libraryType 时赋值， 两种方式有和不同（性能）？？？ )
     // Object.freeze 有无必要？？？ 外层 冻结 与 内层 冻结？？？
     currentDataList(){
-      return this.libraryType === 'local' ? this.currentLocalData.map(item => Object.freeze(item)) : this.libraryList.map(item => Object.freeze(item))
+      return this.libraryType === 'local' ? this.currentLocalData.map(item => Object.freeze(item))
+          : this.libraryList.map(item => Object.freeze(item))
     },
   },
   inject: ['mmsConfig'],
@@ -252,47 +254,28 @@ export default {
     initPager() {
       this.pager = {
         pageSize: 20,
-        pageCount: 6,
+        pageCount: 0,
         total: 100,
         pageIndex: 1
       }
-    },
-
-    libInput(boolean){
-      this.$refs.opPager.style.display = boolean ? 'none' : 'block'
     },
 
     /**
      * 移除素材
      * @param  {[type]} index [当前素材的索引]
      */
-    libRemove(id) {
+    libRemove(id, index) {
       if (!id.toString().length) return
 
-      this.$confirm(`确定删除此${this.typeLabel}?`, '提示', {
-        type: 'warning'
-      }).then(async () => {
-        if(this.libraryType === 'local'){
-          this.localData[this.type['type']] = this.localData[this.type['type']].filter(item =>
-            Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
-          )
-        }else{
-          let fd = new FormData()
-          fd.append('actionType', 'delete')
-          fd.append('resourceIds', id)
+      if(!!index){
+        this.localData[this.type['type']].splice(0, index)
+      }else{
+        this.localData[this.type['type']] = this.localData[this.type['type']].filter(item =>
+          Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
+        )
+      }
+    },
 
-          await this.updateLib(fd)
-          
-          this.libraryList = this.libraryList.filter(item =>
-            Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
-          )  
-        }
-      })
-    },
-    // 处理点击音频
-    audioClick(event) {
-      if (!this.isCheckAble) event.stopPropagation()
-    },
     // 选中/选择
     libAdd(item, evt) {
       if (evt && evt.target.tagName === 'INPUT') return
@@ -322,13 +305,13 @@ export default {
       // 允许上传的 格式
       let accepts = input.getAttribute('accept')
 
-      if (!this.isTypeValidated(_fileType)) {
+      if (!this.validatedType(_fileType)) {
         this.$message.warning('请上传正确格式的素材')
         input.value = ''
         return
       }
 
-      if (!this.isSizeValidated(file.size)) {
+      if (!this.validatedSize(file.size)) {
         this.$message.warning(
           `${this.typeLabel} 上传大小不得超过 ${this.type['size']}M`
         )
@@ -348,22 +331,22 @@ export default {
         let fd = new FormData()
         fd.append('file', file)
         
-        this.upload(fd)
+        this.uploadFile(fd)
       }
     },
 
     // 验证文件大小
-    isSizeValidated(size) {
+    validatedSize(size) {
       return this.type['size'] * 1024 * 1024 > size
     },
 
     // 验证文件格式
-    isTypeValidated(type) {
+    validatedType(type) {
       return this.currentAccept.includes(type.toLowerCase())
     },
 
-    // 更新素材
-    upload(fd) {
+    // 上传素材
+    uploadFile(fd) {
       return this._http(this.mmsConfig.nodeUrl + this.mmsConfig.uploadFile, fd, { timeout: 90000 })
         .then(res => {
 
@@ -386,55 +369,36 @@ export default {
         })
     },
 
-    updateLib(fd){
-      return this._http(this.mmsConfig.file, fd)
-        .then(res => {
-          this.$message({
-            type: res.error === '0' ? 'success' : 'error',
-            message: res.message
-          });
-          if (res.error !== '0') {
-            throw new Error(res.message)
-          }
-        })
-    },
+    // 素材搜索
+    handleSearch: debounce(function() {
+      let str = this.searchStr.trim()
 
-    loadMore(){
-      if(!this.libraryList.length || !this.canMore) return
+      if(!str.length) return
 
-      this.pager.pageIndex ++
-      this.fetchData(this.type['type'], true)
-    },
+      this.pager.pageIndex = 1
+      this.fetchData(this.type['type'], str)
+    }, 500, true),
 
-    // 获取素材库数据
-    async fetchData(type, isMore) {
-      // 非加载更多，清空数据 => 切换 type
-      // 
+    // 获取素材库
+    async fetchData(type, str) {
       this.libraryType = 'library'
-
-      if(!isMore) this.libraryList = []
-
       this.fetchLoading = true
 
       let { pageIndex, pageSize } = this.pager
 
-      this._http(this.mmsConfig.library, { type, pageIndex: pageIndex - 1, pageSize })
+      let params = Object.assign({}, {
+        type,
+        pageIndex: pageIndex - 1,
+        pageSize
+      }, !!str ? { name: str } : null)
+
+      this._http(this.mmsConfig.library, params)
         .then(res => {
           if (res.error === 0) {
-            let _data = res.data || []
+            this.pager.total = res.count
+            this.pager.pageCount = res.pageMaxIndex + 1
+            this.libraryList = res.data || []
 
-            if(isMore){
-              this.libraryList = this.libraryList.concat(_data)
-
-              if(!_data.length){
-                this.pager.pageIndex --
-                this.canMore = false
-              }
-            }else{
-              this.libraryList = _data
-            }
-
-            
             this.$nextTick(() => {
               this.$refs.libraryContent.scrollTop = 0
             })

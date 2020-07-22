@@ -6,7 +6,7 @@ function getRandomId() {
   return minNumber + Math.round(random * range);
 }
 
-// 文件转Blob (url)
+// 文件转 Blob (url)
 function getObjectURL(file) {
   if (window.createObjcectURL != undefined) {
     getObjectURL = file => window.createOjcectURL(file);
@@ -18,7 +18,7 @@ function getObjectURL(file) {
   return getObjectURL(file)
 }
 
-// 网络图片转base64
+// 网络图片转 Base64
 function convertImgToBase64(src, callback, outputFormat = 'image/png') {
   return new Promise((resolve, reject) => {
 
@@ -42,17 +42,16 @@ function convertImgToBase64(src, callback, outputFormat = 'image/png') {
     }
 
     img.src = src;
-
   })
 }
 
+// 网络图片转 Blob
 async function convertImgToBlob (src, format = 'image/png'){
   let dataurl = await convertImgToBase64(src, format)
-
   return dataURItoBlob(dataurl)
 }
 
-// Base64转Blob对象
+// Base64 转 Blob 对象
 function dataURLtoBlob(dataurl) {
   var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
     bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
@@ -62,7 +61,7 @@ function dataURLtoBlob(dataurl) {
   return new Blob([u8arr], { type: mime });
 }
 
-// Base64转Blob对象
+// Base64 转 Blob 对象
 function dataURItoBlob(base64Data) {  
   var byteString;
   if(base64Data.split(',')[0].indexOf('base64') >= 0) {
@@ -78,7 +77,20 @@ function dataURItoBlob(base64Data) {
   return new Blob([ia], {type: mimeString})
 }
 
-// Blob对象转Base64
+// Base64 转 file
+function dataURLtoFile(dataurl, filename) {
+  var arr = dataurl.split(','),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+}
+
+// Blob 对象转 Base64
 function blobToDataURL(blob, callback) { 
   let a = new FileReader();
   a.onload = function (e) { 
@@ -87,6 +99,47 @@ function blobToDataURL(blob, callback) {
   a.readAsDataURL(blob);
 }
 
+/**
+* debounce         防抖
+* { fn }            待执行函数
+* { delay }         延时时间
+* { immediate }     是否立即执行
+*/
+function debounce(fn, delay = 500, immediate = false){
+  let timer = null
+  return function(){
+    let that = this, _args = arguments
+    if(timer) clearTimeout(timer)
+    if(immediate){
+      if(!timer){
+        fn.call(that, _args)
+      }
+      timer = setTimeout(()=>{
+        timer = null
+      }, delay)
+    }else{
+      timer = setTimeout(() => {
+        fn.call(that, _args)
+      }, delay)
+    }
+  }
+}
+
+/**
+* throttle          节流
+* { fn }            待执行函数
+* { delay }         延时时间
+*/
+function throttle(fn, delay = 500){
+  let last = 0
+  return function(){
+    let curr = +new Date()
+    if (curr - last > delay){
+      fn.apply(this, arguments)
+      last = curr
+    }
+  }
+}
 
 export {
 	getRandomId,
@@ -94,6 +147,9 @@ export {
   convertImgToBase64,
   dataURLtoBlob,
   dataURItoBlob,
+  dataURLtoFile,
   convertImgToBlob,
   blobToDataURL,
+  debounce,
+  throttle
 }

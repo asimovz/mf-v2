@@ -1,6 +1,6 @@
 <template>
   <div :class="['lib-item', { 'lib-item--checked': data.checked, 'lib-item--audio': type === 'audio'}]">
-    <span class="lib-remove el-icon-error" @click.stop="remove(data.resourceId)"></span>
+    <span v-if="showRemove" class="lib-remove el-icon-error" @click.stop="remove(data.resourceId)"></span>
     <div class="lib-preview">
       <img :src="data.uri" v-if="type === 'image'" crossorigin="*" />
       <template v-else-if="type === 'video'">
@@ -30,7 +30,11 @@ export default {
       type: Object,
       default: () => ({})
     },
-    type: String
+    type: String,
+    showRemove: {
+      type: Boolean,
+      default: () => false
+    }
   },
   data() {
     return {

@@ -105,7 +105,7 @@ export default {
     isVideoEdit(visible) {
       if (!visible) this.editDataVideo = {}
     },
-    'currentData.poster': {
+    'editDataVideo.poster': {
       handler(nVal, oVal) {
         this.$refs.videoPlayer && this.$refs.videoPlayer.showPoster()
       }
