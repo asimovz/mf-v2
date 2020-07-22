@@ -19,12 +19,12 @@ Vue.filter('format', moqui.dateFormat)
 // import { smsEditor, locale } from './components/mmsEditor/library.core.js'
 // import './components/mmsEditor/style/bundle.css'
 
-import { smsEditor, locale } from './components/smsEditor'
+import { mmsEditor, locale } from './components/mmsEditor'
 
-// import {smsEditor,locale} from './SmsEditor'
+// import {mmsEditor,locale} from './SmsEditor'
 
-// import {smsEditor,locale} from '../compile/dist/library.core.js'
-Vue.use(smsEditor, {
+// import {mmsEditor,locale} from '../compile/dist/library.core.js'
+Vue.use(mmsEditor, {
   http(url, data, config = {}){
     return new Promise((resolve, reject) => {
       axios.post(url, data, {...config})
