@@ -23,7 +23,7 @@ export const locale = {
   }
 }
 
-export const mmsEditor = {
+export const smsEditor = {
   install(Vue, options) {
     Vue.component(editorDraggable.name,editorDraggable)
     Vue.component(mmsEditorComp.name,mmsEditorComp)
