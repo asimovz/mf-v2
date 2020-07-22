@@ -2,7 +2,7 @@
   <div class="text-editor">
     <div class="text-item">
       <label class="editor-label">参数名称</label>
-      <span style="line-height:32px;">Text{{num}}</span>
+      <span style="line-height:32px;">{{paramName.name}}</span>
     </div>
     <!-- 目前不支持配置，暂时隐藏 -->
     <!-- <div class="text-item">
@@ -41,7 +41,7 @@
     </div> -->
     <div class="text-item" style="margin-top: 28px;">
       <!-- 插入参数功能已经完成，后端暂时不支持转换，故暂时disabled禁止 -->
-      <el-button size="small" type="primary" :disabled="!activeBtn"  @mousedown.native.prevent @click.native="addParam">插入参数</el-button>
+      <el-button size="small" type="primary" :disabled="overMaxParam || !activeBtn"  @mousedown.native.prevent @click.native="addParam">插入参数</el-button>
     </div>
   </div>
 </template>
@@ -56,9 +56,11 @@ export default {
   },
   data() {
     return {
-      num: this.options.num +1,
+      paramName: '',
       textConf: {},
       activeBtn: false,
+      maxParam: 5,
+      overMaxParam: false,
       typeList: [{
         value: 'd',
         label: '纯数字（d）'
@@ -103,21 +105,49 @@ export default {
   },
   created() {
     if(!this.options.activeBtn) {
-      // this.$set(this.options, 'list', [])
-      // this.$set(this.options, 'current', null)
-      // this.$set(this.options, 'num', 0)
-      // this.$set(this.options, 'activeBtn', (val) => {
-      //   this.activeBtn = val
-      // })
-      this.options.list = []
-      this.options.current = null
+      this.options.textParamlist = []
+      this.options.nameList = ['text1','text2','text3','text4','text5']
+      this.options.current = {
+        name: 'text1'
+      }
       this.options.text = ""
-      this.options.num = 0
       this.options.activeBtn = (val) => {
         this.activeBtn = val
       }
+      this.options.changeCurrent = (val) => {
+        this.options.current = val
+        this.paramName = val
+      }
+      this.options.checkMax = this.checkMax
+      this.options.delParam = () =>{
+        let inputs = []
+        let inputsArr = document.getElementsByClassName("param-input")
+        let list = this.options.textParamlist
+        for(var i in inputsArr){
+          if(inputsArr[i].value) {
+            inputs.push({
+              name:inputsArr[i].value
+            })
+          }
+        }
+        let delItems = inputs.concat(list).filter(v => !inputs.some((e)=>{
+          return e.name === v.name
+        }) || !list.some((e)=>{
+          return e.name === v.name
+        }))
+        this.options.textParamlist = inputs
+        delItems.map((item)=>{
+          this.options.nameList.push(item.name)
+        })
+        this.options.nameList = this.options.nameList.sort()
+        this.options.changeCurrent({
+          name: this.options.nameList.length>0?this.options.nameList[0]:'text1'
+        })
+      }
+      this.paramName = {
+        name: 'text1'
+      }
       this.$emit('update:options',this.options);
-      this.num = this.options.num +1
     }
     // this.options = {
     //   list: [],
@@ -139,17 +169,33 @@ export default {
     // }
   },
   methods: {
-    addParam(event) {
-      this.options.num = this.options.num+1
-      this.options.current = {
-        name: 'Text' + this.options.num
+    checkMax() {
+      let num = document.getElementsByClassName("param-input").length
+      if(num >= this.maxParam) {
+        this.overMaxParam = true
+        return true
+      } else {
+        this.overMaxParam = false
+        return false
       }
-      this.options.list.push(this.options.current)
-      this.options.addParam()
-      this.$nextTick(()=>{
-        this.num = this.options.num +1
+    },
+    addParam(event) {
+      this.options.changeCurrent ({
+        name: this.options.nameList[0]
       })
-      
+      this.options.nameList.splice(0, 1)
+      this.options.textParamlist.push(this.options.current)
+      this.options.addParam()
+      if(this.checkMax()) {
+        this.options.changeCurrent ({
+          name: 'text1'
+        })
+      } else {
+        this.options.changeCurrent ({
+          name: this.options.nameList[0]
+        })
+      }
+
     }
   }
 };

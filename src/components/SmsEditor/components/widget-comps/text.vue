@@ -1,5 +1,5 @@
 <template>
-  <div :contenteditable="isEdit" style="min-height:22px;-webkit-user-select:auto;color:#606266;" @mousedown="mousedown" @focus="focus" @dblclick="edit" @blur="changeText" ref="text" v-html="data.text || placeholder"></div>
+  <div :contenteditable="isEdit" style="min-height:22px;-webkit-user-select:auto;color:#606266;" @mousedown="mousedown" @focus="focus" @dblclick="edit" @blur="changeText" @keyup.delete="delParam" ref="text" v-html="data.text || placeholder"></div>
 </template>
 
 <script>
@@ -20,13 +20,25 @@ export default {
         e.stopPropagation()
         e.preventDefault()
         this.data.activeBtn(false)
+        this.data.changeCurrent({
+          name: e.target.value
+        })
       } else {
-        if(this.data && this.isEdit) this.data.activeBtn(true)
+        if(this.data && this.isEdit) {
+          this.data.changeCurrent({
+            name: this.data.nameList.length>0?this.data.nameList[0]:'text1'
+          })
+          this.data.activeBtn(true)
+        }
       }
     },
     focus(e) {
       this.data.addParam = this.addParam
       this.data.activeBtn(true)
+    },
+    delParam(e) {
+      this.data.checkMax()
+      this.data.delParam()
     },
 
     addParam() {
