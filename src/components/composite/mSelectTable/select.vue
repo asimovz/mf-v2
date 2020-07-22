@@ -1,5 +1,5 @@
 <template>
-	<span :id="id" class="m-select-wrap">
+	<span :id="id" class="m-select-wrap aw-select-table">
 		<v-selectpage 
 			:data="data"
 			:key-field="keyField"
@@ -126,7 +126,7 @@ export default {
 	},
 	computed: {
 		inputClasses: function(){
-      return this.errors.has(this.name)?'v-selectpage ivu-form-item-error':'v-selectpage'
+      return this.errors.has(this.name)?'v-selectpage m-form-item-error':'v-selectpage'
     }
 	},
 	created: function() {
@@ -215,7 +215,10 @@ export default {
 }
 </script>
 <style>
-.ivu-form-item-error {
+.aw-select-table {
+	width: 100%;
+}
+.m-form-item-error {
 	border:1px solid #ed3f14;
 }
 

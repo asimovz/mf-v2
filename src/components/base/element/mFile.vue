@@ -400,6 +400,9 @@ export default {
 .components_upload_list {
   display: block;
   line-height: 20px;
+  
+}
+.components_upload_list+.components_upload_list {
   margin-top: 5px;
 }
 

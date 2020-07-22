@@ -206,7 +206,7 @@ export default {
   font-weight: 400;
 }
 .aw-content {
-  .el-button+.el-button{margin-left:0!important}
+  .el-button+.el-button{margin-left:0}
 }
 
 

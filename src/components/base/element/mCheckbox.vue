@@ -1,5 +1,5 @@
 <template>
-    <el-checkbox-group v-model="selectValue" @change="handleChange" :name="name" :size="sizeType">
+    <el-checkbox-group class="aw-checkbox" v-model="selectValue" @change="handleChange" :name="name" :size="sizeType">
         <input type="hidden" :name="name" :form="form" :value="selectValue">
         <el-checkbox v-for="item in options" :key="item.id"  :label="item.value" :disabled="item.disabled">
           <span>{{item.label}}</span>
@@ -64,3 +64,9 @@ export default {
   }
 };
 </script>
+<style lang="less">
+.aw-checkbox {
+  height: 32px;
+  line-height: 32px;
+}
+</style>
