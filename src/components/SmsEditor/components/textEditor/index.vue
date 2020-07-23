@@ -59,13 +59,6 @@ export default {
   computed: {
   },
   watch:{
-    paramsText:{
-      handler(){
-        console.log(12121,this.paramsText)
-        this.getParamsText(this.paramsText)
-      },
-      immediate:true
-    }
   },
   data() {
     return {
@@ -116,6 +109,7 @@ export default {
     }
   },
   mounted() {
+    console.log(999,this.options)
     if(!this.$root.TEXT_PARAM) {
       let nameList = []
       for(let i=0;i<this.maxParamNum;i++) {
@@ -167,6 +161,24 @@ export default {
       this.paramName = {
         name: 'text1'
       }
+      if(this.paramsText) {
+        // 非新建文本
+        this.$root.TEXT_PARAM.textParamlist = this.getTextParamlist(this.paramsText)
+        let inputs = []
+        this.$root.TEXT_PARAM.textParamlist.map((item)=>{
+          inputs.push(item.name)
+        })
+        let list = this.$root.TEXT_PARAM.nameList
+        let delItems = inputs.concat(list).filter(v => !inputs.some((e)=>{
+          return e === v
+        }) || !list.some((e)=>{
+          return e === v
+        }))
+        this.$root.TEXT_PARAM.nameList = delItems.sort()
+        this.$root.TEXT_PARAM.changeCurrent({
+          name: this.$root.TEXT_PARAM.nameList.length>0?this.$root.TEXT_PARAM.nameList[0]:'text1'
+        })
+      }
       this.$emit('update:options',this.options);
     }
     // this.options = {
@@ -189,14 +201,16 @@ export default {
     // }
   },
   methods: {
-    getParamsText(val) {
+    getTextParamlist(val) {
       var re = /{(.*?)}/g;
       var array = [];
       var temp
       while (temp = re.exec(val)) {
-        array.push(temp[0].replace(/\{|\}/gi,''))
+        array.push({
+          name: temp[0].replace(/\{|\}/gi,'')
+        })
       }
-      console.log(2222,array)
+      return array
     },
     checkMax() {
       let num = document.getElementsByClassName("param-input").length
@@ -226,6 +240,9 @@ export default {
       }
 
     }
+  },
+  beforeDestroy: function() {
+    this.$root.TEXT_PARAM = null
   }
 };
 </script>
