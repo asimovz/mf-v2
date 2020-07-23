@@ -572,7 +572,6 @@ export default {
 
       // 提取需要字段
       let newList = flatList.map(item => {
-        console.log(item)
         let _item = {}
         let { type, content, name = '', uri, size, resourceId, poster, duration, width, height} = item
 
@@ -604,7 +603,7 @@ export default {
       newList = newList.concat({ type: 'text', content: '退订回复T, 此条短信免流', size: 1 })
       let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
-      // this.captrue(_data)
+      this.captrue(_data)
     },
     async pretreatment (list) {
       // 黑名单，匹配未上传资源
