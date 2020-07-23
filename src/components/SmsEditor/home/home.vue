@@ -89,7 +89,13 @@
         </div>
       </div>
       <div class="editor-pane-right" :class="{eidtorPaneShow: isEditorShow}">
-        <edit-pane :item="currentEditItem" @on-remove="onEditRemove" @on-close="isEditorShow = false"></edit-pane>
+        <edit-pane
+          :item="currentEditItem"
+          :params-text="textParamsStr"
+          :params-length="textParamsLen"
+          @on-remove="onEditRemove"
+          @on-close="isEditorShow = false"
+        ></edit-pane>
       </div>
       <!-- 画布拖动 -->
       <div :class="['space-key-mask',{'cursor-grabbing':isMouseDown}]" v-if="isDownSpacebar" @mousedown="dropCanvas"></div>
@@ -258,6 +264,17 @@ export default {
     },
     uploadPercentage(){
       return this.totalUpload === 0 ? 0 : (this.totalUpload - this.uploadPendings.length) / this.totalUpload * 100
+    },
+
+    flatMmsList(){
+      return getAllData(this.mmsData.list)
+    },
+    textParamsStr(){
+      return this.flatMmsList.filter(item => item.type === 'text').map(item => item.content).join('')
+    },
+    textParamsLen(){
+      let texts = this.flatMmsList.filter(item => item.type === 'text' && item.textParamlist && item.textParamlist.length)
+      return texts.length ? texts[0].textParamlist.length : 0
     }
   },
   methods: {
@@ -737,6 +754,7 @@ export default {
         fdata.append('mmsTemplate', JSON.stringify(sData.mmsTemplate))
         fdata.append('mmsResourceIds', sData.mmsResourceIds)
         fdata.append('mmsOriginalTemplate', JSON.stringify(this.mmsData.list))
+        fdata.append('placeholderNum', this.textParamsLen)
 
         this.submit(fdata)
       })
