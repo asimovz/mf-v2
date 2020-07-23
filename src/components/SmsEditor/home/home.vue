@@ -184,7 +184,7 @@ export default {
         select: 'item-selected',
         shiftSelect: 'item-shift-selected'
       },
-
+      textParamsLen:0,//自定义参数个数
       isEditorShow: false,
       currentEditItem: {},
       saveLoading: false, // 保存的loading
@@ -276,10 +276,6 @@ export default {
       return this.flatMmsList.filter(item => item.type === 'text')
         .map(item => replaceTextContent(item.content)).join('')
     },
-    textParamsLen(){
-      let texts = this.flatMmsList.filter(item => item.type === 'text' && item.textParamlist && item.textParamlist.length)
-      return texts.length ? texts[0].textParamlist.length : 0
-    }
   },
   methods: {
     getTemplate () {
@@ -571,9 +567,7 @@ export default {
 
       flatList = await this.pretreatment(flatList)
 
-      let num = 0
       // 提取需要字段
-      let _textParamsLen = this.textParamsLen - 1
       let newList = flatList.map(item => {
         let _item = {}
         let { type, text, content, name = '', uri, size, resourceId, poster, duration, width, height} = item
@@ -585,39 +579,12 @@ export default {
         // if (height) _item.height = height
 
         if (type === 'text') {
-          // let newContent = replaceTextContent(content)
-          // let len = newContent.split('{text').length - 1
-
-          // let texts = text.match(/<input(([\s\S])*?)>/g)
-
-          // for(let i = 0; i < texts.length; i ++){
-          //   newContent.replace(/{text(.*)}/i, function(){
-
-          //   }(i))
-          // }
-
-
-          // let that = this
-          // if(/<input(([\s\S])*?)>/g.test(text)){
-
-          //   newContent.replace(/{text(\d)}/i, function(da, i){
-          //     num ++
-          //     // let str = `{text${that.textParamsLen - _textParamsLen}}`
-          //     // _textParamsLen --
-              
-          //     console.log('`{text${ num }}`', da, i)
-          //     return `{text${ num }}`
-          //   })
-
-          // }
-
-          // let index = 0
-          // let _newContent = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
-          //   index = index + 1
-          //   let r =/(?<=value=").*?(?=")/
-          //   return '{'+data.match(r)[0]+'}'
-          // })
-
+          let newContent = text
+          let texts = newContent.match(/<input(([\s\S])*?)>/g)
+          for(let i = 0; i < texts.length; i++){
+            this.textParamNum += 1
+            newContent = newContent.replace(/<input(([\s\S])*?)>/,`{text${this.textParamNum}}`)
+          }
           _item.name = this.initParams.messageName
           _item.content = newContent
           _item.size = 1
@@ -625,7 +592,6 @@ export default {
           ids.push(resourceId)
           _item.content = uri
         }
-
         return _item
       })
 
@@ -633,7 +599,7 @@ export default {
         this.$message.warning('模板必须包含文本')
         return
       }
-
+      
       newList = newList.concat({ type: 'text', content: '退订回复T, 此条短信免流', size: 1 })
       let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
