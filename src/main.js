@@ -25,15 +25,21 @@ import { smsEditor, locale } from './components/SmsEditor'
 
 // import {smsEditor,locale} from '../compile/dist/library.core.js'
 Vue.use(smsEditor, {
-  http(url, data, config = {}){
+  http(url, data, config = {}) {
     return new Promise((resolve, reject) => {
-      axios.post(url, data, {...config})
-      .then(res => {
-        if(res.status === 200){
-          return resolve(res.data)
-        }
+      config.method = config.method || 'post'
+      axios({
+        url,
+        data: config.method === 'post' ? data : {},
+        params: config.method === 'get' ? data : {},
+        ...config
       })
-      .catch(err => reject(err))
+        .then(res => {
+          if (res.status === 200) {
+            return resolve(res.data)
+          }
+        })
+        .catch(err => reject(err))
     })
   }
 })
