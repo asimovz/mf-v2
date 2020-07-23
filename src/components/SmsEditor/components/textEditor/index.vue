@@ -50,6 +50,10 @@
 export default {
   props: {
     options: Object,
+    placeholderNum: {
+      type: Number,
+      default: 5
+    }
   },
   computed: {
     
@@ -59,7 +63,6 @@ export default {
       paramName: '',
       textConf: {},
       activeBtn: false,
-      maxParam: 5,
       overMaxParam: false,
       typeList: [{
         value: 'd',
@@ -103,47 +106,55 @@ export default {
       }],
     }
   },
-  created() {
-    if(!this.options.activeBtn) {
-      this.options.textParamlist = []
-      this.options.nameList = ['text1','text2','text3','text4','text5']
-      this.options.current = {
-        name: 'text1'
+  mounted() {
+    if(!this.$root.TEXT_PARAM) {
+      let nameList = []
+      for(let i=0;i<this.placeholderNum;i++) {
+        nameList.push(
+          'text'+(i+1)*1
+        )
+      }
+      this.$root.TEXT_PARAM = {
+        textParamlist: [],
+        nameList: nameList,
+        current: {
+          name: 'text1'
+        },
+        activeBtn: (val) => {
+          this.activeBtn = val
+        },
+        changeCurrent: (val) => {
+          this.$root.TEXT_PARAM.current = val
+          this.paramName = val
+        },
+        checkMax: this.checkMax,
+        delParam: () =>{
+          let inputs = []
+          let inputsArr = document.getElementsByClassName("param-input")
+          let list = this.$root.TEXT_PARAM.textParamlist
+          for(var i in inputsArr){
+            if(inputsArr[i].value) {
+              inputs.push({
+                name:inputsArr[i].value
+              })
+            }
+          }
+          let delItems = inputs.concat(list).filter(v => !inputs.some((e)=>{
+            return e.name === v.name
+          }) || !list.some((e)=>{
+            return e.name === v.name
+          }))
+          this.$root.TEXT_PARAM.textParamlist = inputs
+          delItems.map((item)=>{
+            this.$root.TEXT_PARAM.nameList.push(item.name)
+          })
+          this.$root.TEXT_PARAM.nameList = this.$root.TEXT_PARAM.nameList.sort()
+          this.$root.TEXT_PARAM.changeCurrent({
+            name: this.$root.TEXT_PARAM.nameList.length>0?this.$root.TEXT_PARAM.nameList[0]:'text1'
+          })
+        }
       }
       this.options.text = ""
-      this.options.activeBtn = (val) => {
-        this.activeBtn = val
-      }
-      this.options.changeCurrent = (val) => {
-        this.options.current = val
-        this.paramName = val
-      }
-      this.options.checkMax = this.checkMax
-      this.options.delParam = () =>{
-        let inputs = []
-        let inputsArr = document.getElementsByClassName("param-input")
-        let list = this.options.textParamlist
-        for(var i in inputsArr){
-          if(inputsArr[i].value) {
-            inputs.push({
-              name:inputsArr[i].value
-            })
-          }
-        }
-        let delItems = inputs.concat(list).filter(v => !inputs.some((e)=>{
-          return e.name === v.name
-        }) || !list.some((e)=>{
-          return e.name === v.name
-        }))
-        this.options.textParamlist = inputs
-        delItems.map((item)=>{
-          this.options.nameList.push(item.name)
-        })
-        this.options.nameList = this.options.nameList.sort()
-        this.options.changeCurrent({
-          name: this.options.nameList.length>0?this.options.nameList[0]:'text1'
-        })
-      }
       this.paramName = {
         name: 'text1'
       }
@@ -171,7 +182,7 @@ export default {
   methods: {
     checkMax() {
       let num = document.getElementsByClassName("param-input").length
-      if(num >= this.maxParam) {
+      if(num >= this.placeholderNum) {
         this.overMaxParam = true
         return true
       } else {
@@ -180,19 +191,19 @@ export default {
       }
     },
     addParam(event) {
-      this.options.changeCurrent ({
-        name: this.options.nameList[0]
+      this.$root.TEXT_PARAM.changeCurrent ({
+        name: this.$root.TEXT_PARAM.nameList[0]
       })
-      this.options.nameList.splice(0, 1)
-      this.options.textParamlist.push(this.options.current)
-      this.options.addParam()
+      this.$root.TEXT_PARAM.nameList.splice(0, 1)
+      this.$root.TEXT_PARAM.textParamlist.push(this.$root.TEXT_PARAM.current)
+      this.$root.TEXT_PARAM.addParam()
       if(this.checkMax()) {
-        this.options.changeCurrent ({
+        this.$root.TEXT_PARAM.changeCurrent ({
           name: 'text1'
         })
       } else {
-        this.options.changeCurrent ({
-          name: this.options.nameList[0]
+        this.$root.TEXT_PARAM.changeCurrent ({
+          name: this.$root.TEXT_PARAM.nameList[0]
         })
       }
 

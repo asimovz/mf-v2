@@ -19,31 +19,31 @@ export default {
       if(e.target.className === 'param-input') {
         e.stopPropagation()
         e.preventDefault()
-        this.data.activeBtn(false)
-        this.data.changeCurrent({
+        this.$root.TEXT_PARAM.activeBtn(false)
+        this.$root.TEXT_PARAM.changeCurrent({
           name: e.target.value
         })
       } else {
-        if(this.data && this.isEdit) {
-          this.data.changeCurrent({
-            name: this.data.nameList.length>0?this.data.nameList[0]:'text1'
+        if(this.$root.TEXT_PARAM && this.isEdit) {
+          this.$root.TEXT_PARAM.changeCurrent({
+            name: this.$root.TEXT_PARAM.nameList.length>0?this.$root.TEXT_PARAM.nameList[0]:'text1'
           })
-          this.data.activeBtn(true)
+          this.$root.TEXT_PARAM.activeBtn(true)
         }
       }
     },
     focus(e) {
-      this.data.addParam = this.addParam
-      this.data.activeBtn(true)
+      this.$root.TEXT_PARAM.addParam = this.addParam
+      this.$root.TEXT_PARAM.activeBtn(true)
     },
     delParam(e) {
-      this.data.checkMax()
-      this.data.delParam()
+      this.$root.TEXT_PARAM.checkMax()
+      this.$root.TEXT_PARAM.delParam()
     },
 
     addParam() {
       let dom = this.$refs.text
-      let param = '<input type="button" class="param-input" unselectable="on" readonly value="'+this.data.current.name+'">'
+      let param = '<input type="button" class="param-input" unselectable="on" readonly value="'+this.$root.TEXT_PARAM.current.name+'">'
       let sel = window.getSelection()
       let range
       if (sel.getRangeAt && sel.rangeCount) {
@@ -64,12 +64,12 @@ export default {
           sel.addRange(range)
         }
       }
-      this.data.current = null
+      this.$root.TEXT_PARAM.current = null
     },
     edit() {
       this.$emit("edit",true)
       this.isEdit = true
-      if(this.data.text == "") this.placeholder = ""
+      if(this.data.text == ""||this.data.content == "") this.placeholder = ""
       this.$nextTick(function(){
         this.$refs.text.focus()
         // 强制每次focus时，光标都在最后
@@ -80,7 +80,7 @@ export default {
     },
     changeText() {
       this.isEdit = false
-      this.data.activeBtn(false)
+      this.$root.TEXT_PARAM.activeBtn(false)
       let text = this.$refs.text.innerHTML
       this.data.text = text
       let index = 0
