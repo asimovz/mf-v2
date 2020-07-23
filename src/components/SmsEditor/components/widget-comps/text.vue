@@ -87,7 +87,7 @@ export default {
       text = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
         index = index + 1
         let r =/(?<=value=").*?(?=")/
-        return '{'+'text'+index+'}'
+        return '{'+data.match(r)[0]+'}'
       })
       this.data.content = text
       if(this.data.text === "")  this.placeholder = "请填写"

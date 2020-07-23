@@ -92,7 +92,6 @@
         <edit-pane
           :item="currentEditItem"
           :params-text="textParamsStr"
-          :params-length="textParamsLen"
           @on-remove="onEditRemove"
           @on-close="isEditorShow = false"
         ></edit-pane>
@@ -127,6 +126,10 @@ function getAllData (arr) {
       return ar
     }
   })
+}
+
+function replaceTextContent(str){
+  return str.replace(/<div>/g, '').replace(/(<\/div>|<br>)/g, '\n').replace(/&nbsp;/g, ' ')
 }
 
 export default {
@@ -245,7 +248,7 @@ export default {
         })
       }
       getSzie(list)
-      textContent = this.replaceTextContent(textContent)
+      textContent = replaceTextContent(textContent)
       let newContent = textContent
       let textLength = newContent.replace(/[^\x00-\xFF]/g, '**').length
       size += Math.ceil(textLength / 1024)
@@ -270,7 +273,8 @@ export default {
       return getAllData(this.mmsData.list)
     },
     textParamsStr(){
-      return this.flatMmsList.filter(item => item.type === 'text').map(item => item.content).join('')
+      return this.flatMmsList.filter(item => item.type === 'text')
+        .map(item => replaceTextContent(item.content)).join('')
     },
     textParamsLen(){
       let texts = this.flatMmsList.filter(item => item.type === 'text' && item.textParamlist && item.textParamlist.length)
@@ -297,9 +301,6 @@ export default {
       }).then(res => {
         this.$refs.goBack.$el.click()
       })
-    },
-    replaceTextContent (val) {
-      return val.replace(/<div>/g, '').replace(/(<\/div>|<br>)/g, '\n').replace(/&nbsp;/g, ' ')
     },
     listenerPhone () {
       const _self = this
@@ -570,10 +571,12 @@ export default {
 
       flatList = await this.pretreatment(flatList)
 
+      let num = 0
       // 提取需要字段
+      let _textParamsLen = this.textParamsLen - 1
       let newList = flatList.map(item => {
         let _item = {}
-        let { type, content, name = '', uri, size, resourceId, poster, duration, width, height} = item
+        let { type, text, content, name = '', uri, size, resourceId, poster, duration, width, height} = item
 
         _item = { type, name, size }
         if (poster) _item.poster = poster
@@ -581,8 +584,39 @@ export default {
         // if (width) _item.width = width
         // if (height) _item.height = height
 
-        if (item.type === 'text') {
-          let newContent = this.replaceTextContent(content)
+        if (type === 'text') {
+          // let newContent = replaceTextContent(content)
+          // let len = newContent.split('{text').length - 1
+
+          // let texts = text.match(/<input(([\s\S])*?)>/g)
+
+          // for(let i = 0; i < texts.length; i ++){
+          //   newContent.replace(/{text(.*)}/i, function(){
+
+          //   }(i))
+          // }
+
+
+          // let that = this
+          // if(/<input(([\s\S])*?)>/g.test(text)){
+
+          //   newContent.replace(/{text(\d)}/i, function(da, i){
+          //     num ++
+          //     // let str = `{text${that.textParamsLen - _textParamsLen}}`
+          //     // _textParamsLen --
+              
+          //     console.log('`{text${ num }}`', da, i)
+          //     return `{text${ num }}`
+          //   })
+
+          // }
+
+          // let index = 0
+          // let _newContent = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
+          //   index = index + 1
+          //   let r =/(?<=value=").*?(?=")/
+          //   return '{'+data.match(r)[0]+'}'
+          // })
 
           _item.name = this.initParams.messageName
           _item.content = newContent
