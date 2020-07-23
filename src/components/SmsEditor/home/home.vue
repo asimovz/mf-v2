@@ -557,10 +557,10 @@ export default {
 
       if (!this.mmsData.list.length) return
 
-      // if (this.fileSize > this.maxFileSize) {
-      //   this.$message.warning(`文件大小不能超过 ${this.maxFileSize}K`)
-      //   return false
-      // }
+      if (this.fileSize > this.maxFileSize) {
+        this.$message.warning(`文件大小不能超过 ${this.maxFileSize}K`)
+        return false
+      }
 
       // 获取扁平模板数据
       let flatList = getAllData(this.mmsData.list).flat(3)
@@ -568,8 +568,11 @@ export default {
       // 提交参数 mmsResourceIds
       let ids = []
 
+      flatList = await this.pretreatment(flatList)
+
       // 提取需要字段
       let newList = flatList.map(item => {
+        console.log(item)
         let _item = {}
         let { type, content, name = '', uri, size, resourceId, poster, duration, width, height} = item
 
@@ -599,11 +602,11 @@ export default {
       }
 
       newList = newList.concat({ type: 'text', content: '退订回复T, 此条短信免流', size: 1 })
-      let _data = await this.saveBefore({ initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids })
+      let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
-      this.captrue(_data)
+      // this.captrue(_data)
     },
-    async saveBefore (data) {
+    async pretreatment (list) {
       // 黑名单，匹配未上传资源
       const blacklist = new RegExp(`(^blob:)|(^${this.config.nodeUrl})`)
       // 上传中的资源
@@ -648,25 +651,24 @@ export default {
       }
 
       // 遍历预览区域内容，将需要上传的资源加入待上传队列
-      data.mmsTemplate.forEach(item => {
-        if (item.type === 'text' || !blacklist.test(item.content)) return
+      list.forEach(item => {
+        if (item.type === 'text' || !blacklist.test(item.uri)) return
 
         const pending = {
-          key: item.content,
           source: item,
           file: null
         }
 
         if (item.type === 'image') {
-          const blobCall = this._http(item.content, {}, { baseURL: '', method: 'get', responseType: 'blob' }).then(res => {
+          const blobCall = this._http(item.uri, {}, { baseURL: '', method: 'get', responseType: 'blob' }).then(res => {
             pending.file = blobToFile(res, item.name)
             pendings.push(pending)
           })
 
           blobCalls.push(blobCall)
         } else {
-          pending.file = item.content
-          pendings.push(pending)          
+          pending.file = item.uri
+          pendings.push(pending)
         }
       })
 
@@ -674,7 +676,7 @@ export default {
         // 等待所有图片类型转化工作完成
         await Promise.all(blobCalls)
 
-        if (pendings.length === 0) return data
+        if (pendings.length === 0) return list
 
         // 更新用于UI渲染的部分数据
         this.totalUpload = pendings.length
@@ -690,12 +692,13 @@ export default {
             // 修改资源地址及信息
             item.source.name = data.name
             item.source.size = data.size
-            item.source.content = data.uri
+            item.source.uri = data.uri
+            item.source.resourceId = data.resourceId
             item.source.poster !== undefined && (item.source.poster = data.poster)
 
             // 剔除上传成功的资源
 
-            this.uploadPendings = this.uploadPendings.filter(pendingItem => pendingItem.key !== item.key)
+            this.uploadPendings = this.uploadPendings.filter(pendingItem => pendingItem.source.id !== item.source.id)
 
             if(this.uploadPendings.length === 0){
               this.uploadProgressVisible = false
@@ -711,7 +714,7 @@ export default {
       
       try {
         await Promise.all(uploadCalls)
-        return data
+        return list
       } catch(err){
         console.log(err)
       }
