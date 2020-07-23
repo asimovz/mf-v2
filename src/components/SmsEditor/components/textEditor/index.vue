@@ -50,13 +50,22 @@
 export default {
   props: {
     options: Object,
-    placeholderNum: {
+    paramsText: String,
+    maxParamNum: {
       type: Number,
       default: 5
     }
   },
   computed: {
-    
+  },
+  watch:{
+    paramsText:{
+      handler(){
+        console.log(12121,this.paramsText)
+        this.getParamsText(this.paramsText)
+      },
+      immediate:true
+    }
   },
   data() {
     return {
@@ -109,7 +118,7 @@ export default {
   mounted() {
     if(!this.$root.TEXT_PARAM) {
       let nameList = []
-      for(let i=0;i<this.placeholderNum;i++) {
+      for(let i=0;i<this.maxParamNum;i++) {
         nameList.push(
           'text'+(i+1)*1
         )
@@ -180,9 +189,18 @@ export default {
     // }
   },
   methods: {
+    getParamsText(val) {
+      var re = /{(.*?)}/g;
+      var array = [];
+      var temp
+      while (temp = re.exec(val)) {
+        array.push(temp[0].replace(/\{|\}/gi,''))
+      }
+      console.log(2222,array)
+    },
     checkMax() {
       let num = document.getElementsByClassName("param-input").length
-      if(num >= this.placeholderNum) {
+      if(num >= this.maxParamNum) {
         this.overMaxParam = true
         return true
       } else {
