@@ -13,7 +13,7 @@
           </li>
         </ul>
         <div class="widget-pane-wrapper" v-show="widgetPaneShow">
-          <sms-library :type="currentAddDragItem" @on-close="widgetPaneShow = false" @on-add="onLibAdd"></sms-library>
+          <sms-library ref="library" :type="currentAddDragItem" @on-close="widgetPaneShow = false" @on-add="onLibAdd"></sms-library>
         </div>
       </div>
       <div class="editor-body">
@@ -126,6 +126,7 @@ export default {
         mmsTemplate: this.mmsTemplate,
         library: this.resourceInit,
         file: this.resourceAction,
+        clearFile: '/file/clear',
         uploadFile: '/upload/file',
         videoInfo: '/video/info', // 视频信息接口
         videoCut: '/video/cut', // 视频剪切接口
@@ -189,6 +190,10 @@ export default {
   mounted () {
     this.listenerPhone()
   },
+
+  beforeDestory(){
+    this.handleClear()
+  },
   computed: {
     isComposeDisabled () {
       return Object.keys(this.composeGroupList).length >= 2
@@ -245,6 +250,16 @@ export default {
     }
   },
   methods: {
+    handleClear(){
+      let localData = this.$refs.library.localData
+      let { video, audio } = localData
+      let localList = [...video, ...audio].map(item => item.name)
+
+      this.clearNodeLibrary(localList)
+    },
+    clearNodeLibrary(data){
+      this._http(this.config.nodeUrl + this.config.clearFile, { data })
+    },
     getTemplate () {
       this._http(this.mmsTemplate, {
         messageId: this.initParams.messageId
