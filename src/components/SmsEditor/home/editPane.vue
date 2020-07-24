@@ -16,7 +16,7 @@
           <audioPlayer style="flex:1" :options="audioOptions" />
         </template>
         <template v-if="currentData.type === 'text'">
-          <text-editor :options.sync="currentData" :params-text="paramsText"></text-editor>
+          <text-editor :options.sync="editDataText" :params-text="paramsText"></text-editor>
         </template>
       </div>
       <div class="editPane-operation">
@@ -60,7 +60,8 @@ export default {
       isImgEdit: false,
       isVideoEdit: false,
       editDataImg: {},
-      editDataVideo: {}
+      editDataVideo: {},
+      editDataText: {}
     }
   },
   computed: {
@@ -99,6 +100,10 @@ export default {
     item: {
       handler(val) {
         this.currentData = val
+
+        if(val.type === 'text'){
+          this.editDataText = JSON.parse(JSON.stringify(this.currentData))
+        }
       },
       deep: true,
       immediate: true
