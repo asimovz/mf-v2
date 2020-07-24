@@ -7,14 +7,13 @@ import _L from 'accredit'
 
 import "./assets/css/main.less"
 
-window['CKEDITOR_BASEPATH'] = process.env.NODE_ENV === 'production' ? __webpack_define_cdn__ + '/static/js/CKEditor/' : '/static/js/CKEditor/'
+window['CKEDITOR_BASEPATH'] = process.env.NODE_ENV === 'production' ? process.env.BASE_URL + '/static/js/CKEditor/' : '/static/js/CKEditor/'
 Vue.use(moquiComponents)
 
 Vue.prototype.$http = axios
 Vue.prototype.moqui = moqui
 Vue.filter('decodeHtml', moqui.htmlDecode)
 Vue.filter('format', moqui.dateFormat)
-
 
 window.moquiVue = new Vue({
   el: '#app',

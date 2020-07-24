@@ -1,34 +1,34 @@
 const path = require("path")
 const webpack = require('webpack')
-const resolve = dir => path.join(__dirname, dir)
 const baseThemeConfig = require('./config/theme.config')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const resolve = dir => path.join(__dirname, dir)
 
-const host = 'http://10.0.80.16:8082/'
-// const host = 'http://10.0.81.220:8090/'
+const host = 'http://10.0.81.220:8090/'
+const compileDomain = 'http://op-fe.mfexcel.com/'
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? 'http://op-fe.mfexcel.com/' : '/',
+  publicPath: process.env.NODE_ENV === 'production' ? compileDomain : '/',
   outputDir: process.env.outputDir || 'dist', 
   // assetsDir: "static",
   productionSourceMap: false,
+  filenameHashing:false,
   lintOnSave: false,
   configureWebpack: config => {
-    config.context = path.resolve(__dirname, './'),
+    config.context = path.resolve(__dirname, './')
     config.output.libraryTarget = "umd"
     config.externals= {
       jquery: "jQuery"
     }
+
     config.module.rules.push(
       {
         test: /iview.src.*?js$/,
         loader: 'babel-loader',
-      },
+      }
     )
     config.module.rules.push(
       {
@@ -40,64 +40,50 @@ module.exports = {
           resolve('node_modules/vue-echarts'), 
           resolve('node_modules/resize-detector')
         ]
-      },
-    )
-
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        '$THEME': baseThemeConfig,
-        '__webpack_define_cdn__': 'http://op-fe.mfexcel.com/'
-      }),
+      }
     )
     
     // 如果是开发环境，webpack配置
-    if (process.env.NODE_ENV === 'development') {
-      config.mode = 'development'
-      config.output.filename = '[name].js'
-      config.output.chunkFilename = '[name].[hash:8].js'
-      config.plugins.push(
-        new HtmlWebpackPlugin({
-          filename: 'index.html',
-          template: 'index.html',
-          inject: true,
-          chunks:['app']
-        }),
-      )
-    }else if (process.env.NODE_ENV === 'production'){
+   if (process.env.NODE_ENV === 'production'){
       // 如果是生产环境，webpack配置
-      config.mode = 'production'
-      config.output.filename = '[name].min.js'
-      config.output.chunkFilename = '[name].min.js'
+      config.output = Object.assign(config.output,{
+        filename: '[name].min.js',
+        chunkFilename:'[name].min.js'
+      })
       config.optimization.usedExports = true
       config.optimization.runtimeChunk = {
         name: "manifest",
       },
-      config.optimization.minimizer.push(
+
+
+      config.plugins.push(
+        new CompressionWebpackPlugin({ //文件开启Gzip，也可以通过服务端
+          algorithm: 'gzip',
+          test: new RegExp('\\.(' + ['js', 'css'].join('|') + ')$'),
+          threshold: 10240,
+          minRatio: 0.8
+        })
+      )
+      config.plugins.push(
         new TerserWebpackPlugin({
           terserOptions: {
-            warnings: false,
-            compress: {
-              drop_console: true,
-              drop_debugger: true
-            },
-            output: {
-              comments: false,
-            },
+            compress: { drop_console: true }
           },
           extractComments: false,
           parallel: true,  // 启用并行压缩
           cache: true,    // 启用缓存
         })
       )
+
       config.plugins.push(
-        new webpack.optimize.ModuleConcatenationPlugin(),
+        new webpack.optimize.ModuleConcatenationPlugin()
       )
       config.plugins.push(
         new OptimizeCSSPlugin({
           cssProcessorOptions: {
             safe: true
           }
-        }),
+        })
       )
       config.plugins.push(
         new CopyWebpackPlugin([
@@ -109,26 +95,11 @@ module.exports = {
         ])
       )
       config.plugins.push(
-        new webpack.HashedModuleIdsPlugin(),
-      )
-      config.plugins.push(
-        new CompressionWebpackPlugin({
-          //压缩成功后的目标资源名称，默认[path].gz[query]，[file]被替换为原始资源。[path]被替换为原始资源的路径。[query]为查询。
-          asset: '[path].gz[query]',
-          algorithm: 'gzip',
-          test: new RegExp(
-            '\\.(' +
-            ['js', 'css'].join('|') +
-            ')$'
-          ),
-          //只有大于这个大小的资源才会被处理。以字节为单位，默认为0。
-          threshold: 10240,
-          //压缩比例，默认为0.8
-          minRatio: 0.8
-        })
+        new webpack.HashedModuleIdsPlugin()
       )
 
     }
+
   },
 
   chainWebpack: config => {
@@ -149,19 +120,28 @@ module.exports = {
       .set("assets", path.resolve(__dirname, './src/assets'),)
       .set("utils", path.resolve(__dirname, './src/components/baseComponent/iview/utils'))
       .set("node_modules", path.resolve(__dirname, './node_modules'))
-      .set("accredit",process.env.NODE_ENV === 'production' ? path.resolve(__dirname, './src/assets/js/accredit.js'):path.resolve(__dirname, './src/assets/js/accredit_dev.js'),);
+      .set("accredit",process.env.NODE_ENV === 'production' ? path.resolve(__dirname, './src/assets/js/accredit.js'):path.resolve(__dirname, './src/assets/js/accredit_dev.js'));
+
+      //定义环境变量
+      config.plugin('define').tap(args => {
+        args[0]['$THEME'] = baseThemeConfig
+        return args
+      })
+  
   },
 
   css: {
-    extract: process.env.NODE_ENV === 'production' ? true : false,
-    sourceMap: false,
-    // usePostCSS: true
+    extract: {
+      filename:"[name].css",
+      chunkFilename: "[name].css"
+    },
+    sourceMap: false
   },
 
   devServer: {
     historyApiFallback: true,
     hot: true,
-    host: 'localhost',
+    host: '0.0.0.0',
     port: 9090,
     progress: true,
     open: false,
@@ -228,34 +208,6 @@ module.exports = {
           '^/apps': '/apps'
         }
       },
-      '/images': {
-        target: host,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/images': '/images'
-        }
-      },
-      '/ssstatic': {
-        target: host,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/ssstatic': '/ssstatic'
-        }
-      },
-      '/learnstatic': {
-        target: host,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/learnstatic': '/learnstatic'
-        }
-      },
-      '/js': {
-        target: host,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/js': '/js'
-        }
-      },
       '/libs': {
         target: host,
         changeOrigin: true,
@@ -297,5 +249,5 @@ module.exports = {
       poll: false,
     },
     disableHostCheck: true
-  },
+  }
 };

@@ -14,7 +14,7 @@
   "dependencies": {
     "@ag-grid-community/vue": "^22.0.0",
     "@ag-grid-enterprise/all-modules": "^22.0.0",
-    "core-js": "^3.6.5",
+    "axios": "^0.17.1",
     "diff-match-patch": "^1.0.4",
     "element-ui": "^2.13.2",
     "inputmask": "^3.3.11",
@@ -41,32 +41,20 @@
     "@vue/cli-plugin-router": "^4.4.0",
     "@vue/cli-service": "^4.4.0",
     "@vue/eslint-config-prettier": "^6.0.0",
-    "axios": "^0.17.1",
     "compression-webpack-plugin": "1.1.12",
     "copy-webpack-plugin": "^4.0.1",
+    "core-js": "^3.6.5",
     "cross-env": "^7.0.2",
     "css-loader": "^0.28.0",
-    "express": "^4.14.1",
-    "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "html-webpack-plugin": "^4.3.0",
     "less-loader": "^6.2.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "postcss-loader": "^2.0.8",
-    "prettier": "^1.19.1",
     "sass-loader": "^9.0.2",
     "terser-webpack-plugin": "^3.0.6",
     "url-loader": "^0.5.8",
     "vue-loader": "^15.9.3",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.6.11"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,vue}": [
-      "vue-cli-service lint",
-      "git add"
-    ]
   }
 }
