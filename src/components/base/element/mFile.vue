@@ -15,13 +15,25 @@
       <div :class="fileClasses" :style="styles" v-show="multiple || !fileList.length">
         <div class="handleClick" @click="handleClick"></div>
       </div>
-
-      <template v-if="fileList.length">
+      <div v-if="fileList.length && fileType==='audio'" class="audio-box">
+        <div class="audio-preview" v-for="(file, index) in fileList" :key="index">
+          <audio v-if="fileType==='audio'" class="outline audio-css" controls :src="file" style="width:300px;height:100%;" ></audio>
+          <span class="upload_files-actions-audio">
+            <div class="audio-name">{{fileName[index]}}</div>
+            <i class="el-icon-close audio-close"  @click="handleRemove(index)"></i>
+          </span>
+        </div>
+      </div>
+      <template v-if="fileList.length && fileType!=='audio'">
         <div class="previews" v-for="(file, index) in fileList" :key="index" :style="styles">
-          <img :src="file" ref="uploadImg" :style="imgStyle">
-          <span class="upload_files-actions" v-if="type === 'card'">
+          <img v-if="fileType==='img'" :src="file" ref="uploadImg" :style="imgStyle" >
+          <video v-if="fileType==='video'" class="outline" controls :src="file" style="width:100%;height:100%;" ></video>
+          <span class="upload_files-actions" v-if="type === 'card' && fileType==='img'">
             <i class="el-icon-close" style="font-size:16px;" @click="handleRemove(index)"></i>
             <i class="el-icon-search"  style="font-size:16px;" @click="handleScale(index)"></i>
+          </span>
+          <span class="upload_files-actions-video" v-if="type === 'card' && fileType==='video'">
+            <i class="el-icon-close video-close"  style="font-size:16px;" @click="handleRemove(index)"></i>
           </span>
         </div>
       </template>
@@ -88,7 +100,12 @@ export default {
     maxLength: {
       type: [Number, String],
       default: 10
-    }
+    },
+    fileType: {
+      type: String,
+      default: "img"
+    },
+    
   },
 
   data() {
@@ -105,7 +122,11 @@ export default {
   computed: {
     styles() {
       let style = {};
-      if (this.size) {
+      if(this.fileType === 'video') {
+        style['width'] = `170px`;
+        style['height'] = `100px`;
+        style['line-height'] = `150px`;
+      } else if (this.size) {
         style['width'] = `${this.size}px`;
         style['height'] = `${this.size}px`;
         style['line-height'] = `${this.size}px`;
@@ -138,12 +159,10 @@ export default {
     },
 
     uploadSelect(event) {
-      console.log(101010,event)
       
       let inputDOM = event.target;
       // let file = Array.from(inputDOM.files)
       let files = Array.from(inputDOM.files)
-      console.log(1111,event,files)
       if (files.some(file => !this.validateFile(file))) {
         return
       }
@@ -151,6 +170,7 @@ export default {
       if (this.type == "card") {
         var url = files.map(file => URL.createObjectURL(file))
         this.fileList = this.fileList.concat(url)
+        this.fileName = this.fileName.concat(files.map(file => file.name))
         setTimeout(() => {
           this.getImgOrigin()
         }, 20)
@@ -165,13 +185,14 @@ export default {
       }
 
       this.isUpFileDel = false
-      let root = document.getElementById("mFileRoot")
-      let inputs = root.getElementsByClassName('hidden')
-      for(var i in inputs){
-        if(Array.from(inputs[i].files).length === 0) {
-          root.removeChild(inputs[i])
-        }
-      }
+      // let root = document.getElementById("mFileRoot")
+      // let inputs = root.getElementsByClassName('hidden')
+      // for(var i in inputs){
+      //   let arr = Array.from(inputs[i].files)
+      //   if(arr.length === 0) {
+      //     root.removeChild(inputs[i])
+      //   }
+      // }
     },
     handleRemove(index) {
       // let input = this.$refs.input
@@ -221,6 +242,7 @@ export default {
     },
 
     getImgOrigin() {
+      if(this.fileType !== 'img') return
       let img = this.$refs.uploadImg
       let w = img.naturalWidth
       let h = img.naturalHeight
@@ -316,8 +338,8 @@ export default {
 .components_upload_box {
   float: left;
   position: relative;
-  margin-right: 9px;
-  margin-bottom: 9px;
+  margin-right: 24px;
+  margin-bottom: 24px;
   border: 1px dashed #D9D9D9;
   cursor: pointer;
   overflow: hidden;
@@ -397,6 +419,31 @@ export default {
   opacity: 1;
 }
 
+.upload_files-actions-video {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 20px;
+  top: -10px;
+  right: -10px;
+  background: #f56c6c;
+  z-index: 9;
+  opacity: 0;
+  text-align: right;
+  -webkit-transition: opacity .3s;
+  transition: opacity .3s;
+}
+.upload_files-actions-video i {
+  font-size: 14px !important;
+    top: 1px;
+    position: absolute;
+    right: .5px;
+    color: #fff;
+}
+.previews:hover .upload_files-actions-video {
+  opacity: 1;
+}
+
 .components_upload_list {
   display: block;
   line-height: 20px;
@@ -410,7 +457,49 @@ export default {
 .components_upload_list:hover{color: #2d8cf0;}
 .components_upload_list:hover i{display: inline-block;}
 
-.previews{position: relative;float: left;margin: 0 9px 9px 0;}
+.previews{position: relative;float: left;margin: 0 24px 24px 0;}
 .previews img{position: absolute;height: 100%}
 .previews .ivu-icon{cursor: pointer;}
+
+.previews .outline:focus {
+  outline: none;
+}
+.audio-box {
+  float: left;
+  width: 100%;
+}
+.audio-box .audio-preview {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 16px;
+}
+.previews .audio-css {
+  display: inline-block;
+}
+.upload_files-actions-audio {
+  width: 150px;
+  height: 40px;
+  display: inline-block;
+  position: relative;
+  /* bottom: 19px; */
+  left: -40px;
+  background: #f1f3f4;
+  border-bottom-right-radius: 40px;
+  border-top-right-radius: 40px;
+}
+.upload_files-actions-audio .audio-name {
+  width: 120px;
+  overflow:hidden; 
+  text-overflow:ellipsis; 
+  white-space:nowrap;
+  line-height: 40px;
+  font-size: 12px;
+}
+.upload_files-actions-audio .audio-close {
+  font-size: 16px;
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  font-weight: bolder;
+}
 </style>

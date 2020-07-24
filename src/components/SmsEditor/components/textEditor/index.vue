@@ -50,13 +50,15 @@
 export default {
   props: {
     options: Object,
-    placeholderNum: {
+    paramsText: String,
+    maxParamNum: {
       type: Number,
       default: 5
     }
   },
   computed: {
-    
+  },
+  watch:{
   },
   data() {
     return {
@@ -107,9 +109,10 @@ export default {
     }
   },
   mounted() {
+    console.log(999,this.options)
     if(!this.$root.TEXT_PARAM) {
       let nameList = []
-      for(let i=0;i<this.placeholderNum;i++) {
+      for(let i=0;i<this.maxParamNum;i++) {
         nameList.push(
           'text'+(i+1)*1
         )
@@ -158,6 +161,24 @@ export default {
       this.paramName = {
         name: 'text1'
       }
+      if(this.paramsText) {
+        // 非新建文本
+        this.$root.TEXT_PARAM.textParamlist = this.getTextParamlist(this.paramsText)
+        let inputs = []
+        this.$root.TEXT_PARAM.textParamlist.map((item)=>{
+          inputs.push(item.name)
+        })
+        let list = this.$root.TEXT_PARAM.nameList
+        let delItems = inputs.concat(list).filter(v => !inputs.some((e)=>{
+          return e === v
+        }) || !list.some((e)=>{
+          return e === v
+        }))
+        this.$root.TEXT_PARAM.nameList = delItems.sort()
+        this.$root.TEXT_PARAM.changeCurrent({
+          name: this.$root.TEXT_PARAM.nameList.length>0?this.$root.TEXT_PARAM.nameList[0]:'text1'
+        })
+      }
       this.$emit('update:options',this.options);
     }
     // this.options = {
@@ -180,9 +201,20 @@ export default {
     // }
   },
   methods: {
+    getTextParamlist(val) {
+      var re = /{(.*?)}/g;
+      var array = [];
+      var temp
+      while (temp = re.exec(val)) {
+        array.push({
+          name: temp[0].replace(/\{|\}/gi,'')
+        })
+      }
+      return array
+    },
     checkMax() {
       let num = document.getElementsByClassName("param-input").length
-      if(num >= this.placeholderNum) {
+      if(num >= this.maxParamNum) {
         this.overMaxParam = true
         return true
       } else {
@@ -208,6 +240,9 @@ export default {
       }
 
     }
+  },
+  beforeDestroy: function() {
+    this.$root.TEXT_PARAM = null
   }
 };
 </script>
