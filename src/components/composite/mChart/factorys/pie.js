@@ -112,13 +112,14 @@ function getPieTooltip (args) {
     }
   }).slice(limitShowNum, innerRows.length)
   return {
+    confine: true,
     formatter (item) {
       let tpl = []
       if (limitShowNum && item.name === '其他') {
         tpl.push('其他:')
         remainArr.forEach(({ name, value }) => {
-          const percent = (value / sum) * 100 + '%'
-          tpl.push(`<br>${name}:${value}`)
+          const percent = ((value / sum) * 100).toFixed(2) + '%'
+          tpl.push(`<br>${name}:${value}, `)
           tpl.push(`(${percent})`)
         })
       } else {
@@ -144,6 +145,7 @@ function getGrid (args) {
 
 export default async ({ extend = {}, data = {}, settings = {} }) => {
   const innerRows = clone(data.rows)
+  let limitShowNum = settings.limitShowNum || 0
 
   const {
     percentShow,
@@ -155,12 +157,30 @@ export default async ({ extend = {}, data = {}, settings = {} }) => {
     selectedMode = false,
     hoverAnimation = true,
     legendName = {},
-    limitShowNum = 0,
     tooltipVisible = true,
-    legendVisible = true
+    legendVisible = true,
+    dividingThreshold = 0
   } = settings
 
   innerRows.sort((a, b) => b[metrics] - a[metrics])
+
+  // 配置分割阈值后 limitShowNum 配置失效
+  if (dividingThreshold !== 0){
+    let sum = 0
+    const metricValues = innerRows.map(item => {
+      sum += item[metrics]
+      return item[metrics]
+    })
+
+    for (let i = 0; i < metricValues.length; i++) {
+      const proportion = ((metricValues[i] / sum) * 100).toFixed(2)
+      if (proportion < dividingThreshold) {
+        limitShowNum = i
+        break
+      }
+    }
+  }
+  
   const seriesParams = {
     innerRows,
     percentShow,
