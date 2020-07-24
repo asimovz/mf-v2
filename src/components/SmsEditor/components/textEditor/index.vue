@@ -109,7 +109,6 @@ export default {
     }
   },
   mounted() {
-    console.log(999,this.options)
     if(!this.$root.TEXT_PARAM) {
       let nameList = []
       for(let i=0;i<this.maxParamNum;i++) {
