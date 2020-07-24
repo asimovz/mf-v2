@@ -17,53 +17,19 @@
         </div>
       </div>
       <div class="editor-body">
-        <div class="toolbar-wrapper" style="margin-bottom:20px">
-          <!-- <div class="toolbar-item">撤销</div>
-          <div class="toolbar-item">恢复</div> -->
-          <div :class="['toolbar-item',{'disabled':!isComposeDisabled}]" @click="composeGroup">
-            <editor-icon name="zuhe" size="20" />&nbsp;组合
-          </div>
-          <div :class="['toolbar-item',{'disabled':!isSplitDisabled}]" @click="splitGroup">
-            <editor-icon name="chaisan1" size="20" />&nbsp;打散
-          </div>
-          <div class="toolbar-item" @click="reset" :class="{disabled: !mmsData.list.length}">
-            <editor-icon name="shanchu" size="16" />&nbsp;清空
-          </div>
-          <!-- <div class="toolbar-item">
-            <editor-icon name="yulan" size="16" />&nbsp;预览
-          </div> -->
-          <!-- style="justify-content: 'space-evenly';width: 86px;" -->
-          <div class="toolbar-item" :class="{'disabled': saveLoading || !mmsData.list.length}" @click="save">
-            <editor-icon v-if="!saveLoading" name="baocun" size="16" />
-            <i v-else class="el-icon-loading" style="font-size: 16px;"></i>&nbsp;保存<font v-if="saveLoading">中</font>
-          </div>
-          <el-popover placement="top" width="200" trigger="click">
-            <div class="toolbar-item" slot="reference">
-              <editor-icon name="bangzhu" size="20" />&nbsp;帮助
-            </div>
-            <div class="shortcut_title">
-              <div class="title">快捷键</div>
-            </div>
-            <div class="shortcut">
-              <div class="name">文本编辑</div>
-              <div class="key">
-                <div><kbd>鼠标双击</kbd></div>
-              </div>
-            </div>
-            <div class="shortcut">
-              <div class="name">多选</div>
-              <div class="key">
-                <div><kbd>Shift</kbd>+<kbd>鼠标单击</kbd></div>
-              </div>
-            </div>
-            <div class="shortcut">
-              <div class="name">拖动画布</div>
-              <div class="key">
-                <div><kbd>Space</kbd>+<kbd>鼠标拖拽</kbd></div>
-              </div>
-            </div>
-          </el-popover>
-        </div>
+        
+        <btn-tools
+          :isComposeDisabled="isComposeDisabled"
+          :isSplitDisabled="isSplitDisabled"
+          :resetDisabled="!mmsData.list.length"
+          :saveDisabled="saveLoading || !mmsData.list.length"
+          :saveLoading="saveLoading"
+          @on-compose-group="composeGroup"
+          @on-split-group="splitGroup"
+          @on-reset="reset"
+          @on-save="save"
+        ></btn-tools>
+
         <div class="editor-canvas" ref="canvas">
           <!-- 画布 -->
           <!-- phone窗口 -->
@@ -71,8 +37,9 @@
             <div :class="['phone-window_body',''] " ref="windowBody">
               <!--body--empty -->
               <div class="body-content scrollbar">
+                 <!-- v-show="mmsData.list.length" -->
                 <editor-draggable class="body-scrollbar" style="padding-bottom: 15px" :data="mmsData" :select-widget-id="selectWidgetId" @on-del-group="deleteGroup"></editor-draggable>
-                <div v-show="!mmsData.list" class="widget-empty">asdasda</div>
+                <!-- <div v-show="!mmsData.list.length" class="widget-empty">请添加素材</div> -->
               </div>
             </div>
           </div>
@@ -114,7 +81,7 @@ import html2canvas from 'html2canvas'
 import { typesList, fileMaxSize } from '../config'
 import smsLibrary from './library'
 import editPane from './editPane'
-import saveConfirm from './saveConfirm'
+import btnTools from './btnTools'
 import '../assets/css/home.less'
 import { getRandomId, dataURLtoFile } from '../utils.js'
 
@@ -137,7 +104,7 @@ export default {
   components: {
     smsLibrary,
     editPane,
-    saveConfirm
+    btnTools
   },
   props: {
     initParams: { // 初始化参数
@@ -184,7 +151,7 @@ export default {
         select: 'item-selected',
         shiftSelect: 'item-shift-selected'
       },
-      textParamsLen:0,//自定义参数个数
+      textParamsLen: 0,
       isEditorShow: false,
       currentEditItem: {},
       saveLoading: false, // 保存的loading
@@ -214,7 +181,7 @@ export default {
   watch: {
     widgetPaneShow (visible) {
       if (!visible) this.currentItemType = ''
-    }
+    },
   },
   async created () {
     if (this.mmsTemplate && this.initParams.messageId) await this.getTemplate()
@@ -275,7 +242,7 @@ export default {
     textParamsStr(){
       return this.flatMmsList.filter(item => item.type === 'text')
         .map(item => replaceTextContent(item.content)).join('')
-    },
+    }
   },
   methods: {
     getTemplate () {
@@ -550,6 +517,7 @@ export default {
     },
 
     async save () {
+      this.textParamsLen = 0
       this.widgetPaneShow = this.isEditorShow = false
 
       if (!this.mmsData.list.length) return
@@ -579,11 +547,11 @@ export default {
         // if (height) _item.height = height
 
         if (type === 'text') {
-          let newContent = text
-          let texts = newContent.match(/<input(([\s\S])*?)>/g)
+          let newContent = text || ''
+          let texts = newContent.match(/<input(([\s\S])*?)>/g) || []
           for(let i = 0; i < texts.length; i++){
-            this.textParamNum += 1
-            newContent = newContent.replace(/<input(([\s\S])*?)>/,`{text${this.textParamNum}}`)
+            this.textParamsLen ++
+            newContent = newContent.replace(/<input(([\s\S])*?)>/,`{text${this.textParamsLen}}`)
           }
           _item.name = this.initParams.messageName
           _item.content = newContent
