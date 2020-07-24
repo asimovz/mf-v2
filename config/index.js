@@ -3,8 +3,10 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-// let host = 'http://10.0.8.16:8082/' //http://tenanttest.mfexcel.com/
-let host = 'http://10.0.8.3:8080/' //http://tenanttest.mfexcel.com/
+let host = 'http://10.0.8.3:8080/' 
+// let host = 'http://10.0.80.16:8082/'
+// let host = 'http://10.0.81.220:8090/'
+// let host = 'http://10.0.80.19:8090/'
 // http://10.0.200.42:8080/coapps/ChatbotManages
 let buildTo = ''
 
