@@ -2,7 +2,7 @@
     <div class="widget-wrapper" :data-type="data.type">
       <!-- 组合 -->
       <div v-if="data.type=='group'" ref="widget" :class="[{'group--selected':data.id == selectWidgetId}]">
-        <component :selected="data.id == selectWidgetId" :select-widget-id="selectWidgetId" is="widgetGroup" :group="listIndex" :data="data"></component>
+        <component :selected="data.id == selectWidgetId" :select-widget-id="selectWidgetId" :is="widgetGroup" :group="listIndex" :data="data" ></component>
       </div>
       <!-- 基础组件 -->
       <div v-else :class="['widget-border',{'widget--selected':data.id == selectWidgetId,'noText':data.type != 'text'}]" ref="widget" @click.stop="selectWidget">

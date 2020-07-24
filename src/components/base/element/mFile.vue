@@ -1,16 +1,15 @@
 <template>
-  <div style="display:inline-block">
-    <input class="hidden" ref="input" :form="form" :id="id" :name="name" type="file" :multiple="multiple" :accept="accept" @change="uploadSelect" />
+  <div style="display:inline-block" id="mFileRoot">
+    <!-- <input class="hidden" ref="input" :form="form" :id="id" :name="name" type="file" :multiple="multiple" :accept="accept" @change="uploadSelect" /> -->
     <input name="isUploadedFile" type="hidden" size="100" v-model="fileList" v-validate="validate" :data-vv-as="fieldTitle" data-vv-name="isUploadedFile" />
     <input :form="form" :name="isUpFileDelName" type="hidden" v-model="isUpFileDel" />
     <template v-if="type=='button'">
-      <button v-show="multiple || !fileList.length" name="filebtn" class="m-link-button m-link-button-primary" @click="handleClick">
-       <i class="el-icon-upload"/> {{text}}
-      </button>
-
       <template v-for="(file, index) in fileName">
         <span class="components_upload_list">{{file}} <i class="el-icon-close" @click="handleRemove(index)" /> </span>
       </template>
+      <button v-show="multiple || !fileList.length" name="filebtn" class="m-link-button m-link-button-primary" @click="handleClick">
+        <i class="el-icon-upload"/> {{text}}
+      </button>
     </template>
     <template v-else>
       <div :class="fileClasses" :style="styles" v-show="multiple || !fileList.length">
@@ -122,14 +121,29 @@ export default {
   methods: {
     handleClick(event) {
       event.stopPropagation()
-      this.$refs.input.click()
+      let fileInput = document.createElement("input")
+      if(this.form) fileInput.setAttribute("form", this.form)
+      fileInput.setAttribute("class", 'hidden')
+      fileInput.setAttribute("ref", 'input')
+      fileInput.setAttribute("id", this.id)
+      fileInput.setAttribute("name", this.name)
+      fileInput.setAttribute("type", 'file')
+      fileInput.setAttribute("multiple", this.multiple)
+      fileInput.setAttribute("accept", this.accept)
+      fileInput.addEventListener('change', this.uploadSelect);
+      let root = document.getElementById("mFileRoot")
+      root.appendChild(fileInput)
+      fileInput.click()
+      // this.$refs.input.click()
     },
 
     uploadSelect(event) {
+      console.log(101010,event)
+      
       let inputDOM = event.target;
       // let file = Array.from(inputDOM.files)
       let files = Array.from(inputDOM.files)
-
+      console.log(1111,event,files)
       if (files.some(file => !this.validateFile(file))) {
         return
       }
@@ -151,11 +165,19 @@ export default {
       }
 
       this.isUpFileDel = false
+      let root = document.getElementById("mFileRoot")
+      let inputs = root.getElementsByClassName('hidden')
+      for(var i in inputs){
+        if(Array.from(inputs[i].files).length === 0) {
+          root.removeChild(inputs[i])
+        }
+      }
     },
     handleRemove(index) {
-      let input = this.$refs.input
-      input.value = ""
-
+      // let input = this.$refs.input
+      // input.value = ""
+      let root = document.getElementById("mFileRoot")
+      root.removeChild(root.getElementsByClassName('hidden')[index])
       this.fileList.splice(index, 1)
       this.fileName.splice(index, 1)
 
@@ -378,6 +400,9 @@ export default {
 .components_upload_list {
   display: block;
   line-height: 20px;
+  
+}
+.components_upload_list+.components_upload_list {
   margin-top: 5px;
 }
 

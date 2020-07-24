@@ -1,58 +1,55 @@
 <template>
   <div class="library library--wrapper">
     <div class="header">
-      <span>我的{{typeLabel}}</span>
+      <el-radio-group size="small" v-model="libraryType">
+        <el-radio-button label="library">素材库</el-radio-button>
+        <el-radio-button label="local">本地</el-radio-button>
+      </el-radio-group>
+
       <span class="close" @click="$emit('on-close')"><i class="el-icon-close"></i></span>
     </div>
-    <div class="operation">
-      <!-- 选择模式 -->
-      <template v-if="isCheckAble">
-        <el-checkbox :indeterminate="isIndeterminate" style="float: left;margin-top: 5px;" :value="checkAll" @change="checkChanged">全选</el-checkbox>
-        <el-button size="small" type="danger" :disabled="!checkedId.length " @click="libRemove(checkedId)">删除</el-button>
-        <el-button size="small" type="primary" @click="isCheckAble = false">取消</el-button>
-      </template>
-      <!-- 编辑模式 -->
-      <template v-else>
-        <el-button size="small" :disabled="isUpLoading" @click="isCheckAble = true">批量操作</el-button>
-        <el-popover style="margin-left: 10px;" placement="bottom" trigger="hover" :content="popoverContent">
-          <el-button slot="reference" type="primary" size="small" :disabled="isUpLoading" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">上传{{ typeLabel }}</el-button>
-        </el-popover>
-        <input style="display: none;" ref="file" type="file" :accept="currentAccept" name="upload" @change="fileChanged" />
-      </template>
+    <div class="operation" :style="{'justify-content': libraryType === 'library' ? 'flex-end' : 'space-between'}">
+      <div v-if="libraryType === 'local'">
+        <el-button v-show="!isCheckAble" size="small" :disabled="isUpLoading" @click="isCheckAble = true">批量操作</el-button>
+        <el-checkbox v-show="isCheckAble" :indeterminate="isIndeterminate" :value="checkAll" @change="checkChanged">全选</el-checkbox>
+      </div>
+
+      <div>
+        <template v-if="isCheckAble">
+          <el-button size="small" type="danger" :disabled="!checkedId.length " @click="libRemove(checkedId)">删除</el-button>
+          <el-button size="small" type="primary" @click="isCheckAble = false">取消</el-button>
+        </template>
+
+        <template v-else>
+          <el-input class="op-input--search" v-show="libraryType === 'library'" size="small"suffix-icon="el-icon-search" placeholder="回车搜索素材库" @keyup.enter.native="handleSearch" v-model="searchStr" />
+
+          <template v-if="libraryType === 'local'">
+            <el-popover style="margin-left: 10px;" placement="bottom" trigger="hover" :content="popoverContent">
+              <el-button slot="reference" type="primary" size="small" :disabled="isUpLoading" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">上传{{ typeLabel }}</el-button>
+            </el-popover>
+            <input style="display: none;" ref="file" type="file" :accept="currentAccept" name="upload" @change="fileChanged" />
+          </template>
+
+        </template>
+
+      </div>
     </div>
 
      <!-- v-infinite-scroll="loadMore" -->
-    <div class="library--content scrollbar" :class="{'no-data': !dataList.length}" v-loading="fetchLoading || isUpLoading" :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''" :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''" :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''">
-      <transition-group name="fade" tag="div" class="lib-list" :class="{'isCheckable': isCheckAble}">
-        <div :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in dataList" :key="item.resourceId" :class="[
-            'lib-item',
-            {
-              'lib-item--checked': item.checked,
-              'lib-item--audio': type.type === 'audio',
-            },
-          ]" @click="libAdd(item, index, $event)">
-          <span class="lib-remove el-icon-error" @click.stop="libRemove(item.resourceId)"></span>
-          <div class="lib-preview">
-            <img :src="item.uri" v-if="type['type'] === 'image'" crossorigin="*" />
-            <template v-else-if="type['type'] === 'video'">
-              <img v-if="item.poster" :src="item.poster" crossorigin="*" />
-              <video v-else :src="item.uri"></video>
-            </template>
-            <template v-else>
-              <widget-audio :showPlusBtn="true" :data="item" @click.native="audioClick">
-                <div class="lib-add el-icon-plus" :title="`${isCheckAble ? '选中' : '添加音频素材'}`" @click.stop="libAdd(item, index)"></div>
-              </widget-audio>
-            </template>
-          </div>
-          <!-- :title="isCheckAble || !isEditAble ? '' : '双击可编辑'" -->
-          <div class="lib-name" v-if="item.name" :title="item.name">
-            <!-- @dblclick="nameEdit" -->
-            <div class="lib-name-word">{{ item.name }}</div>
-            <span title="重命名" class="lib-name-icon el-icon-edit" @click.stop="nameEdit"></span>
-            <input class="lib-name-input" :value="item.name" @keyup.enter="enter2blur" @blur="(evt) => nameEdited(evt, item)" />
-          </div>
-        </div>
-      </transition-group>
+    <div ref="libraryContent" class="library--content scrollbar" :class="{'no-data': !currentDataList.length}" v-loading="fetchLoading || isUpLoading" :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''" :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''" :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''">
+      <div class="lib-list" :class="{'isCheckable': isCheckAble}">
+        <lib-item
+          :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''"
+          v-for="(item, index) in currentDataList" :key="item.resourceId"
+          :type="type['type']"
+          :data="item"
+          :show-remove="libraryType === 'local'"
+          @on-add="libAdd(item)"
+          @on-remove="libRemove(item.resourceId, index)"
+          @click.native="libAdd(item, $event)"
+        >
+        </lib-item>
+      </div>
 
       <transition name="el-fade-in">
         <div style="width: 100%;padding: 0 10px;" v-if="!canMore && showNoMore" ref="noMoreDom">
@@ -60,11 +57,24 @@
         </div>
       </transition>
     </div>
+
+    <div class="library--pager" ref="opPager" v-show="!isCheckAble && currentDataList.length">
+      <el-pagination
+        :current-page.sync="pager.pageIndex"
+        :page-size="pager.pageSize"
+        :page-count="pager.pageCount"
+        layout="prev, slot, next"
+        @current-change="pageChange"
+      >
+        <span style="text-align: center;">{{pager.pageIndex}} / {{pager.pageCount}}</span>
+      </el-pagination>
+    </div>
   </div>
 </template>
 <script>
-import widgetVideo from '../components/widget-comps/video.vue'
-import widgetAudio from '../components/widget-comps/audio.vue'
+import libItem from './libItem.vue'
+import { getObjectURL, getRandomId, debounce } from '../utils.js'
+
 import '../assets/css/library.less'
 
 function selectText(el) {
@@ -85,14 +95,6 @@ function selectText(el) {
   }
 }
 
-function getRandomId() {
-  let maxNumber = 99999999
-  let minNumber = 1000000
-  let range = maxNumber - minNumber; //取值范围的差
-  let random = Math.random(); //小于1的随机数
-  return minNumber + Math.round(random * range);
-}
-
 function movetoEnd(el) {
   let range = window.getSelection()
   range.selectAllChildren(el)
@@ -102,8 +104,7 @@ function movetoEnd(el) {
 
 export default {
   components: {
-    widgetVideo,
-    widgetAudio
+    libItem
   },
   props: {
     type: {
@@ -113,17 +114,27 @@ export default {
   },
   data() {
     return {
+
+      libraryType: 'library', // 素材类型
+
       fetchLoading: false,
-      dataList: [],
+      libraryList: [],  // 素材库列表
+      localData: {      // 本地列表
+        image: [],
+        video: [],
+        audio: []
+      },
+
+      searchStr: '',  // 素材搜索
 
       canMore: true,  // 是否加载更多
       showNoMore: true, // 是否显示无数据标识
 
       pager: {
         pageSize: 20,
-        total: '',
-        pageCount: '',
-        pageIndex: 1
+        pageCount: 0,
+        pageIndex: 1,
+        total: 0
       },
 
       isUpLoading: false, // 上传loading
@@ -149,12 +160,32 @@ export default {
     },
     // 选中的 id
     checkedId() {
-      return this.dataList.filter(item => item.checked).map(item => item.resourceId)
+      if(this.libraryType === 'local'){
+        return this.localData[this.type['type']].filter(item => item.checked).map(item => item.resourceId)
+      }else{
+        return this.libraryList.filter(item => item.checked).map(item => item.resourceId)
+      }
     },
     // 半选
     isIndeterminate() {
-      return this.dataList.some(item => item.checked) && !this.dataList.every(item => item.checked)
-    }
+      if(this.libraryType === 'local'){
+        return this.localData[this.type['type']].some(item => item.checked) && !this.localData[this.type['type']].every(item => item.checked)
+      }else{
+        return this.libraryList.some(item => item.checked) && !this.libraryList.every(item => item.checked)
+      }
+
+    },
+
+    currentLocalData(){
+      return this.localData[this.type['type']]
+    },
+
+    // 当前数据源 ( 可定义在 data 中，切换 libraryType 时赋值， 两种方式有和不同（性能）？？？ )
+    // Object.freeze 有无必要？？？ 外层 冻结 与 内层 冻结？？？
+    currentDataList(){
+      return this.libraryType === 'local' ? this.currentLocalData.map(item => Object.freeze(item))
+          : this.libraryList.map(item => Object.freeze(item))
+    },
   },
   inject: ['mmsConfig'],
   watch: {
@@ -169,7 +200,7 @@ export default {
     checkedId: {
       handler(val) {
         if (val.length) {
-          if (val.length === this.dataList.length) {
+          if (val.length === this.currentDataList.length) {
             this.checkAll = true
           }
         } else {
@@ -183,12 +214,21 @@ export default {
     isCheckAble(visible) {
       this.checkAll = false
 
-      this.dataList = this.dataList.map(item => {
-        return {
-          ...item,
-          checked: false
-        }
-      })
+      if(this.libraryType === 'local'){
+        this.localData[this.type['type']] = this.localData[this.type['type']].map(item => {
+          return {
+            ...item,
+            checked: false
+          }
+        })
+      }else{
+        this.libraryList = this.libraryList.map(item => {
+          return {
+            ...item,
+            checked: false
+          }
+        })
+      }
     },
 
     canMore(val){
@@ -197,6 +237,11 @@ export default {
           this.showNoMore = false
         }, 1000)
       }
+    },
+
+    libraryType(){
+      this.isCheckAble = false
+      this.isUpLoading = false
     }
   },
   methods: {
@@ -210,8 +255,8 @@ export default {
     initPager() {
       this.pager = {
         pageSize: 20,
-        total: '',
-        pageCount: '',
+        pageCount: 0,
+        total: 100,
         pageIndex: 1
       }
     },
@@ -220,30 +265,20 @@ export default {
      * 移除素材
      * @param  {[type]} index [当前素材的索引]
      */
-    libRemove(id) {
+    libRemove(id, index) {
       if (!id.toString().length) return
 
-      this.$confirm(`确定删除此${this.typeLabel}?`, '提示', {
-        type: 'warning'
-      }).then(async () => {
-
-        let fd = new FormData()
-        fd.append('actionType', 'delete')
-        fd.append('resourceIds', id)
-
-        await this.updateLib(fd)
-
-        this.dataList = this.dataList.filter(item =>
+      if(!!index){
+        this.localData[this.type['type']].splice(0, index)
+      }else{
+        this.localData[this.type['type']] = this.localData[this.type['type']].filter(item =>
           Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
         )
-      })
+      }
     },
-    // 处理点击音频
-    audioClick(event) {
-      if (!this.isCheckAble) event.stopPropagation()
-    },
+
     // 选中/选择
-    libAdd(item, index, evt) {
+    libAdd(item, evt) {
       if (evt && evt.target.tagName === 'INPUT') return
 
       if (this.isCheckAble) {
@@ -255,62 +290,10 @@ export default {
 
     // 设置是否全选
     checkChanged(val) {
-      this.dataList.forEach(item => {
+      this.currentDataList.forEach(item => {
         item.checked = val
       })
     },
-
-    // 文件名编辑
-    nameEdit(evt) {
-      // if (!this.isEditAble) return
-
-      let target = evt.target
-      let parent = target.offsetParent
-
-      parent.classList.add('isEdit')
-
-      let input = target.parentElement.querySelector('input')
-      input.focus()
-
-      this.$nextTick(() => {
-        movetoEnd(input)
-      })
-    },
-    // enter 触发 blur
-    enter2blur(evt){
-      let target = evt.target
-      target.blur()
-    },
-
-    // 文件名编辑结束
-    async nameEdited(evt, item) {
-      let target = evt.target
-      let parent = target.offsetParent
-
-      parent.classList.remove('isEdit')
-
-      let oldVal = item.name
-      let value = item.name = target.value
-
-      if (value !== oldVal) {
-        console.log('名称修改过')
-
-        let fd = new FormData()
-        fd.append('actionType', 'rename')
-        fd.append('type', this.type['type'])
-        fd.append('resourceId', item.resourceId)
-        fd.append('newFileName', value)
-
-        try{
-          await this.updateLib(fd)
-          item.name = value
-        }catch(err){
-          item.name = target.value = oldVal
-        }
-
-      }
-    },
-
 
     // 选择文件
     fileChanged(evt) {
@@ -323,13 +306,13 @@ export default {
       // 允许上传的 格式
       let accepts = input.getAttribute('accept')
 
-      if (!this.isTypeValidated(_fileType)) {
+      if (!this.validatedType(_fileType)) {
         this.$message.warning('请上传正确格式的素材')
         input.value = ''
         return
       }
 
-      if (!this.isSizeValidated(file.size)) {
+      if (!this.validatedSize(file.size)) {
         this.$message.warning(
           `${this.typeLabel} 上传大小不得超过 ${this.type['size']}M`
         )
@@ -337,96 +320,94 @@ export default {
         return
       }
 
-      this.isUpLoading = true
-      let fd = new FormData()
-
-      fd.append('type', this.type['type'])
-      fd.append('saveResource', 'Y')
-      fd.append('file', file)
-      fd.append('actionType', 'upload')
-      if (this.type['type'] === 'video') {
-        fd.append('thumbnailGenratedUrl', this.mmsConfig.nodeUrl + this.mmsConfig.videoThumbnail)
+      if(this.type['type'] === 'image'){
+        this.localData[this.type['type']].unshift({
+          resourceId: getRandomId(),
+          name: file.name,
+          size: file.size,
+          uri: getObjectURL(file),
+        })
+      }else{
+        this.isUpLoading = true
+        let fd = new FormData()
+        fd.append('file', file)
+        
+        this.uploadFile(fd)
       }
-
-      this.updateLib(fd)
     },
 
     // 验证文件大小
-    isSizeValidated(size) {
+    validatedSize(size) {
       return this.type['size'] * 1024 * 1024 > size
     },
 
     // 验证文件格式
-    isTypeValidated(type) {
+    validatedType(type) {
       return this.currentAccept.includes(type.toLowerCase())
     },
 
-    // 更新素材
-    updateLib(fd) {
-      return this._http(this.mmsConfig.file, fd, { timeout: 90000 })
+    // 上传素材
+    uploadFile(fd) {
+      return this._http(this.mmsConfig.nodeUrl + this.mmsConfig.uploadFile, fd, { timeout: 90000 })
         .then(res => {
-          let actionType = fd.get('actionType')
 
-          switch (actionType) {
-            case 'upload':
-              this.$message({
-                type: res.type || 'warning',
-                message: res.messages
-              });
-              res.type === 'success' && this.dataList.unshift(res.data)
-              break;
-            case 'delete':
-            case 'rename':
-              this.$message({
-                type: res.error === '0' ? 'success' : 'error',
-                message: res.message
-              });
+          this.$message({
+            type: res.error === 0 ? 'success' : 'error',
+            message: res.message
+          });
 
-              if(res.error !== '0'){
-                throw new Error(res.message)
-              }
-              break;
-            default:
-              break;
+          if(this.type['type'] === 'video'){
+            res.data.poster = res.data.thumbnail
+            delete res.data.thumbnail
           }
 
+          res.data.resourceId = getRandomId()
+          
+          res.error === 0 && this.localData[this.type['type']].unshift(res.data)
         }).finally(cb => {
           this.isUpLoading = false
           if (this.$refs.file) this.$refs.file.value = ''
         })
     },
 
-    loadMore(){
-      if(!this.dataList.length || !this.canMore) return
-
-      this.pager.pageIndex ++
-      this.fetchData(this.type['type'], true)
+    pageChange(page){
+      this.fetchData()
     },
 
-    // 获取素材库数据
-    async fetchData(type, isMore) {
-      // 非加载更多，清空数据 => 切换 type
-      if(!isMore) this.dataList = []
+    // 素材搜索
+    handleSearch: debounce(function() {
+      let str = this.searchStr.trim()
 
+      if(!str.length) return
+
+      this.pager.pageIndex = 1
+      this.fetchData(this.type['type'], str)
+    }, 500, true),
+
+    // 获取素材库
+    async fetchData(type = this.type['type'], str) {
+      this.libraryType = 'library'
+      this.libraryList = []
       this.fetchLoading = true
 
       let { pageIndex, pageSize } = this.pager
 
-      this._http(this.mmsConfig.library, { type, pageIndex: pageIndex - 1, pageSize })
+      let params = Object.assign({}, {
+        type,
+        pageIndex: pageIndex - 1,
+        pageSize
+      }, !!str ? { name: str } : null)
+
+      this._http(this.mmsConfig.library, params)
         .then(res => {
           if (res.error === 0) {
-            let _data = res.data || []
+            this.pager.total = res.count
+            this.pager.pageCount = res.pageMaxIndex + 1
+            this.libraryList = res.data || []
 
-            if(isMore){
-              this.dataList = this.dataList.concat(_data)
-
-              if(!_data.length){
-                this.pager.pageIndex --
-                this.canMore = false
-              }
-            }else{
-              this.dataList = _data
-            }
+            this.$nextTick(() => {
+              this.$refs.libraryContent.scrollTop = 0
+            })
           }
         }).finally(end => {
           this.fetchLoading = false

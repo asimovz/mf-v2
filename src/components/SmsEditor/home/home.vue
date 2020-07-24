@@ -94,38 +94,26 @@
       <!-- 画布拖动 -->
       <div :class="['space-key-mask',{'cursor-grabbing':isMouseDown}]" v-if="isDownSpacebar" @mousedown="dropCanvas"></div>
     </div>
+
+    <el-dialog class="videoConf" title="上传资源" :visible.sync="uploadProgressVisible" :close-on-click-modal="false">
+      <div style="font-size:12px">
+        <p>资源正在上传至素材库，请勿关闭窗口，完成后窗口自动关闭！</p>
+        <el-progress style="margin: 10px 0" :text-inside="true" :stroke-width="20" :percentage="uploadPercentage" status="success"></el-progress>
+        <p>正在上传：{{uploadPendings[0] ? uploadPendings[0].source.name : ''}}</p>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 import html2canvas from 'html2canvas'
-import { typesList, fileMaxSize } from "../config"
+import { typesList, fileMaxSize } from '../config'
 import smsLibrary from './library'
 import editPane from './editPane'
 import saveConfirm from './saveConfirm'
 import '../assets/css/home.less'
+import { getRandomId, dataURLtoFile } from '../utils.js'
 
-function getRandomId() {
-
-  let maxNumber = 99999999
-  let minNumber = 1000000
-  let range = maxNumber - minNumber; //取值范围的差
-  let random = Math.random(); //小于1的随机数
-  return minNumber + Math.round(random * range);
-}
-
-function dataURLtoFile(dataurl, filename) {
-  var arr = dataurl.split(','),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]),
-    n = bstr.length,
-    u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new File([u8arr], filename, { type: mime });
-}
-
-function getAllData(arr) {
+function getAllData (arr) {
   return arr.map(ar => {
     if (ar.type === 'group' && ar.list.length) {
       return getAllData(ar.list)
@@ -136,25 +124,25 @@ function getAllData(arr) {
 }
 
 export default {
-  name: "mms-editor",
+  name: 'mms-editor',
   components: {
     smsLibrary,
     editPane,
     saveConfirm
   },
   props: {
-    initParams: { //初始化参数
+    initParams: { // 初始化参数
       type: Object,
       default: () => ({})
     },
-    resourceInit: String, //素材库接口
-    resourceAction: String, //素材操作接口
-    mmsTemplate: String, //模板数据接口
-    mmsSave: String, //模板保存接口
-    nodeUrl: String, //node服务接口
+    resourceInit: String, // 素材库接口
+    resourceAction: String, // 素材操作接口
+    mmsTemplate: String, // 模板数据接口
+    mmsSave: String, // 模板保存接口
+    nodeUrl: String, // node服务接口
     backUrl: String
   },
-  data() {
+  data () {
     return {
       config: {
         nodeUrl: this.nodeUrl,
@@ -162,18 +150,19 @@ export default {
         mmsTemplate: this.mmsTemplate,
         library: this.resourceInit,
         file: this.resourceAction,
-        videoInfo: '/video/info', //视频信息接口
-        videoCut: '/video/cut', //视频剪切接口
-        videoThumbnail: '/video/thumbnail', //视频封面接口
-        videoCompress: '/video/compress', //视频转码压缩接口
-        videoWaterMark: '/video/waterMark', //视频水印接口
+        uploadFile: '/upload/file',
+        videoInfo: '/video/info', // 视频信息接口
+        videoCut: '/video/cut', // 视频剪切接口
+        videoThumbnail: '/video/thumbnail', // 视频封面接口
+        videoCompress: '/video/compress', // 视频转码压缩接口
+        videoWaterMark: '/video/waterMark' // 视频水印接口
       },
-      isDownSpacebar: false, //是否按下space
-      isComposeGroup: false, //是否合并
+      isDownSpacebar: false, // 是否按下space
+      isComposeGroup: false, // 是否合并
       isMouseDown: false, // 鼠标是否按下
       widgetPaneShow: false,
       mmsData: {
-        list: [] //dragList
+        list: [] // dragList
       },
       compList: typesList,
       currentAddDragItem: {},
@@ -183,65 +172,68 @@ export default {
       splitGroupList: {},
       currentGroupIndex: -1,
       compStauts: {
-        select: "item-selected",
-        shiftSelect: "item-shift-selected"
+        select: 'item-selected',
+        shiftSelect: 'item-shift-selected'
       },
 
       isEditorShow: false,
       currentEditItem: {},
       saveLoading: false, // 保存的loading
+      uploadPendings: [], // 保存模板时进行中的上传
+      totalUpload: 0, // 需要上传的资源数量
+      uploadProgressVisible: false // 显示上传进度
     }
   },
-  provide() {
+  provide () {
     let _self = this
     return {
-      setSelectWidget(data, param) {
+      setSelectWidget (data, param) {
         _self.setSelectWidget(data, param)
       },
-      setSelectGroup(data, param) {
+      setSelectGroup (data, param) {
         _self.setSelectGroup(data, param)
       },
-      delGroup(index) {
+      delGroup (index) {
         _self.deleteGroup(index)
       },
-      delWidget() {
+      delWidget () {
         _self.deleteWidget()
       },
       mmsConfig: this.config
     }
   },
   watch: {
-    widgetPaneShow(visible) {
+    widgetPaneShow (visible) {
       if (!visible) this.currentItemType = ''
     }
   },
-  async created() {
+  async created () {
     if (this.mmsTemplate && this.initParams.messageId) await this.getTemplate()
   },
-  mounted() {
+  mounted () {
     this.listenerPhone()
   },
   computed: {
-    isComposeDisabled() {
+    isComposeDisabled () {
       return Object.keys(this.composeGroupList).length >= 2
     },
-    isSplitDisabled() {
+    isSplitDisabled () {
       return Object.keys(this.splitGroupList).length > 0
     },
-    maxFileSize() {
+    maxFileSize () {
       return fileMaxSize.split('M')[0] * 1024
     },
-    fileSize() {
+    fileSize () {
       let list = this.mmsData.list
       let size = 0
-      let textContent = ""
-      let getSzie = function g(data) {
+      let textContent = ''
+      let getSzie = function g (data) {
         data.map(item => {
           if (item.list && item.list.length > 0) g(item.list)
-          if (item.type == "text") {
+          if (item.type == 'text') {
             textContent += item.content
             // size += Math.ceil(item.content.length/1024)
-          } else if (item.type != "group") {
+          } else if (item.type != 'group') {
             size += Math.ceil(item.size / 1024)
           }
         })
@@ -249,24 +241,27 @@ export default {
       getSzie(list)
       textContent = this.replaceTextContent(textContent)
       let newContent = textContent
-      let textLength = newContent.replace(/[^\x00-\xFF]/g, '**').length;
+      let textLength = newContent.replace(/[^\x00-\xFF]/g, '**').length
       size += Math.ceil(textLength / 1024)
       return size
     },
 
-    filePercentage() {
+    filePercentage () {
       return this.fileSize / this.maxFileSize > 1 ? 100 : Math.floor(this.fileSize / this.maxFileSize * 100)
     },
-    fileStatus() {
+    fileStatus () {
       return this.fileSize / this.maxFileSize > 1 ? 'exception' : 'success'
     },
 
-    toolbarDisabled() {
+    toolbarDisabled () {
       return !this.mmsData.list.length
+    },
+    uploadPercentage(){
+      return this.totalUpload === 0 ? 0 : (this.totalUpload - this.uploadPendings.length) / this.totalUpload * 100
     }
   },
   methods: {
-    getTemplate() {
+    getTemplate () {
       this._http(this.mmsTemplate, {
         messageId: this.initParams.messageId
       }).then(res => {
@@ -279,26 +274,26 @@ export default {
         this.$message.error('请求失败')
       })
     },
-    goBack() {
+    goBack () {
       this.$confirm('未保存修改将丢失，确认返回?', '提示', {
         type: 'warning'
       }).then(res => {
         this.$refs.goBack.$el.click()
       })
     },
-    replaceTextContent(val) {
-      return val.replace(/<div>/g, "").replace(/(<\/div>|<br>)/g, "\n").replace(/&nbsp;/g, " ")
+    replaceTextContent (val) {
+      return val.replace(/<div>/g, '').replace(/(<\/div>|<br>)/g, '\n').replace(/&nbsp;/g, ' ')
     },
-    listenerPhone() {
+    listenerPhone () {
       const _self = this
       const onkeydown = e => {
         if (e.keyCode == 16) {
           this.isComposeGroup = true
-          console.log("按下了shift");
+          console.log('按下了shift')
         }
         if (e.keyCode == 32) {
           this.isDownSpacebar = true
-          console.log("按下了space");
+          console.log('按下了space')
         }
       }
       const onkeyup = e => {
@@ -314,18 +309,16 @@ export default {
           this.isDownSpacebar = false
         }
       }
-      document.addEventListener("keydown", onkeydown)
-      document.addEventListener("keyup", onkeyup)
-
+      document.addEventListener('keydown', onkeydown)
+      document.addEventListener('keyup', onkeyup)
     },
-    //添加彩信组件
-    addDragItem(data) {
-
+    // 添加彩信组件
+    addDragItem (data) {
       // 点击素材库类型，关闭编辑区
       this.isEditorShow = false
       let _data = JSON.parse(JSON.stringify(data))
 
-      if (_data.type == "text") {
+      if (_data.type == 'text') {
         if (this.widgetPaneShow) {
           this.widgetPaneShow = false
         }
@@ -337,7 +330,7 @@ export default {
       this.currentItemType = _data.type
     },
 
-    onLibAdd(data) {
+    onLibAdd (data) {
       // 点击素材添加，关闭编辑区
       this.isEditorShow = false
       let item = JSON.parse(JSON.stringify(this.currentAddDragItem))
@@ -346,7 +339,7 @@ export default {
           ...data,
           id: getRandomId()
         },
-        item.type === 'image' ? { imgConf: {} } : null,
+        item.type === 'image' ? { imgConf: {} } : null
       )
       this.mmsData.list.push(item)
       // 添加素材后中间区域显示最底部
@@ -356,14 +349,14 @@ export default {
       })
     },
 
-    //打散组合
-    splitGroup() {
+    // 打散组合
+    splitGroup () {
       this.mmsData.list.splice(this.currentGroupIndex, 1, ...this.splitGroupList.list)
       this.splitGroupList = {}
       this.currentGroupIndex = -1
     },
-    //组合组件
-    composeGroup() {
+    // 组合组件
+    composeGroup () {
       if (this.isObjectEmpty(this.composeGroupList)) return
       let list = this.mmsData.list
       let newGroup = []
@@ -379,12 +372,12 @@ export default {
       this.currentGroupIndex = -1
       list.splice(list.indexOf(firstSelectedItem), 1, {
         id: getRandomId(),
-        type: "group",
+        type: 'group',
         list: newGroup
       })
     },
-    //选择组合
-    setSelectGroup(data, param) {
+    // 选择组合
+    setSelectGroup (data, param) {
       let el = param.evt
       if (this.selectWidgetId == data.id) {
         this.splitGroupList = {}
@@ -395,8 +388,8 @@ export default {
         this.selectWidgetId = data.id
       }
     },
-    //选择组件
-    setSelectWidget(data, param) {
+    // 选择组件
+    setSelectWidget (data, param) {
       if (this.isComposeGroup) {
         if (!param.isGroup) {
           let el = param.evt
@@ -420,17 +413,17 @@ export default {
         this.isEditorShow = true
       }
     },
-    deleteGroup(index) {
+    deleteGroup (index) {
       this.mmsData.list.splice(index, 1)
     },
-    deleteWidget() {
+    deleteWidget () {
       this.currentEditItem = {}
       this.isEditorShow = false
     },
     // 移除素材
-    onEditRemove(data, param) {
+    onEditRemove (data, param) {
       let groupIndex
-      let getDataIndex = function g(dataList) {
+      let getDataIndex = function g (dataList) {
         let listIndex
         dataList.map((item, index) => {
           if (item.list && item.list.length > 0) {
@@ -461,11 +454,11 @@ export default {
         }
         this.currentEditItem = {}
         this.isEditorShow = false
-        this.$message.success('删除成功');
+        this.$message.success('删除成功')
       })
     },
 
-    handleWidget(item) {
+    handleWidget (item) {
       if (!this.widgetPaneShow) {
         this.currentAddDragItem = item
         this.widgetPaneShow = true
@@ -477,20 +470,20 @@ export default {
         }
       }
     },
-    isObjectEmpty(obj) {
-      return JSON.stringify(obj) == "{}"
+    isObjectEmpty (obj) {
+      return JSON.stringify(obj) == '{}'
     },
-    removeElClassName(cName) {
+    removeElClassName (cName) {
       let allEl = Array.from(document.querySelectorAll(`.${cName}`))
       allEl.map(item => {
         item.classList.remove(cName)
       })
     },
-    //拖动画布 按住空格
-    dropCanvas(evt) {
+    // 拖动画布 按住空格
+    dropCanvas (evt) {
       this.isMouseDown = true
       let canvasEl = this.$refs.canvas
-      let transform = canvasEl.style.transform.replace(/[^0-9\-,]/g, "").split(",")
+      let transform = canvasEl.style.transform.replace(/[^0-9\-,]/g, '').split(',')
       let pos = {
         x: transform.length == 1 ? 0 : parseInt(transform[0]),
         y: transform.length == 1 ? 0 : parseInt(transform[1])
@@ -503,7 +496,6 @@ export default {
         let x = e.pageX - mousePos.x + pos.x
         let y = e.pageY - mousePos.y + pos.y
         canvasEl.style.transform = `translate(${x}px,${y}px)`
-
       }
       document.onmouseup = () => {
         document.onmousemove = null
@@ -511,29 +503,29 @@ export default {
         this.isMouseDown = false
       }
     },
-    //拖动容器
-    dropWindown(evt) {
+    // 拖动容器
+    dropWindown (evt) {
       let dropEl = evt.target.parentNode
       let gapX = evt.pageX - dropEl.offsetLeft
       let gapY = evt.pageY - dropEl.offsetTop
-      dropEl.style.cursor = "grabbing"
+      dropEl.style.cursor = 'grabbing'
 
       document.onmousemove = (e) => {
         let x = e.pageX - gapX
         let y = e.pageY - gapY
 
-        dropEl.style.left = x + "px"
-        dropEl.style.top = y + "px"
+        dropEl.style.left = x + 'px'
+        dropEl.style.top = y + 'px'
       }
       document.onmouseup = () => {
         document.onmousemove = null
         document.onmouseup = null
-        dropEl.style.cursor = ""
+        dropEl.style.cursor = ''
       }
     },
 
     // 清空
-    reset() {
+    reset () {
       this.$confirm('是否清空已添加的全部素材?', '提示', {
         type: 'warning'
       }).then(() => {
@@ -543,17 +535,15 @@ export default {
       })
     },
 
-
-
-    save() {
+    async save () {
       this.widgetPaneShow = this.isEditorShow = false
 
       if (!this.mmsData.list.length) return
 
-      if (this.fileSize > this.maxFileSize) {
-        this.$message.warning(`文件大小不能超过 ${this.maxFileSize}K`)
-        return false
-      }
+      // if (this.fileSize > this.maxFileSize) {
+      //   this.$message.warning(`文件大小不能超过 ${this.maxFileSize}K`)
+      //   return false
+      // }
 
       // 获取扁平模板数据
       let flatList = getAllData(this.mmsData.list).flat(3)
@@ -564,10 +554,13 @@ export default {
       // 提取需要字段
       let newList = flatList.map(item => {
         let _item = {}
-        let { type, content, name = '', uri, size, resourceId, poster } = item
+        let { type, content, name = '', uri, size, resourceId, poster, duration, width, height} = item
 
         _item = { type, name, size }
         if (poster) _item.poster = poster
+        if (duration) _item.duration = duration
+        // if (width) _item.width = width
+        // if (height) _item.height = height
 
         if (item.type === 'text') {
           let newContent = this.replaceTextContent(content)
@@ -584,26 +577,140 @@ export default {
       })
 
       if (!this.submitValidate(newList)) {
-        this.$message.warning('模板必须包含文本');
+        this.$message.warning('模板必须包含文本')
         return
       }
 
-      let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
+      newList = newList.concat({ type: 'text', content: '退订回复T, 此条短信免流', size: 1 })
+      let _data = await this.saveBefore({ initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids })
 
       this.captrue(_data)
     },
+    async saveBefore (data) {
+      // 黑名单，匹配未上传资源
+      const blacklist = new RegExp(`(^blob:)|(^${this.config.nodeUrl})`)
+      // 上传中的资源
+      const pendings = []
+      // 转换Blob对象的请求
+      const blobCalls = []
+      // 上传中的Promise队列
+      const uploadCalls = []
 
-    submitValidate(datas) {
+      // Blob to File
+      const blobToFile = (Blob, fileName) => {
+        return new File([Blob], fileName, {lastModified: Date.now()})
+      }
+
+      /**
+       * 上传方法
+       * @param {Object} item - 当然资源信息对象
+       * @param {File, String} file - 待上传的资源文件
+       * @returns {Promise}
+       */
+      const upload = async (item, file) => {
+        const fd = new FormData()
+
+        fd.append('type', item.type)
+        fd.append('saveResource', 'Y')
+        fd.append(typeof file === 'string' ? 'fileUrl' : 'file', file)
+        fd.append('actionType', 'upload')
+        fd.append('size', item.size)
+        // if (item.type === 'image') {
+        //   fd.append('width', item.width)
+        //   fd.append('height', item.height)
+        // }
+        if (item.type === 'video') {
+          fd.append('poster', item.poster)
+          fd.append('duration', item.duration)
+        }
+
+        return this._http(this.config.file, fd, { timeout: 90000 }).then(res => {
+          (res.type !== 'success') && this.$message.warning(res.messages)
+          return res
+        })
+      }
+
+      // 遍历预览区域内容，将需要上传的资源加入待上传队列
+      data.mmsTemplate.forEach(item => {
+        if (item.type === 'text' || !blacklist.test(item.content)) return
+
+        const pending = {
+          key: item.content,
+          source: item,
+          file: null
+        }
+
+        if (item.type === 'image') {
+          const blobCall = this._http(item.content, {}, { baseURL: '', method: 'get', responseType: 'blob' }).then(res => {
+            pending.file = blobToFile(res, item.name)
+            pendings.push(pending)
+          })
+
+          blobCalls.push(blobCall)
+        } else {
+          pending.file = item.content
+          pendings.push(pending)          
+        }
+      })
+
+      try {
+        // 等待所有图片类型转化工作完成
+        await Promise.all(blobCalls)
+
+        if (pendings.length === 0) return data
+
+        // 更新用于UI渲染的部分数据
+        this.totalUpload = pendings.length
+        this.uploadPendings = pendings.map(item => JSON.parse(JSON.stringify(item)))
+        this.uploadProgressVisible = true
+
+        // 启动队列，开始上传
+        pendings.forEach((item, index) => {
+          const pm = upload(item.source, item.file).then(res => {
+            const { data, type } = res
+            if(type !== 'success') Promise.reject('上传遇到错误，终止上传')
+
+            // 修改资源地址及信息
+            item.source.name = data.name
+            item.source.size = data.size
+            item.source.content = data.uri
+            item.source.poster !== undefined && (item.source.poster = data.poster)
+
+            // 剔除上传成功的资源
+
+            this.uploadPendings = this.uploadPendings.filter(pendingItem => pendingItem.key !== item.key)
+
+            if(this.uploadPendings.length === 0){
+              this.uploadProgressVisible = false
+            }
+          })
+
+          // 存储Promise，用于检测是否全部完成
+          uploadCalls.push(pm)
+        })
+      } catch (err) {
+        console.log(err)
+      }
+      
+      try {
+        await Promise.all(uploadCalls)
+        return data
+      } catch(err){
+        console.log(err)
+      }
+    },
+
+    submitValidate (datas) {
       return datas.some(data => data.type === 'text')
     },
 
     // 截图前处理
-    beforeCaptrue() {
+    beforeCaptrue () {
       this.$refs.windowBody.classList.add('isCapture')
       document.querySelector('.body-content').scrollTop = 0
     },
 
-    async captrue(sData) {
+    async captrue (sData) {
       this.saveLoading = true
 
       await this.beforeCaptrue()
@@ -634,7 +741,7 @@ export default {
         this.submit(fdata)
       })
     },
-    submit(fd) {
+    submit (fd) {
       this._http(this.mmsSave, fd).then(res => {
         // 保存后的处理
         this.handleRes(res)
@@ -646,30 +753,19 @@ export default {
       })
     },
 
-    handleRes(resp) {
+    handleRes (resp) {
       if (resp && this.$root.moqui.isPlainObject(resp)) {
-        this.$root.moqui.notifyMessages(resp.messageInfos, resp.errors);
+        this.$root.moqui.notifyMessages(resp.messageInfos, resp.errors)
 
         this.initParams.messageId = resp.screenParameters.messageId
-
-        // 跳转页面
-        // if (resp.screenUrl && resp.screenUrl.length > 0) {
-        //   setTimeout(() => {
-        //     this.$root.setUrl(resp.screenUrl);
-        //   })
-        // } else if (resp.redirectUrl && resp.redirectUrl.length > 0) {
-        //   window.location.href = resp.redirectUrl;
-        // }
-        
       } else {
         this.$message.error('保存错误')
         console.warn('m-form no response or non-JSON response: ' + JSON.stringify(resp))
       }
     }
-  },
+  }
 
 }
-
 </script>
 <style lang="less">
 .file-size {

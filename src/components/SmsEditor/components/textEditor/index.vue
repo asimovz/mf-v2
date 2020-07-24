@@ -2,9 +2,10 @@
   <div class="text-editor">
     <div class="text-item">
       <label class="editor-label">参数名称</label>
-      <span class="editor-label" >{{textConf.name}}</span>
+      <span style="line-height:32px;">{{paramName.name}}</span>
     </div>
-    <div class="text-item">
+    <!-- 目前不支持配置，暂时隐藏 -->
+    <!-- <div class="text-item">
       <label class="editor-label">参数类型</label>
       <el-select v-model="textConf.type"  placeholder="请选择">
         <el-option
@@ -14,15 +15,15 @@
           :value="item.value">
         </el-option>
       </el-select>
-    </div>
-    <div class="text-item">
+    </div> -->
+    <!-- <div class="text-item">
       <label class="editor-label">长度限制</label>
       <el-radio-group class="length-type" v-model="textConf.lengthType">
         <el-radio label="variable">可变长度</el-radio>
         <el-radio label="static">最大长度</el-radio>
       </el-radio-group>
-    </div>
-    <div v-if="textConf.lengthType === 'variable'">
+    </div> -->
+    <!-- <div v-if="textConf.lengthType === 'variable'">
       <div class="text-item">
         <label class="editor-label">最小长度</label>
         <el-input-number v-model="textConf.minNum" controls-position="right"  :min="0" :max="100"></el-input-number>
@@ -31,16 +32,16 @@
         <label class="editor-label">最大长度</label>
         <el-input-number v-model="textConf.maxNum" controls-position="right"  :min="1" :max="100"></el-input-number>
       </div>
-    </div>
-    <div v-else>
+    </div> -->
+    <!-- <div v-else>
       <div class="text-item">
         <label class="editor-label">固定长度</label>
         <el-input-number v-model="textConf.staticNum" controls-position="right"  :min="1" :max="100"></el-input-number>
       </div>
-    </div>
-    <div class="text-item">
+    </div> -->
+    <div class="text-item" style="margin-top: 28px;">
       <!-- 插入参数功能已经完成，后端暂时不支持转换，故暂时disabled禁止 -->
-      <el-button size="small" type="primary" :disabled="!activeBtn"  @mousedown.native.prevent @click.native="addParam">插入参数</el-button>
+      <el-button size="small" type="primary" :disabled="overMaxParam || !activeBtn"  @mousedown.native.prevent @click.native="addParam">插入参数</el-button>
     </div>
   </div>
 </template>
@@ -48,16 +49,18 @@
 <script>
 export default {
   props: {
-    currentData: Object,
+    options: Object,
   },
   computed: {
     
   },
   data() {
     return {
-      paramIndex: 0,
+      paramName: '',
       textConf: {},
       activeBtn: false,
+      maxParam: 5,
+      overMaxParam: false,
       typeList: [{
         value: 'd',
         label: '纯数字（d）'
@@ -100,48 +103,99 @@ export default {
       }],
     }
   },
-  beforeCreate() {
-    // 因为目前这个功能暂时还没实现，暂定该数据格式，为防止冲突，暂时绑定到window上
-    if(!window._textParams) {
-      window._textParams = {
-        list: [],
-        current: null,
-        activeBtn: (val) => {
-          if(val) {
-            this.add()
-          }
-          this.activeBtn = val
-        },
+  created() {
+    if(!this.options.activeBtn) {
+      this.options.textParamlist = []
+      this.options.nameList = ['text1','text2','text3','text4','text5']
+      this.options.current = {
+        name: 'text1'
       }
+      this.options.text = ""
+      this.options.activeBtn = (val) => {
+        this.activeBtn = val
+      }
+      this.options.changeCurrent = (val) => {
+        this.options.current = val
+        this.paramName = val
+      }
+      this.options.checkMax = this.checkMax
+      this.options.delParam = () =>{
+        let inputs = []
+        let inputsArr = document.getElementsByClassName("param-input")
+        let list = this.options.textParamlist
+        for(var i in inputsArr){
+          if(inputsArr[i].value) {
+            inputs.push({
+              name:inputsArr[i].value
+            })
+          }
+        }
+        let delItems = inputs.concat(list).filter(v => !inputs.some((e)=>{
+          return e.name === v.name
+        }) || !list.some((e)=>{
+          return e.name === v.name
+        }))
+        this.options.textParamlist = inputs
+        delItems.map((item)=>{
+          this.options.nameList.push(item.name)
+        })
+        this.options.nameList = this.options.nameList.sort()
+        this.options.changeCurrent({
+          name: this.options.nameList.length>0?this.options.nameList[0]:'text1'
+        })
+      }
+      this.paramName = {
+        name: 'text1'
+      }
+      this.$emit('update:options',this.options);
     }
-  },
-  mounted() {
-    this.textConf = {
-      name: '参数',
-      type: 'c',
-      lengthType: 'variable',
-      minNum: 0,
-      maxNum: 100,
-      staticNum: 1,
-    }
+    // this.options = {
+    //   list: [],
+    //   current: null,
+    //   activeBtn: (val) => {
+    //     if(val) {
+    //       this.add()
+    //     }
+    //     this.activeBtn = val
+    //   },
+    // }
+    // this.textConf = {
+    //   name: 'Text1',
+      // type: 'c',
+      // lengthType: 'variable',
+      // minNum: 0,
+      // maxNum: 100,
+      // staticNum: 1,
+    // }
   },
   methods: {
-    add() {
-      let obj = {
-        name: '参数',
-        type: 'c',
-        lengthType: 'variable',
-        minNum: 0,
-        maxNum: 100,
-        staticNum: 1,
+    checkMax() {
+      let num = document.getElementsByClassName("param-input").length
+      if(num >= this.maxParam) {
+        this.overMaxParam = true
+        return true
+      } else {
+        this.overMaxParam = false
+        return false
       }
-      window._textParams.current = obj
-      this.textConf = obj
     },
     addParam(event) {
-      this.paramIndex = this.paramIndex + 1
-      window._textParams.list.push(window._textParams.current)
-      window._textParams.addParam()
+      this.options.changeCurrent ({
+        name: this.options.nameList[0]
+      })
+      this.options.nameList.splice(0, 1)
+      this.options.textParamlist.push(this.options.current)
+      this.options.addParam()
+      if(this.checkMax()) {
+        this.options.changeCurrent ({
+          name: 'text1'
+        })
+      } else {
+        this.options.changeCurrent ({
+          name: this.options.nameList[0]
+        })
+      }
+
     }
   }
 };
@@ -149,6 +203,7 @@ export default {
 
 <style lang="less" scoped>
 .text-editor {
+  width: 100%;
   .text-item {
     display: flex;
     padding: 8px;

@@ -16,7 +16,7 @@
           <audioPlayer style="flex:1" :options="audioOptions" />
         </template>
         <template v-if="currentData.type === 'text'">
-          <text-editor></text-editor>
+          <text-editor :options.sync="currentData"></text-editor>
         </template>
       </div>
       <div class="editPane-operation">
@@ -84,6 +84,11 @@ export default {
         src: this.currentData.uri
       }
     },
+    textOptions() {
+      return {
+        ...this.currentData,
+      }
+    },
 
   },
   watch: {
@@ -100,7 +105,7 @@ export default {
     isVideoEdit(visible) {
       if (!visible) this.editDataVideo = {}
     },
-    'currentData.poster': {
+    'editDataVideo.poster': {
       handler(nVal, oVal) {
         this.$refs.videoPlayer && this.$refs.videoPlayer.showPoster()
       }

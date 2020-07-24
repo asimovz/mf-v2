@@ -223,10 +223,15 @@ export default {
 				this.submitConfirm(resp)
 			}else if(resp.type == "write"){
 				let el = document.getElementById(resp.id)
-				if(el.tagName != "TEXTAREA" && el.tagName != "INPUT") {
-					el = el.querySelector(resp.target)
+				let target = resp.target
+				if(target == "textarea" || target == "input") {
+					if(el.tagName != "TEXTAREA" && el.tagName != "INPUT") {
+						el = el.querySelector(resp.target)
+					}
+					el.value = resp.results
+				} else {
+					el.innerHTML = resp.results
 				}
-				el.value = resp.results
 			}
 			if(resp.type !== 'confirm'){
 				this.responseCb(resp)

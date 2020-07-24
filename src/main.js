@@ -16,7 +16,7 @@ Vue.filter('decodeHtml', moqui.htmlDecode)
 Vue.filter('format', moqui.dateFormat)
 
 
-// import { smsEditor, locale } from './components/mmsEditor/library.core.js'
+// import { smsEditor, locale } from './components/smsEditor/library.core.js'
 // import './components/mmsEditor/style/bundle.css'
 
 import { smsEditor, locale } from './components/SmsEditor'

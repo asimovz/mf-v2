@@ -348,6 +348,10 @@ export default {
   line-height: 20px;
   margin-top: 5px;
 }
+.components_upload_list+.components_upload_list {
+  margin-top: 5px;
+}
+
 
 .components_upload_list i {
   display: none;

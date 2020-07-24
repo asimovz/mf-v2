@@ -1,5 +1,5 @@
 <template>
-  <div :contenteditable="isEdit" style="min-height:22px;-webkit-user-select:auto" @mousedown="mousedown" @focus="focus" @dblclick="edit" @blur="changeText" ref="text" v-html="data.content || placeholder"></div>
+  <div :contenteditable="isEdit" style="min-height:22px;-webkit-user-select:auto;color:#606266;" @mousedown="mousedown" @focus="focus" @dblclick="edit" @blur="changeText" @keyup.delete="delParam" ref="text" v-html="data.text || placeholder"></div>
 </template>
 
 <script>
@@ -12,7 +12,6 @@ export default {
     return {
       isEdit:false,
       placeholder: "请填写",
-      // content: this.data.content == "" ? "请填写":this.data.content
     }
   },
   methods: {
@@ -20,19 +19,31 @@ export default {
       if(e.target.className === 'param-input') {
         e.stopPropagation()
         e.preventDefault()
-        window._textParams.activeBtn(false)
+        this.data.activeBtn(false)
+        this.data.changeCurrent({
+          name: e.target.value
+        })
       } else {
-        if(window._textParams && this.isEdit) window._textParams.activeBtn(true)
+        if(this.data && this.isEdit) {
+          this.data.changeCurrent({
+            name: this.data.nameList.length>0?this.data.nameList[0]:'text1'
+          })
+          this.data.activeBtn(true)
+        }
       }
     },
     focus(e) {
-      window._textParams.addParam = this.addParam
-      window._textParams.activeBtn(true)
+      this.data.addParam = this.addParam
+      this.data.activeBtn(true)
+    },
+    delParam(e) {
+      this.data.checkMax()
+      this.data.delParam()
     },
 
     addParam() {
       let dom = this.$refs.text
-      let param = '<input type="button" class="param-input" unselectable="on" readonly value="{#'+window._textParams.current.name+'#}"/>'
+      let param = '<input type="button" class="param-input" unselectable="on" readonly value="'+this.data.current.name+'">'
       let sel = window.getSelection()
       let range
       if (sel.getRangeAt && sel.rangeCount) {
@@ -53,11 +64,12 @@ export default {
           sel.addRange(range)
         }
       }
+      this.data.current = null
     },
     edit() {
       this.$emit("edit",true)
       this.isEdit = true
-      if(this.data.content == "") this.placeholder = ""
+      if(this.data.text == "") this.placeholder = ""
       this.$nextTick(function(){
         this.$refs.text.focus()
         // 强制每次focus时，光标都在最后
@@ -68,10 +80,17 @@ export default {
     },
     changeText() {
       this.isEdit = false
-      window._textParams.activeBtn(false)
+      this.data.activeBtn(false)
       let text = this.$refs.text.innerHTML
+      this.data.text = text
+      let index = 0
+      text = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
+        index = index + 1
+        let r =/(?<=value=").*?(?=")/
+        return '{'+'text'+index+'}'
+      })
       this.data.content = text
-      if(this.data.content === "")  this.placeholder = "请填写"
+      if(this.data.text === "")  this.placeholder = "请填写"
       this.$emit("edit",false)
     }
   }
@@ -79,14 +98,15 @@ export default {
 </script>
 <style lang="less">
   .param-input {
-    margin-right: 8px;
+    margin: 0 8px;
     padding: 0;
     outline: none;
     border: none;
+    color: #9eb2dc !important;
     background: transparent;
   }
   .param-input:hover {
-    color: #66b1ff;
+    color: #66b1ff !important;
     cursor: pointer;
   }
 </style>
