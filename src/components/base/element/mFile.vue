@@ -166,7 +166,6 @@ export default {
       if (files.some(file => !this.validateFile(file))) {
         return
       }
-
       if (this.type == "card") {
         var url = files.map(file => URL.createObjectURL(file))
         this.fileList = this.fileList.concat(url)
@@ -198,10 +197,13 @@ export default {
       // let input = this.$refs.input
       // input.value = ""
       let root = document.getElementById("mFileRoot")
+      if(index === -1) {
+        root.removeChild(root.getElementsByClassName('hidden')[root.getElementsByClassName('hidden').length-1])
+        return
+      }
       root.removeChild(root.getElementsByClassName('hidden')[index])
       this.fileList.splice(index, 1)
       this.fileName.splice(index, 1)
-
       this.isUpFileDel = true
     },
 
