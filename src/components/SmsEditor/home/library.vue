@@ -360,7 +360,7 @@ export default {
     handleSearch: debounce(function() {
       let str = this.searchStr.trim()
 
-      if (!str.length) return
+      // if (!str.length) return
 
       this.pager.pageIndex = 1
       this.fetchData(this.type['type'], str)
@@ -385,7 +385,10 @@ export default {
           if (res.error === 0) {
             this.pager.total = res.count
             this.pager.pageCount = res.pageMaxIndex + 1
-            this.libraryList = res.data || []
+            this.libraryList = (res.data || []).map(item => ({
+              ...item,
+              uri: encodeURI(item.uri)
+            }))
 
             this.$nextTick(() => {
               this.$refs.libraryContent.scrollTop = 0
