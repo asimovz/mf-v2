@@ -5,7 +5,6 @@
         <el-radio-button label="library">素材库</el-radio-button>
         <el-radio-button label="local">本地</el-radio-button>
       </el-radio-group>
-
       <span class="close" @click="$emit('on-close')"><i class="el-icon-close"></i></span>
     </div>
     <div class="operation" :style="{'justify-content': libraryType === 'library' ? 'flex-end' : 'space-between'}">
@@ -13,59 +12,36 @@
         <el-button v-show="!isCheckAble" size="small" :disabled="isUpLoading" @click="isCheckAble = true">批量操作</el-button>
         <el-checkbox v-show="isCheckAble" :indeterminate="isIndeterminate" :value="checkAll" @change="checkChanged">全选</el-checkbox>
       </div>
-
       <div>
         <template v-if="isCheckAble">
           <el-button size="small" type="danger" :disabled="!checkedId.length " @click="libRemove(checkedId)">删除</el-button>
           <el-button size="small" type="primary" @click="isCheckAble = false">取消</el-button>
         </template>
-
         <template v-else>
-          <el-input class="op-input--search" v-show="libraryType === 'library'" size="small"suffix-icon="el-icon-search" placeholder="回车搜索素材库" @keyup.enter.native="handleSearch" v-model="searchStr" />
-
+          <el-input class="op-input--search" v-show="libraryType === 'library'" size="small" suffix-icon="el-icon-search" placeholder="回车搜索素材库" @keyup.enter.native="handleSearch" v-model="searchStr" />
           <template v-if="libraryType === 'local'">
             <el-popover style="margin-left: 10px;" placement="bottom" trigger="hover" :content="popoverContent">
               <el-button slot="reference" type="primary" size="small" :disabled="isUpLoading" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">上传{{ typeLabel }}</el-button>
             </el-popover>
-            <input style="display: none;" ref="file" type="file" :accept="currentAccept" name="upload" @change="fileChanged" />
+            <input style="display: none;" ref="file" type="file" multiple :accept="currentAccept" name="upload" @change="fileChanged" />
           </template>
-
         </template>
-
       </div>
     </div>
-
-     <!-- v-infinite-scroll="loadMore" -->
+    <!-- v-infinite-scroll="loadMore" -->
     <div ref="libraryContent" class="library--content scrollbar" :class="{'no-data': !currentDataList.length}" v-loading="fetchLoading || isUpLoading" :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''" :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''" :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''">
       <div class="lib-list" :class="{'isCheckable': isCheckAble}">
-        <lib-item
-          :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''"
-          v-for="(item, index) in currentDataList" :key="item.resourceId"
-          :type="type['type']"
-          :data="item"
-          :show-remove="libraryType === 'local'"
-          @on-add="libAdd(item)"
-          @on-remove="libRemove(item.resourceId, index)"
-          @click.native="libAdd(item, $event)"
-        >
+        <lib-item :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in currentDataList" :key="item.id" :type="type['type']" :data="item" :show-remove="libraryType === 'local'" @on-add="libAdd(item)" @on-remove="libRemove(item.id, index)" @click.native="libAdd(item, $event)">
         </lib-item>
       </div>
-
       <transition name="el-fade-in">
         <div style="width: 100%;padding: 0 10px;" v-if="!canMore && showNoMore" ref="noMoreDom">
           <div class="bottom-deliver"><span>到底啦</span></div>
         </div>
       </transition>
     </div>
-
     <div class="library--pager" ref="opPager" v-show="!isCheckAble && currentDataList.length">
-      <el-pagination
-        :current-page.sync="pager.pageIndex"
-        :page-size="pager.pageSize"
-        :page-count="pager.pageCount"
-        layout="prev, slot, next"
-        @current-change="pageChange"
-      >
+      <el-pagination :current-page.sync="pager.pageIndex" :page-size="pager.pageSize" :page-count="pager.pageCount" layout="prev, slot, next" @current-change="pageChange">
         <span style="text-align: center;">{{pager.pageIndex}} / {{pager.pageCount}}</span>
       </el-pagination>
     </div>
@@ -118,16 +94,16 @@ export default {
       libraryType: 'library', // 素材类型
 
       fetchLoading: false,
-      libraryList: [],  // 素材库列表
-      localData: {      // 本地列表
+      libraryList: [], // 素材库列表
+      localData: { // 本地列表
         image: [],
         video: [],
         audio: []
       },
 
-      searchStr: '',  // 素材搜索
+      searchStr: '', // 素材搜索
 
-      canMore: true,  // 是否加载更多
+      canMore: true, // 是否加载更多
       showNoMore: true, // 是否显示无数据标识
 
       pager: {
@@ -160,31 +136,31 @@ export default {
     },
     // 选中的 id
     checkedId() {
-      if(this.libraryType === 'local'){
+      if (this.libraryType === 'local') {
         return this.localData[this.type['type']].filter(item => item.checked).map(item => item.resourceId)
-      }else{
+      } else {
         return this.libraryList.filter(item => item.checked).map(item => item.resourceId)
       }
     },
     // 半选
     isIndeterminate() {
-      if(this.libraryType === 'local'){
+      if (this.libraryType === 'local') {
         return this.localData[this.type['type']].some(item => item.checked) && !this.localData[this.type['type']].every(item => item.checked)
-      }else{
+      } else {
         return this.libraryList.some(item => item.checked) && !this.libraryList.every(item => item.checked)
       }
 
     },
 
-    currentLocalData(){
+    currentLocalData() {
       return this.localData[this.type['type']]
     },
 
     // 当前数据源 ( 可定义在 data 中，切换 libraryType 时赋值， 两种方式有和不同（性能）？？？ )
     // Object.freeze 有无必要？？？ 外层 冻结 与 内层 冻结？？？
-    currentDataList(){
-      return this.libraryType === 'local' ? this.currentLocalData.map(item => Object.freeze(item))
-          : this.libraryList.map(item => Object.freeze(item))
+    currentDataList() {
+      return this.libraryType === 'local' ? this.currentLocalData.map(item => Object.freeze(item)) :
+        this.libraryList.map(item => Object.freeze(item))
     },
   },
   inject: ['mmsConfig'],
@@ -214,14 +190,14 @@ export default {
     isCheckAble(visible) {
       this.checkAll = false
 
-      if(this.libraryType === 'local'){
+      if (this.libraryType === 'local') {
         this.localData[this.type['type']] = this.localData[this.type['type']].map(item => {
           return {
             ...item,
             checked: false
           }
         })
-      }else{
+      } else {
         this.libraryList = this.libraryList.map(item => {
           return {
             ...item,
@@ -231,15 +207,15 @@ export default {
       }
     },
 
-    canMore(val){
-      if(!val){
+    canMore(val) {
+      if (!val) {
         setTimeout(() => {
           this.showNoMore = false
         }, 1000)
       }
     },
 
-    libraryType(){
+    libraryType() {
       this.isCheckAble = false
       this.isUpLoading = false
     }
@@ -268,11 +244,11 @@ export default {
     libRemove(id, index) {
       if (!id.toString().length) return
 
-      if(!!index){
+      if (!!index) {
         this.localData[this.type['type']].splice(0, index)
-      }else{
+      } else {
         this.localData[this.type['type']] = this.localData[this.type['type']].filter(item =>
-          Array.isArray(id) ? !id.includes(item.resourceId) : item.resourceId !== id
+          Array.isArray(id) ? !id.includes(item.id) : item.id !== id
         )
       }
     },
@@ -296,43 +272,49 @@ export default {
     },
 
     // 选择文件
-    fileChanged(evt) {
+    async fileChanged(evt) {
       let input = evt.target
-      let { files } = input
-      let file = [...files][0]
+      let files = Array.from(input.files)
 
-      // 文件的 格式
-      let _fileType = file.name.split('.').slice(-1).join()
-      // 允许上传的 格式
-      let accepts = input.getAttribute('accept')
 
-      if (!this.validatedType(_fileType)) {
-        this.$message.warning('请上传正确格式的素材')
-        input.value = ''
-        return
-      }
+      for (let i = 0; i < files.length; i++) {
+        let file = files[i]
 
-      if (!this.validatedSize(file.size)) {
-        this.$message.warning(
-          `${this.typeLabel} 上传大小不得超过 ${this.type['size']}M`
-        )
-        input.value = ''
-        return
-      }
+        // 文件的 格式
+        let _fileType = file.name.split('.').slice(-1).join()
+        // 允许上传的 格式
+        let accepts = input.getAttribute('accept')
 
-      if(this.type['type'] === 'image'){
-        this.localData[this.type['type']].unshift({
-          resourceId: getRandomId(),
-          name: file.name,
-          size: file.size,
-          uri: getObjectURL(file),
-        })
-      }else{
-        this.isUpLoading = true
-        let fd = new FormData()
-        fd.append('file', file)
-        
-        this.uploadFile(fd)
+        if (!this.validatedType(_fileType)) {
+          this.$message.warning(`${file.name} 格式不正确, 请上传正确格式的素材`)
+          input.value = ''
+          continue
+        }
+
+        if (!this.validatedSize(file.size)) {
+          this.$message.warning(
+            `${file.name} 大小超过限制 ${this.type['size']}M, 请重新选择`
+          )
+          input.value = ''
+          continue
+        }
+
+        if (this.type['type'] === 'image') {
+          this.localData[this.type['type']].unshift({
+            id: getRandomId(),
+            name: file.name,
+            size: file.size,
+            uri: getObjectURL(file),
+          })
+
+          if (this.$refs.file) this.$refs.file.value = ''
+        } else {
+          this.isUpLoading = true
+          let fd = new FormData()
+          fd.append('file', file)
+
+          await this.uploadFile(fd)
+        }
       }
     },
 
@@ -356,13 +338,13 @@ export default {
             message: res.message
           });
 
-          if(this.type['type'] === 'video'){
+          if (this.type['type'] === 'video') {
             res.data.poster = res.data.thumbnail
             delete res.data.thumbnail
           }
 
-          res.data.resourceId = getRandomId()
-          
+          res.data.id = getRandomId()
+
           res.error === 0 && this.localData[this.type['type']].unshift(res.data)
         }).finally(cb => {
           this.isUpLoading = false
@@ -370,7 +352,7 @@ export default {
         })
     },
 
-    pageChange(page){
+    pageChange(page) {
       this.fetchData()
     },
 
@@ -378,7 +360,7 @@ export default {
     handleSearch: debounce(function() {
       let str = this.searchStr.trim()
 
-      if(!str.length) return
+      // if (!str.length) return
 
       this.pager.pageIndex = 1
       this.fetchData(this.type['type'], str)
@@ -403,7 +385,10 @@ export default {
           if (res.error === 0) {
             this.pager.total = res.count
             this.pager.pageCount = res.pageMaxIndex + 1
-            this.libraryList = res.data || []
+            this.libraryList = (res.data || []).map(item => ({
+              ...item,
+              uri: encodeURI(item.uri)
+            }))
 
             this.$nextTick(() => {
               this.$refs.libraryContent.scrollTop = 0

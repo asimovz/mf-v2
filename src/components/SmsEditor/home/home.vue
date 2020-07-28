@@ -13,57 +13,23 @@
           </li>
         </ul>
         <div class="widget-pane-wrapper" v-show="widgetPaneShow">
-          <sms-library :type="currentAddDragItem" @on-close="widgetPaneShow = false" @on-add="onLibAdd"></sms-library>
+          <sms-library ref="library" :type="currentAddDragItem" @on-close="widgetPaneShow = false" @on-add="onLibAdd"></sms-library>
         </div>
       </div>
       <div class="editor-body">
-        <div class="toolbar-wrapper" style="margin-bottom:20px">
-          <!-- <div class="toolbar-item">撤销</div>
-          <div class="toolbar-item">恢复</div> -->
-          <div :class="['toolbar-item',{'disabled':!isComposeDisabled}]" @click="composeGroup">
-            <editor-icon name="zuhe" size="20" />&nbsp;组合
-          </div>
-          <div :class="['toolbar-item',{'disabled':!isSplitDisabled}]" @click="splitGroup">
-            <editor-icon name="chaisan1" size="20" />&nbsp;打散
-          </div>
-          <div class="toolbar-item" @click="reset" :class="{disabled: !mmsData.list.length}">
-            <editor-icon name="shanchu" size="16" />&nbsp;清空
-          </div>
-          <!-- <div class="toolbar-item">
-            <editor-icon name="yulan" size="16" />&nbsp;预览
-          </div> -->
-          <!-- style="justify-content: 'space-evenly';width: 86px;" -->
-          <div class="toolbar-item" :class="{'disabled': saveLoading || !mmsData.list.length}" @click="save">
-            <editor-icon v-if="!saveLoading" name="baocun" size="16" />
-            <i v-else class="el-icon-loading" style="font-size: 16px;"></i>&nbsp;保存<font v-if="saveLoading">中</font>
-          </div>
-          <el-popover placement="top" width="200" trigger="click">
-            <div class="toolbar-item" slot="reference">
-              <editor-icon name="bangzhu" size="20" />&nbsp;帮助
-            </div>
-            <div class="shortcut_title">
-              <div class="title">快捷键</div>
-            </div>
-            <div class="shortcut">
-              <div class="name">文本编辑</div>
-              <div class="key">
-                <div><kbd>鼠标双击</kbd></div>
-              </div>
-            </div>
-            <div class="shortcut">
-              <div class="name">多选</div>
-              <div class="key">
-                <div><kbd>Shift</kbd>+<kbd>鼠标单击</kbd></div>
-              </div>
-            </div>
-            <div class="shortcut">
-              <div class="name">拖动画布</div>
-              <div class="key">
-                <div><kbd>Space</kbd>+<kbd>鼠标拖拽</kbd></div>
-              </div>
-            </div>
-          </el-popover>
-        </div>
+        
+        <btn-tools
+          :isComposeDisabled="isComposeDisabled"
+          :isSplitDisabled="isSplitDisabled"
+          :resetDisabled="!mmsData.list.length"
+          :saveDisabled="saveLoading || !mmsData.list.length"
+          :saveLoading="saveLoading"
+          @on-compose-group="composeGroup"
+          @on-split-group="splitGroup"
+          @on-reset="reset"
+          @on-save="save"
+        ></btn-tools>
+
         <div class="editor-canvas" ref="canvas">
           <!-- 画布 -->
           <!-- phone窗口 -->
@@ -71,8 +37,9 @@
             <div :class="['phone-window_body',''] " ref="windowBody">
               <!--body--empty -->
               <div class="body-content scrollbar">
+                 <!-- v-show="mmsData.list.length" -->
                 <editor-draggable class="body-scrollbar" style="padding-bottom: 15px" :data="mmsData" :select-widget-id="selectWidgetId" @on-del-group="deleteGroup"></editor-draggable>
-                <div v-show="!mmsData.list" class="widget-empty">asdasda</div>
+                <!-- <div v-show="!mmsData.list.length" class="widget-empty">请添加素材</div> -->
               </div>
             </div>
           </div>
@@ -89,7 +56,12 @@
         </div>
       </div>
       <div class="editor-pane-right" :class="{eidtorPaneShow: isEditorShow}">
-        <edit-pane :item="currentEditItem" @on-remove="onEditRemove" @on-close="isEditorShow = false"></edit-pane>
+        <edit-pane
+          :item="currentEditItem"
+          :params-text="textParamsStr"
+          @on-remove="onEditRemove"
+          @on-close="isEditorShow = false"
+        ></edit-pane>
       </div>
       <!-- 画布拖动 -->
       <div :class="['space-key-mask',{'cursor-grabbing':isMouseDown}]" v-if="isDownSpacebar" @mousedown="dropCanvas"></div>
@@ -109,7 +81,7 @@ import html2canvas from 'html2canvas'
 import { typesList, fileMaxSize } from '../config'
 import smsLibrary from './library'
 import editPane from './editPane'
-import saveConfirm from './saveConfirm'
+import btnTools from './btnTools'
 import '../assets/css/home.less'
 import { getRandomId, dataURLtoFile } from '../utils.js'
 
@@ -123,12 +95,16 @@ function getAllData (arr) {
   })
 }
 
+function replaceTextContent(str){
+  return str.replace(/<div>/g, '').replace(/(<\/div>|<br>)/g, '\n').replace(/&nbsp;/g, ' ')
+}
+
 export default {
   name: 'mms-editor',
   components: {
     smsLibrary,
     editPane,
-    saveConfirm
+    btnTools
   },
   props: {
     initParams: { // 初始化参数
@@ -150,6 +126,7 @@ export default {
         mmsTemplate: this.mmsTemplate,
         library: this.resourceInit,
         file: this.resourceAction,
+        clearFile: '/file/clear',
         uploadFile: '/upload/file',
         videoInfo: '/video/info', // 视频信息接口
         videoCut: '/video/cut', // 视频剪切接口
@@ -175,7 +152,7 @@ export default {
         select: 'item-selected',
         shiftSelect: 'item-shift-selected'
       },
-
+      textParamsLen: 0,
       isEditorShow: false,
       currentEditItem: {},
       saveLoading: false, // 保存的loading
@@ -205,13 +182,17 @@ export default {
   watch: {
     widgetPaneShow (visible) {
       if (!visible) this.currentItemType = ''
-    }
+    },
   },
   async created () {
     if (this.mmsTemplate && this.initParams.messageId) await this.getTemplate()
   },
   mounted () {
     this.listenerPhone()
+  },
+
+  beforeDestory(){
+    this.handleClear()
   },
   computed: {
     isComposeDisabled () {
@@ -239,7 +220,7 @@ export default {
         })
       }
       getSzie(list)
-      textContent = this.replaceTextContent(textContent)
+      textContent = replaceTextContent(textContent)
       let newContent = textContent
       let textLength = newContent.replace(/[^\x00-\xFF]/g, '**').length
       size += Math.ceil(textLength / 1024)
@@ -258,9 +239,27 @@ export default {
     },
     uploadPercentage(){
       return this.totalUpload === 0 ? 0 : (this.totalUpload - this.uploadPendings.length) / this.totalUpload * 100
+    },
+
+    flatMmsList(){
+      return getAllData(this.mmsData.list)
+    },
+    textParamsStr(){
+      return this.flatMmsList.filter(item => item.type === 'text')
+        .map(item => replaceTextContent(item.content)).join('')
     }
   },
   methods: {
+    handleClear(){
+      let localData = this.$refs.library.localData
+      let { video, audio } = localData
+      let localList = [...video, ...audio].map(item => item.name)
+
+      this.clearNodeLibrary(localList)
+    },
+    clearNodeLibrary(data){
+      this._http(this.config.nodeUrl + this.config.clearFile, { data })
+    },
     getTemplate () {
       this._http(this.mmsTemplate, {
         messageId: this.initParams.messageId
@@ -280,9 +279,6 @@ export default {
       }).then(res => {
         this.$refs.goBack.$el.click()
       })
-    },
-    replaceTextContent (val) {
-      return val.replace(/<div>/g, '').replace(/(<\/div>|<br>)/g, '\n').replace(/&nbsp;/g, ' ')
     },
     listenerPhone () {
       const _self = this
@@ -536,14 +532,15 @@ export default {
     },
 
     async save () {
+      this.textParamsLen = 0
       this.widgetPaneShow = this.isEditorShow = false
 
       if (!this.mmsData.list.length) return
 
-      // if (this.fileSize > this.maxFileSize) {
-      //   this.$message.warning(`文件大小不能超过 ${this.maxFileSize}K`)
-      //   return false
-      // }
+      if (this.fileSize > this.maxFileSize) {
+        this.$message.warning(`文件大小不能超过 ${this.maxFileSize}K`)
+        return false
+      }
 
       // 获取扁平模板数据
       let flatList = getAllData(this.mmsData.list).flat(3)
@@ -551,10 +548,12 @@ export default {
       // 提交参数 mmsResourceIds
       let ids = []
 
+      flatList = await this.pretreatment(flatList)
+
       // 提取需要字段
       let newList = flatList.map(item => {
         let _item = {}
-        let { type, content, name = '', uri, size, resourceId, poster, duration, width, height} = item
+        let { type, text, content, name = '', uri, size, resourceId, poster, duration, width, height} = item
 
         _item = { type, name, size }
         if (poster) _item.poster = poster
@@ -562,9 +561,13 @@ export default {
         // if (width) _item.width = width
         // if (height) _item.height = height
 
-        if (item.type === 'text') {
-          let newContent = this.replaceTextContent(content)
-
+        if (type === 'text') {
+          let newContent = text || ''
+          let texts = newContent.match(/<input(([\s\S])*?)>/g) || []
+          for(let i = 0; i < texts.length; i++){
+            this.textParamsLen ++
+            newContent = newContent.replace(/<input(([\s\S])*?)>/,`{text${this.textParamsLen}}`)
+          }
           _item.name = this.initParams.messageName
           _item.content = newContent
           _item.size = 1
@@ -572,7 +575,6 @@ export default {
           ids.push(resourceId)
           _item.content = uri
         }
-
         return _item
       })
 
@@ -580,13 +582,13 @@ export default {
         this.$message.warning('模板必须包含文本')
         return
       }
-
+      
       newList = newList.concat({ type: 'text', content: '退订回复T, 此条短信免流', size: 1 })
-      let _data = await this.saveBefore({ initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids })
+      let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
       this.captrue(_data)
     },
-    async saveBefore (data) {
+    async pretreatment (list) {
       // 黑名单，匹配未上传资源
       const blacklist = new RegExp(`(^blob:)|(^${this.config.nodeUrl})`)
       // 上传中的资源
@@ -631,25 +633,24 @@ export default {
       }
 
       // 遍历预览区域内容，将需要上传的资源加入待上传队列
-      data.mmsTemplate.forEach(item => {
-        if (item.type === 'text' || !blacklist.test(item.content)) return
+      list.forEach(item => {
+        if (item.type === 'text' || !blacklist.test(item.uri)) return
 
         const pending = {
-          key: item.content,
           source: item,
           file: null
         }
 
         if (item.type === 'image') {
-          const blobCall = this._http(item.content, {}, { baseURL: '', method: 'get', responseType: 'blob' }).then(res => {
+          const blobCall = this._http(item.uri, {}, { baseURL: '', method: 'get', responseType: 'blob' }).then(res => {
             pending.file = blobToFile(res, item.name)
             pendings.push(pending)
           })
 
           blobCalls.push(blobCall)
         } else {
-          pending.file = item.content
-          pendings.push(pending)          
+          pending.file = item.uri
+          pendings.push(pending)
         }
       })
 
@@ -657,7 +658,7 @@ export default {
         // 等待所有图片类型转化工作完成
         await Promise.all(blobCalls)
 
-        if (pendings.length === 0) return data
+        if (pendings.length === 0) return list
 
         // 更新用于UI渲染的部分数据
         this.totalUpload = pendings.length
@@ -673,12 +674,13 @@ export default {
             // 修改资源地址及信息
             item.source.name = data.name
             item.source.size = data.size
-            item.source.content = data.uri
+            item.source.uri = data.uri
+            item.source.resourceId = data.resourceId
             item.source.poster !== undefined && (item.source.poster = data.poster)
 
             // 剔除上传成功的资源
 
-            this.uploadPendings = this.uploadPendings.filter(pendingItem => pendingItem.key !== item.key)
+            this.uploadPendings = this.uploadPendings.filter(pendingItem => pendingItem.source.id !== item.source.id)
 
             if(this.uploadPendings.length === 0){
               this.uploadProgressVisible = false
@@ -694,7 +696,7 @@ export default {
       
       try {
         await Promise.all(uploadCalls)
-        return data
+        return list
       } catch(err){
         console.log(err)
       }
@@ -737,6 +739,7 @@ export default {
         fdata.append('mmsTemplate', JSON.stringify(sData.mmsTemplate))
         fdata.append('mmsResourceIds', sData.mmsResourceIds)
         fdata.append('mmsOriginalTemplate', JSON.stringify(this.mmsData.list))
+        fdata.append('placeholderNum', this.textParamsLen)
 
         this.submit(fdata)
       })
