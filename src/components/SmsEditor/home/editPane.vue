@@ -156,6 +156,11 @@ export default {
         this.isImgEdit = false
       }
 
+      this.$emit('on-add-lib', {
+        ...this.currentData,
+        ...newData
+      })
+
       this.currentData = Object.assign(this.currentData, newData)
     },
   },

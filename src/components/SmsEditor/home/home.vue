@@ -61,6 +61,7 @@
           :params-text="textParamsStr"
           @on-remove="onEditRemove"
           @on-close="isEditorShow = false"
+          @on-add-lib="onAddLib"
         ></edit-pane>
       </div>
       <!-- 画布拖动 -->
@@ -204,7 +205,7 @@ export default {
     this.listenerPhone()
   },
 
-  beforeDestory(){
+  beforeDestroy(){
     this.handleClear()
   },
   computed: {
@@ -271,7 +272,7 @@ export default {
       this.clearNodeLibrary(localList)
     },
     clearNodeLibrary(data){
-      this._http(this.config.nodeUrl + this.config.clearFile, { data })
+      this._http(this.config.nodeUrl + this.config.clearFile, data)
     },
     getTemplate () {
       this._http(this.mmsTemplate, {
@@ -544,6 +545,11 @@ export default {
       })
     },
 
+    onAddLib(data){
+      debugger
+      this.$refs.library.add2Local(data)
+    },
+
     async save () {
       this.textParamsLen = 0
       this.widgetPaneShow = this.isEditorShow = false
@@ -774,6 +780,8 @@ export default {
         this.$root.moqui.notifyMessages(resp.messageInfos, resp.errors)
 
         this.initParams.messageId = resp.screenParameters.messageId
+        // 保存后将素材 type 清空，实现再次点击素材库刷新
+        this.currentAddDragItem = {}
       } else {
         this.$message.error('保存错误')
         console.warn('m-form no response or non-JSON response: ' + JSON.stringify(resp))

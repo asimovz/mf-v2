@@ -1,6 +1,6 @@
 <template>
   <div :class="['lib-item', { 'lib-item--checked': data.checked, 'lib-item--audio': type === 'audio'}]">
-    <span v-if="showRemove" class="lib-remove el-icon-error" @click.stop="remove(data.resourceId)"></span>
+    <span v-if="showRemove" class="lib-remove el-icon-error" @click.stop="remove(data.id)"></span>
     <div class="lib-preview">
       <img :src="data.uri" v-if="type === 'image'"  />
       <template v-else-if="type === 'video'">
@@ -13,7 +13,7 @@
           <div class="lib-add el-icon-plus" @click.stop="audioAdd()"></div>
         </widget-audio>
       </template>
-      <div class="lib-name ">{{ data.name }}</div>
+      <div class="lib-name ">{{shortName(data.name)}}</div>
     </div>
   </div>
 </template>
@@ -42,11 +42,14 @@ export default {
     }
   },
   methods: {
+    shortName(name){
+      return name.substr(0, 10)
+    },
     audioAdd(data) {
       this.$emit('on-add')
     },
-    remove(){
-    	this.$emit('on-remove')
+    remove(id){
+    	this.$emit('on-remove', id)
     }
   },
 
