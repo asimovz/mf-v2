@@ -83,9 +83,6 @@ export default {
 
       let fd = new FormData()
       fd.append('file', file)
-      fd.append('actionType', 'upload')
-      fd.append('saveResource', 'N')
-      fd.append('type', 'image')
 
       this.upload(fd)
     },
@@ -95,14 +92,14 @@ export default {
     },
 
     upload(fd) {
-      this._http(this.mmsConfig.file, fd).then(res => {
+      this._http(this.mmsConfig.nodeUrl + this.mmsConfig.uploadFile, fd).then(res => {
         
         this.$message({
-          type: res.type,
-          message: res.messages
+          type: res.error === 0 ? 'success' : 'error',
+          message: res.message
         })
 
-        if(res.type === 'success'){
+        if(res.error === 0){
           this.$emit('input', res.data.uri)
         }
       }).finally(end => {
