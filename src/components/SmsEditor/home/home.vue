@@ -182,9 +182,9 @@ export default {
         _self.deleteWidget()
       },
       setUseCors(url) {
-        if(_self.useCors) {
+        if(_self.useCors && url.indexOf(_self.nodeUrl) < 0) {
           let newUrl = url.replace(/(http|https):\/\//gi,"").split("/")
-          newUrl[0] = "http://10.0.80.13:3001/oss"//_self.nodeUrl + "/oss"
+          newUrl[0] = _self.nodeUrl + "/oss"
           return newUrl.join("/")
         } else {
           return url
@@ -546,7 +546,6 @@ export default {
     },
 
     onAddLib(data){
-      debugger
       this.$refs.library.add2Local(data)
     },
 

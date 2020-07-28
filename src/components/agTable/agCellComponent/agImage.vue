@@ -46,6 +46,7 @@ export default {
         "=" +
         this.params.value;
     }
+    this.imgUrl = encodeURI(this.imgUrl)
   },
   mounted() {
     this.params.context.componentParent.gridOptions.api.resetRowHeights(
