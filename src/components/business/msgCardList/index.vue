@@ -1,69 +1,71 @@
 <template>
   <div class="msgCardList">
-    <ul class="list-wrap">
-      <li class="item btn-add">
-        <div class="item-content">
-          <div class="inner-wrap" v-if="standard" @click="standardCreate">
-            <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
-          </div>
-          <m-link v-else :href="editUrl">
-            <div class="inner-wrap">
+    <div class="main">
+      <ul class="list-wrap">
+        <li class="item btn-add">
+          <div class="item-content">
+            <div class="inner-wrap" v-if="standard" @click="standardCreate">
               <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
             </div>
-          </m-link>
-        </div>
-      </li>
-      <li class="item" v-for="(item, index) in items" :key="item.msgId">
-        <div class="item-content">
-          <div class="preview" :class="{'perview-icon': !standard}">
-            <img class="img" :src="item.thumb">
+            <m-link v-else :href="editUrl">
+              <div class="inner-wrap">
+                <div class="control"><img class="icon icon-add" src="./icons/icon-add.svg"><p>新建消息</p></div>
+              </div>
+            </m-link>
           </div>
-          <div class="main">
-            <div class="title" :title="item.title">{{item.title}}</div>
-            <div class="other">
-              <p><label>消息ID：</label>{{item.msgId}}</p>
-              <p><label>场景名称：</label>{{item.sceneName}}</p>
-              <p v-show="item.botName"><label>机器人：</label>{{item.botName}}</p>
-              <p v-show="item.signature"><label>签名：</label>{{item.signature}}</p>
+        </li>
+        <li class="item" v-for="(item, index) in items" :key="item.msgId">
+          <div class="item-content">
+            <div class="preview" :class="{'perview-icon': !standard}">
+              <img class="img" :src="item.thumb">
             </div>
-          </div>
+            <div class="main">
+              <div class="title" :title="item.title">{{item.title}}</div>
+              <div class="other">
+                <p><label>消息ID：</label>{{item.msgId}}</p>
+                <p><label>场景名称：</label>{{item.sceneName}}</p>
+                <p v-show="item.botName"><label>机器人：</label>{{item.botName}}</p>
+                <p v-show="item.signature"><label>签名：</label>{{item.signature}}</p>
+              </div>
+            </div>
 
-          <div class="mask">
-            <div class="control">
-              <div v-show="item.statusId !== 'MmsSubmit'">
-                <div v-if="standard" @click="standardCreate(item)">
-                  <img class="icon icon-edit" src="./icons/icon-edit.svg">
-                  <span>编辑</span>
+            <div class="mask">
+              <div class="control">
+                <div v-show="item.statusId !== 'MmsSubmit'">
+                  <div v-if="standard" @click="standardCreate(item)">
+                    <img class="icon icon-edit" src="./icons/icon-edit.svg">
+                    <span>编辑</span>
+                  </div>
+                  <m-link v-else :href="editUrlItem(item)">
+                    <img class="icon icon-edit" src="./icons/icon-edit.svg">
+                    <span>编辑</span>
+                  </m-link>
                 </div>
-                <m-link v-else :href="editUrlItem(item)">
-                  <img class="icon icon-edit" src="./icons/icon-edit.svg">
-                  <span>编辑</span>
-                </m-link>
-              </div>
-              <div v-show="item.statusId === 'MmsOpen'" @click="verifyBefore(item, index)">
-                <img class="icon icon-submit" src="./icons/icon-submit.svg">
-                <span>提交</span>
-              </div>
-              <div @click="preview(item, index)">
-                <img class="icon icon-preview" src="./icons/icon-preview.svg">
-                <span>预览</span>
-              </div>
-              <div v-show="!standard" @click="delBefore(item, index)">
-                <img class="icon icon-del" src="./icons/icon-del.svg">
-                <span>删除</span>
+                <div v-show="item.statusId === 'MmsOpen'" @click="verifyBefore(item, index)">
+                  <img class="icon icon-submit" src="./icons/icon-submit.svg">
+                  <span>提交</span>
+                </div>
+                <div @click="preview(item, index)">
+                  <img class="icon icon-preview" src="./icons/icon-preview.svg">
+                  <span>预览</span>
+                </div>
+                <div v-show="!standard" @click="delBefore(item, index)">
+                  <img class="icon icon-del" src="./icons/icon-del.svg">
+                  <span>删除</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="flag" v-if="standard" :class="item.statusId | stateFormat">
-            {{item.statusId | stateName}}
-            <m-tooltip class="tooltip" v-if="item.desc" :title="item.desc">
-                <span class="el-icon-warning-outline"></span>
-            </m-tooltip>
+            <div class="flag" v-if="standard" :class="item.statusId | stateFormat">
+              {{item.statusId | stateName}}
+              <m-tooltip class="tooltip" v-if="item.desc" :title="item.desc">
+                  <span class="el-icon-warning-outline"></span>
+              </m-tooltip>
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </div>
     <div class="pagination_box">
       <m-page 
         :enable-all="false"
@@ -310,18 +312,47 @@ export default {
 </script>
 <style lang='less'>
 .msgCardList {
+  .main{
+    overflow-x: auto;
+  }
+  
   .list-wrap{
     display: flex;
     flex-wrap: wrap;
-    margin:0 -10px;
+    min-width: 1175px;
     .item{
-      flex: 0 0 20%;
       margin-bottom: 20px;
       overflow: hidden;
       min-height: 200px;
     }
+    @media (max-width: 1600px){
+      .item{
+        flex: 0 0 25%;
+      }
+    }
+    @media (min-width: 1601px) and (max-width: 1920px){
+      .item{
+        flex: 0 0 20%;
+      }
+    }
+    @media (min-width: 1921px) and (max-width: 2240px){
+      .item{
+        flex: 0 0 16.6%;
+      }
+    }
+    @media (min-width: 2241px) and (max-width: 2560px){
+      .item{
+        flex: 0 0 14.28%;
+      }
+    }
+    @media (min-width: 2561px) {
+      .item{
+        flex: 0 0 12.5%;
+      }
+    }
     .item-content{
-      margin: 0 10px;
+      width: 272px;
+      margin: 0 auto;
       position: relative;
       border-radius: 6px;
       border: 1px solid rgba(0,0,0,0.15);
@@ -355,7 +386,7 @@ export default {
     .preview{
       font-size: 14px;
       position: relative;
-      height: 120px;
+      height: 153px;
       overflow: hidden;
       border-radius: 6px 6px 0 0;
       text-align: center;
@@ -465,12 +496,12 @@ export default {
       }
       span{
         display: none;
-        font-size: 10px;
+        font-size: 12px;
       }
       div{
-        width:30px;
-        height:30px;
-        line-height: 30px;
+        width:40px;
+        height:40px;
+        line-height: 40px;
         background: #fff;
         display: inline-block;
         border-radius: 50%;
