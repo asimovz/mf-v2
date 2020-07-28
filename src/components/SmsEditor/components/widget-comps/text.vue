@@ -3,6 +3,15 @@
 </template>
 
 <script>
+
+function nodeToString ( node ) {
+  var tmpNode = document.createElement( "div" );
+  tmpNode.appendChild( node.cloneNode( true ) );
+  var str = tmpNode.innerHTML;
+  tmpNode = node = null; // prevent memory leaks in IE
+  return str;
+}
+
 export default {
   name:"widget-text",
   props: {
@@ -14,6 +23,7 @@ export default {
       placeholder: "请填写",
     }
   },
+
   methods: {
     mousedown(e) {
       if(e.target.className === 'param-input') {
@@ -83,18 +93,37 @@ export default {
         range.collapseToEnd()
       })
     },
-    changeText() {
+    changeText(evt) {
+      let { target } = evt
+
+      let childNodes = target.childNodes
+      let content = ''
+
+      Array.from(childNodes).forEach(node => {
+        if(node.nodeType === 3){
+          content += node.nodeValue
+        }else if(node.nodeType === 1){
+          if(node.nodeName !== 'INPUT'){
+            content += node.innerText
+          }else{
+            content += nodeToString(node)
+          }
+        }
+      })
+
+      console.log('content', content)
       this.isEdit = false
       this.$root.TEXT_PARAM.activeBtn(false)
-      let text = this.$refs.text.innerHTML
-      this.data.text = text
+
+      this.data.text = target.innerHTML = content
+
       let index = 0
-      text = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
+      content = content.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
         index = index + 1
         let r =/(?<=value=").*?(?=")/
         return '{'+data.match(r)[0]+'}'
       })
-      this.data.content = text
+      this.data.content = content
       if(this.data.text === "")  this.placeholder = "请填写"
       this.$emit("edit",false)
     }
