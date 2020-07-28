@@ -58,7 +58,7 @@ export default {
 
     addParam() {
       let dom = this.$refs.text
-      let param = '<input type="button" class="param-input" unselectable="on" readonly value="'+this.$root.TEXT_PARAM.current.name+'">'
+      let param = '<input type="button" class="param-input" unselectable="on" readonly value="{'+this.$root.TEXT_PARAM.current.name+'}">'
       let sel = window.getSelection()
       let range
       if (sel.getRangeAt && sel.rangeCount) {
