@@ -37,6 +37,14 @@
         <span style="text-align: center;">{{pager.pageIndex}} / {{pager.pageCount}}</span>
       </el-pagination>
     </div>
+
+    <el-dialog title="上传资源" :visible.sync="uploadProgressVisible" :close-on-click-modal="false" append-to-body>
+      <div style="font-size:12px">
+        <el-progress style="margin-bottom: 10px" :text-inside="true" :stroke-width="20" :percentage="uploadPercentage" status="success"></el-progress>
+        <p>正在上传：{{uploadPendings.name || ''}}</p>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 <script>
@@ -106,6 +114,12 @@ export default {
       },
 
       isUpLoading: false, // 上传loading
+
+
+      // 上传中 progress
+      uploadProgressVisible: false,
+      uploadPercentage: 0,
+      uploadPendings: {}
     }
   },
   computed: {
@@ -171,6 +185,10 @@ export default {
 
     libraryType() {
       this.isUpLoading = false
+    },
+
+    uploadProgressVisible(val){
+      if(val) this.uploadPercentage = 0
     }
   },
   methods: {
@@ -250,11 +268,19 @@ export default {
         }
 
         if (this.type['type'] === 'video') {
-          this.isUpLoading = true
+          // this.isUpLoading = true
+
           let fd = new FormData()
           fd.append('file', file)
 
+          this.uploadProgressVisible = true
+
           await this.uploadFile(fd)
+          
+          this.uploadPercentage = (i + 1) / files.length * 100 >> 0
+          this.uploadPendings = files[i]
+
+          if(i == files.length - 1) this.uploadProgressVisible = false
         } else {
           this.localData[this.type['type']].unshift({
             id: getRandomId(),
