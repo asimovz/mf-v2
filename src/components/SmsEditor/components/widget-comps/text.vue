@@ -3,15 +3,6 @@
 </template>
 
 <script>
-
-function nodeToString ( node ) {
-  var tmpNode = document.createElement( "div" );
-  tmpNode.appendChild( node.cloneNode( true ) );
-  var str = tmpNode.innerHTML;
-  tmpNode = node = null; // prevent memory leaks in IE
-  return str;
-}
-
 export default {
   name:"widget-text",
   props: {
@@ -23,7 +14,6 @@ export default {
       placeholder: "请填写",
     }
   },
-
   methods: {
     mousedown(e) {
       if(e.target.className === 'param-input') {
@@ -50,6 +40,9 @@ export default {
       this.$root.TEXT_PARAM.changeCurrent({
         name: this.$root.TEXT_PARAM.nameList.length>0?this.$root.TEXT_PARAM.nameList[0]:'text1'
       })
+
+      document.addEventListener("paste",this.handlePaste)
+
     },
     delParam(e) {
       this.$root.TEXT_PARAM.checkMax()
@@ -93,39 +86,53 @@ export default {
         range.collapseToEnd()
       })
     },
-    changeText(evt) {
-      let { target } = evt
+    changeText() {
+      document.removeEventListener("paste",this.handlePaste)
 
-      let childNodes = target.childNodes
-      let content = ''
-
-      Array.from(childNodes).forEach(node => {
-        if(node.nodeType === 3){
-          content += node.nodeValue
-        }else if(node.nodeType === 1){
-          if(node.nodeName !== 'INPUT'){
-            content += node.innerText
-          }else{
-            content += nodeToString(node)
-          }
-        }
-      })
-
-      console.log('content', content)
       this.isEdit = false
       this.$root.TEXT_PARAM.activeBtn(false)
-
-      this.data.text = target.innerHTML = content
-
-      let index = 0
-      content = content.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
-        index = index + 1
-        let r =/(?<=value=").*?(?=")/
-        return '{'+data.match(r)[0]+'}'
-      })
-      this.data.content = content
+      let text = this.$refs.text.innerHTML
+      this.data.text = text
+      // let index = 0
+      // text = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
+      //   index = index + 1
+      //   let r =/(?<=value=").*?(?=")/
+      //   return '{'+data.match(r)[0]+'}'
+      // })
+      this.data.content = ''
       if(this.data.text === "")  this.placeholder = "请填写"
       this.$emit("edit",false)
+    },
+    handlePaste(e){
+      e.stopPropagation();
+      e.preventDefault();
+      var text = '', event = (e.originalEvent || e);
+      if (event.clipboardData && event.clipboardData.getData) {
+        text = event.clipboardData.getData('text/plain');
+      } else if (window.clipboardData && window.clipboardData.getData) {
+        text = window.clipboardData.getData('Text');
+      }
+
+      let sel = window.getSelection()
+      let range
+      if (sel.getRangeAt && sel.rangeCount) {
+        range = sel.getRangeAt(0)
+        range.deleteContents()
+        var el = document.createElement('div')
+        el.innerHTML = text
+        var frag = document.createDocumentFragment(), node, lastNode
+        while ((node = el.firstChild)) {
+          lastNode = frag.appendChild(node);
+        }
+        range.insertNode(frag);
+        if (lastNode) {
+          range = range.cloneRange()
+          range.setStartAfter(lastNode)
+          range.collapse(true)
+          sel.removeAllRanges()
+          sel.addRange(range)
+        }
+      }
     }
   }
 };
