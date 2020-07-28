@@ -1,6 +1,6 @@
 <template>
 	<div class="widget-image--wrapper">
-  	<img class="image" :src="data.uri" crossorigin="*">
+  	<img class="image" :src="setUseCors(data.uri)" >
   </div>
 </template>
 
@@ -10,6 +10,10 @@ export default {
   props: {
     data:Object
   },
+  inject:['setUseCors'],
+  methods: {
+
+  }
 }
 </script>
 <style lang="less">

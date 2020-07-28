@@ -2,9 +2,9 @@
   <div :class="['lib-item', { 'lib-item--checked': data.checked, 'lib-item--audio': type === 'audio'}]">
     <span v-if="showRemove" class="lib-remove el-icon-error" @click.stop="remove(data.resourceId)"></span>
     <div class="lib-preview">
-      <img :src="data.uri" v-if="type === 'image'" crossorigin="*" />
+      <img :src="data.uri" v-if="type === 'image'"  />
       <template v-else-if="type === 'video'">
-        <img v-if="data.poster" :src="data.poster" crossorigin="*" />
+        <img v-if="data.poster" :src="data.poster"  />
         <video v-else :src="data.uri"></video>
       </template>
       <template v-else>

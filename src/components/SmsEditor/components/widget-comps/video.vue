@@ -7,7 +7,7 @@
       :options="videoOptions" />
 
     <div class="video-poster">
-      <img :src="data.poster" crossorigin="*">
+      <img :src="setUseCors(data.poster)">
       <span class="video-playBtn"></span>
     </div>
   </div>
@@ -36,6 +36,7 @@ export default {
       default: false
     }
   },
+  inject:['setUseCors'],
   mounted(){
     this.$refs.videoPlayer.replay()
   },

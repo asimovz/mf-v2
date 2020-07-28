@@ -116,7 +116,11 @@ export default {
     mmsTemplate: String, // 模板数据接口
     mmsSave: String, // 模板保存接口
     nodeUrl: String, // node服务接口
-    backUrl: String
+    backUrl: String,
+    useCors: {
+      type: Boolean,
+      default: true
+    }
   },
   data () {
     return {
@@ -175,6 +179,15 @@ export default {
       },
       delWidget () {
         _self.deleteWidget()
+      },
+      setUseCors(url) {
+        if(_self.useCors) {
+          let newUrl = url.replace(/(http|https):\/\//gi,"").split("/")
+          newUrl[0] = "http://10.0.80.13:3001/oss"//_self.nodeUrl + "/oss"
+          return newUrl.join("/")
+        } else {
+          return url
+        }
       },
       mmsConfig: this.config
     }
