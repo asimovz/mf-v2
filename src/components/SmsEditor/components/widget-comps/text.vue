@@ -93,13 +93,12 @@ export default {
       this.$root.TEXT_PARAM.activeBtn(false)
       let text = this.$refs.text.innerHTML
       this.data.text = text
-      // let index = 0
-      // text = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
-      //   index = index + 1
-      //   let r =/(?<=value=").*?(?=")/
-      //   return '{'+data.match(r)[0]+'}'
-      // })
-      this.data.content = ''
+      text = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
+        let r =/(?<=value=").*?(?=")/
+        return data.match(r)[0]
+      })
+
+      this.data.content = text
       if(this.data.text === "")  this.placeholder = "请填写"
       this.$emit("edit",false)
     },

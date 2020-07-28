@@ -194,6 +194,7 @@ export default {
   methods: {
     // 初始化数据
     init() {
+      this.searchStr = ''
       this.initPager()
     },
 
