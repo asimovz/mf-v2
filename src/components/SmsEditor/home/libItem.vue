@@ -13,7 +13,7 @@
           <div class="lib-add el-icon-plus" @click.stop="audioAdd()"></div>
         </widget-audio>
       </template>
-      <div class="lib-name ">{{shortName(data.name)}}</div>
+      <div class="lib-name ">{{ data.name }}</div>
     </div>
   </div>
 </template>
@@ -36,15 +36,7 @@ export default {
       default: () => false
     }
   },
-  data() {
-    return {
-
-    }
-  },
   methods: {
-    shortName(name){
-      return name.length > 10 ? name.substr(0, 10) + '...' : name
-    },
     audioAdd(data) {
       this.$emit('on-add')
     },
@@ -52,14 +44,6 @@ export default {
     	this.$emit('on-remove', id)
     }
   },
-
-  beforeCreate() {
-
-  },
-
-  mounted() {
-
-  }
 }
 
 </script>

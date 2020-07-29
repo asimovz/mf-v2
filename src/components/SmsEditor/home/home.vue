@@ -126,7 +126,7 @@ export default {
   data () {
     return {
       config: {
-        nodeUrl: /*this.nodeUrl*/ 'http://10.0.80.13:3001',
+        nodeUrl: this.nodeUrl,
         mmsSave: this.mmsSave,
         mmsTemplate: this.mmsTemplate,
         library: this.resourceInit,
