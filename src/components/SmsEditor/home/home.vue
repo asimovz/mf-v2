@@ -601,7 +601,7 @@ export default {
         return
       }
       
-      newList = newList.concat({ type: 'text', content: '退订回复T, 此条短信免流', size: 1 })
+      newList = newList.concat({ type: 'text', content: '本条短信免流量，退订回复T', size: 1 })
       let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
       this.captrue(_data)
