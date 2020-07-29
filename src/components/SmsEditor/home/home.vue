@@ -68,11 +68,10 @@
       <div :class="['space-key-mask',{'cursor-grabbing':isMouseDown}]" v-if="isDownSpacebar" @mousedown="dropCanvas"></div>
     </div>
 
-    <el-dialog class="videoConf" title="上传资源" :visible.sync="uploadProgressVisible" :close-on-click-modal="false">
+    <el-dialog class="videoConf" title="资源上传中" :visible.sync="uploadProgressVisible" :close-on-click-modal="false">
       <div style="font-size:12px">
-        <p>资源正在上传至素材库，请勿关闭窗口，完成后窗口自动关闭！</p>
-        <el-progress style="margin: 10px 0" :text-inside="true" :stroke-width="20" :percentage="uploadPercentage" status="success"></el-progress>
-        <p>正在上传：{{uploadPendings[0] ? uploadPendings[0].source.name : ''}}</p>
+        <el-progress style="margin: 10px 0" :text-inside="true" :stroke-width="2" :show-text="false" :percentage="uploadPercentage" status="success"></el-progress>
+        <p>当前进度：{{`${totalUpload - uploadPendings.length} / ${totalUpload}`}}</p>
       </div>
     </el-dialog>
   </div>

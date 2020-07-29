@@ -202,7 +202,7 @@ import VueCropper from '../vue-cropper/vue-cropper'
 import vueDragResize from '../vue-drag-resize/vue-drag-resize'
 import editText from '../widget-comps/editText'
 import html2canvas from 'html2canvas'
-
+import { getObjectURL } from '../../utils.js'
 
 function getRandomId() {
   let maxNumber = 99999999
@@ -592,6 +592,7 @@ export default {
       }
       this.$refs.cropper.getCropData((data) => {
         this.previews.url = data
+
         this.$nextTick(() => {
           html2canvas(this.$refs.imageWrapper, {
             // scale: 3,
@@ -599,28 +600,22 @@ export default {
             height: this.h,
             useCORS: true
           }).then(canvas => {
+            this.configData.baseImg = data
+            
             let dataURL = canvas.toDataURL('image/png')
             let file = this.dataURLtoFile(dataURL, getRandomId() + '.png')
-            // this.data.uri = dataURL
-            this.configData.baseImg = data
 
-            let formData = new FormData()
-            formData.append('file', file)
-            formData.append('type', 'image')
-            formData.append('actionType', 'upload')
-            formData.append('saveResource', 'Y')
+            let uri = getObjectURL(file)
 
-            this._http(this.mmsConfig.file, formData)
-            .then(res => {
-              if(res.type === 'success'){
-                this.$emit('on-save', {
-                  newData: res.data,
-                  imgConf: this.configData
-                })
-              }
-            }).finally(end => {
-              this.saveLoading = false
+            this.$emit('on-save', {
+              newData: {
+                ...this.data,
+                uri
+              },
+              imgConf: this.configData
             })
+
+            this.saveLoading = false
           })
         })
       })

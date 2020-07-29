@@ -10,7 +10,10 @@
 
       <div v-show="libraryType === 'local'">
         <el-popover placement="bottom" trigger="hover" :content="popoverContent">
-          <el-button style="width: 100%;" slot="reference" type="primary" size="small" :disabled="isUpLoading" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">上传{{ typeLabel }}</el-button>
+          <el-button style="width: 100%;" slot="reference" type="primary" size="small" :disabled="isUpLoading || uploadProgressVisible" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">
+            <span v-if="!uploadProgressVisible">上传{{ typeLabel }}</span>
+            <span v-else>{{`正在上传： ${uploadPercentage}%`}}</span>
+          </el-button>
         </el-popover>
         <input style="display: none;" ref="file" type="file" multiple :accept="currentAccept" name="upload" @change="fileChanged" />
       </div>
@@ -37,13 +40,6 @@
         <span style="text-align: center;">{{pager.pageIndex}} / {{pager.pageCount}}</span>
       </el-pagination>
     </div>
-
-    <el-dialog title="上传资源" :visible.sync="uploadProgressVisible" :close-on-click-modal="false" append-to-body>
-      <div style="font-size:12px">
-        <el-progress style="margin-bottom: 10px" :text-inside="true" :stroke-width="20" :percentage="uploadPercentage" status="success"></el-progress>
-        <p>正在上传：{{uploadPendings.name || ''}}</p>
-      </div>
-    </el-dialog>
 
   </div>
 </template>
@@ -119,7 +115,7 @@ export default {
       // 上传中 progress
       uploadProgressVisible: false,
       uploadPercentage: 0,
-      uploadPendings: {}
+      // uploadPendings: {}
     }
   },
   computed: {
@@ -214,6 +210,7 @@ export default {
         ...data,
         id: getRandomId()
       })
+      this.$message('已添加至工作区')
     },
 
     /**
@@ -278,7 +275,7 @@ export default {
 
           this.uploadProgressVisible = true
 
-          this.uploadPendings = files[i]
+          // this.uploadPendings = files[i]
 
           await this.uploadFile(fd)
           
