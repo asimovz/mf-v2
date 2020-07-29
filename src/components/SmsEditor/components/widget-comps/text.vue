@@ -94,8 +94,8 @@ export default {
       let text = this.$refs.text.innerHTML
       this.data.text = text
       text = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
-        let r =/(?<=value=").*?(?=")/
-        return data.match(r)[0]
+        let r =/value="(.*?)(?=">)/
+        return data.match(r)[1]
       })
 
       this.data.content = text
