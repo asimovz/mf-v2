@@ -691,7 +691,7 @@ export default {
             // 修改资源地址及信息
             item.source.name = data.name
             item.source.size = data.size
-            item.source.uri = data.uri
+            item.source.uri = item.source.type == "image" ? encodeURI(data.uri) : data.uri
             item.source.resourceId = data.resourceId
             item.source.poster !== undefined && (item.source.poster = data.poster)
 
