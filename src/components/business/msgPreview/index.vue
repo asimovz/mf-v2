@@ -11,10 +11,11 @@
           <div v-for="(item, index) in card" :key="index">
             <div :class="{
               card: item.replyType,
-              horizontal: item.cardOrientation === 'HORIZONTAL'
+              horizontal: item.cardOrientation === 'HORIZONTAL',
+              [item.cardWidth]: item.cardWidth
             }">
               <div class="main">
-                <div class="resources">
+                <div class="resources" :class="{[item.cardHeight]: item.cardHeight}">
                   <p v-if="item.type === 'text'">{{item.content}}</p>
                   <div v-if="item.type === 'image' || item.type === 'pic'">
                     <img :src="item.content" />
@@ -163,7 +164,8 @@ export default {
               replyType: item.replyType,
               type: mediaType,
               poster: imosThumbnailMediaUrl || thumbnailMediaUrl,
-              cardOrientation: item.reply.cardOrientation
+              cardOrientation: item.reply.cardOrientation,
+              cardHeight: item.reply.height
             }])
           } else {
             item.reply.cards.forEach(card => {
@@ -176,7 +178,9 @@ export default {
                   buttons: card.buttons,
                   replyType: item.replyType,
                   type: mediaType,
-                  poster: imosThumbnailMediaUrl || thumbnailMediaUrl
+                  poster: imosThumbnailMediaUrl || thumbnailMediaUrl,
+                  cardWidth: item.reply.cardWidth,
+                  cardHeight: item.reply.cardHeight
                 }
               ])
             })
@@ -193,6 +197,8 @@ export default {
 .msgPreview {
   width:280px;
   height:560px;
+  // width:320px;
+  // height:640px;
   padding:40px 15px 50px;
   background:url('./phone-bg.png') 0 0 no-repeat;
   background-size: cover;
@@ -203,6 +209,9 @@ export default {
   flex-direction:column;
   .media-bg, audio::-webkit-media-controls-panel{
     background: #f1f3f4;
+  }
+  .el-dialog__body{
+    max-height: 800px;
   }
   .media-bg{
     text-align: center;
@@ -226,6 +235,7 @@ export default {
     video,audio,img{
       width:100%;
       max-width: 100%;
+      height: 100%;
     }
     &::-webkit-scrollbar {
       width: 4px;
@@ -244,6 +254,18 @@ export default {
   .carousel{
     width:100%;
     flex:1;
+    &::-webkit-scrollbar {
+      width: 4px;
+      height: 1px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      box-shadow: inset 0 0 0 2px #dedede;
+      border-radius: 20px;
+    }
+    &::-webkit-scrollbar-track {
+      background: none;
+    }
     .el-carousel__container{
       height: 100%;
     }
@@ -258,11 +280,35 @@ export default {
   .card{
     background: #fff;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, .1);
+    &.SMALL_WIDTH{
+      width:50%;
+    }
+    &.MEDIUM_WIDTH{
+      width: 70%;
+    }
     .desc{
       padding:.5em 1em;
     }
     h3{
       font-weight: normal;
+    }
+
+    .TALL_HEIGHT,.SHORT_HEIGHT{
+      div{
+        height: 132px;
+      }
+    }
+
+    .MEDIUM_HEIGHT{
+      div{
+        height: 90px;
+      }
+    }
+
+    .SHORT_HEIGHT{
+      div{
+        height: 70px;
+      }
     }
 
     &.horizontal{

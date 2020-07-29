@@ -1,37 +1,29 @@
 <template>
   <div class="library library--wrapper">
     <div class="header">
-      <el-radio-group size="small" v-model="libraryType">
-        <el-radio-button label="library">素材库</el-radio-button>
-        <el-radio-button label="local">本地</el-radio-button>
-      </el-radio-group>
+      <span>我的{{typeLabel}}</span>
       <span class="close" @click="$emit('on-close')"><i class="el-icon-close"></i></span>
     </div>
     <div class="operation" :style="{'justify-content': libraryType === 'library' ? 'flex-end' : 'space-between'}">
-      <div v-if="libraryType === 'local'">
-        <el-button v-show="!isCheckAble" size="small" :disabled="isUpLoading" @click="isCheckAble = true">批量操作</el-button>
-        <el-checkbox v-show="isCheckAble" :indeterminate="isIndeterminate" :value="checkAll" @change="checkChanged">全选</el-checkbox>
+      <!-- 工作区搜索框 与 上传按钮 -->
+      <el-input v-show="libraryType === 'library'" class="op-input--search" size="small" suffix-icon="el-icon-search" placeholder="回车搜索素材库" @keyup.enter.native="handleSearch" v-model="searchStr" />
+
+      <div v-show="libraryType === 'local'">
+        <el-popover placement="bottom" trigger="hover" :content="popoverContent">
+          <el-button style="width: 100%;" slot="reference" type="primary" size="small" :disabled="isUpLoading" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">上传{{ typeLabel }}</el-button>
+        </el-popover>
+        <input style="display: none;" ref="file" type="file" multiple :accept="currentAccept" name="upload" @change="fileChanged" />
       </div>
-      <div>
-        <template v-if="isCheckAble">
-          <el-button size="small" type="danger" :disabled="!checkedId.length " @click="libRemove(checkedId)">删除</el-button>
-          <el-button size="small" type="primary" @click="isCheckAble = false">取消</el-button>
-        </template>
-        <template v-else>
-          <el-input class="op-input--search" v-show="libraryType === 'library'" size="small" suffix-icon="el-icon-search" placeholder="回车搜索素材库" @keyup.enter.native="handleSearch" v-model="searchStr" />
-          <template v-if="libraryType === 'local'">
-            <el-popover style="margin-left: 10px;" placement="bottom" trigger="hover" :content="popoverContent">
-              <el-button slot="reference" type="primary" size="small" :disabled="isUpLoading" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">上传{{ typeLabel }}</el-button>
-            </el-popover>
-            <input style="display: none;" ref="file" type="file" multiple :accept="currentAccept" name="upload" @change="fileChanged" />
-          </template>
-        </template>
+
+      <div class="library-type--item">
+        <span :class="{active: libraryType === 'local'}" @click="libraryType = 'local'">我的工作区</span>
+        <span :class="{active: libraryType === 'library'}" @click="libraryType = 'library'">素材库素材</span>
       </div>
     </div>
     <!-- v-infinite-scroll="loadMore" -->
     <div ref="libraryContent" class="library--content scrollbar" :class="{'no-data': !currentDataList.length}" v-loading="fetchLoading || isUpLoading" :element-loading-text="isUpLoading ? `${type['type'] === 'video' ? '转码' : ''}上传中，请稍后...` : ''" :element-loading-spinner="isUpLoading ? 'el-icon-loading' : ''" :element-loading-background="isUpLoading ? 'rgba(0, 0, 0, 0.8)' : ''">
-      <div class="lib-list" :class="{'isCheckable': isCheckAble}">
-        <lib-item :title="isCheckAble ? '选中' : type.type !== 'audio' ? `添加${typeLabel}` : ''" v-for="(item, index) in currentDataList" :key="item.id" :type="type['type']" :data="item" :show-remove="libraryType === 'local'" @on-add="libAdd(item)" @on-remove="libRemove(item.id, index)" @click.native="libAdd(item, $event)">
+      <div class="lib-list">
+        <lib-item :title="`添加${typeLabel}`" v-for="(item, index) in currentDataList" :key="item.id" :type="type['type']" :data="item" :show-remove="libraryType === 'local'" @on-add="libAdd(item)" @on-remove="libRemove(item.id, index)" @click.native="libAdd(item, $event)">
         </lib-item>
       </div>
       <transition name="el-fade-in">
@@ -40,11 +32,19 @@
         </div>
       </transition>
     </div>
-    <div class="library--pager" ref="opPager" v-show="!isCheckAble && currentDataList.length">
+    <div class="library--pager" ref="opPager" v-show="currentDataList.length">
       <el-pagination :current-page.sync="pager.pageIndex" :page-size="pager.pageSize" :page-count="pager.pageCount" layout="prev, slot, next" @current-change="pageChange">
         <span style="text-align: center;">{{pager.pageIndex}} / {{pager.pageCount}}</span>
       </el-pagination>
     </div>
+
+    <el-dialog title="上传资源" :visible.sync="uploadProgressVisible" :close-on-click-modal="false" append-to-body>
+      <div style="font-size:12px">
+        <el-progress style="margin-bottom: 10px" :text-inside="true" :stroke-width="20" :percentage="uploadPercentage" status="success"></el-progress>
+        <p>正在上传：{{uploadPendings.name || ''}}</p>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 <script>
@@ -114,9 +114,12 @@ export default {
       },
 
       isUpLoading: false, // 上传loading
-      // isEditAble: false, // 可编辑名称
-      isCheckAble: false, // 选择模式
-      checkAll: false, // 全选
+
+
+      // 上传中 progress
+      uploadProgressVisible: false,
+      uploadPercentage: 0,
+      uploadPendings: {}
     }
   },
   computed: {
@@ -134,26 +137,10 @@ export default {
     popoverContent() {
       return `${this.typeLabel} 大小不超过 ${this.type.size}M，支持格式： ${this.type['accept']}`
     },
-    // 选中的 id
-    checkedId() {
-      if (this.libraryType === 'local') {
-        return this.localData[this.type['type']].filter(item => item.checked).map(item => item.resourceId)
-      } else {
-        return this.libraryList.filter(item => item.checked).map(item => item.resourceId)
-      }
-    },
-    // 半选
-    isIndeterminate() {
-      if (this.libraryType === 'local') {
-        return this.localData[this.type['type']].some(item => item.checked) && !this.localData[this.type['type']].every(item => item.checked)
-      } else {
-        return this.libraryList.some(item => item.checked) && !this.libraryList.every(item => item.checked)
-      }
-
-    },
+    
 
     currentLocalData() {
-      return this.localData[this.type['type']]
+      return this.localData[this.type['type']] || []
     },
 
     // 当前数据源 ( 可定义在 data 中，切换 libraryType 时赋值， 两种方式有和不同（性能）？？？ )
@@ -187,25 +174,6 @@ export default {
       deep: true,
     },
 
-    isCheckAble(visible) {
-      this.checkAll = false
-
-      if (this.libraryType === 'local') {
-        this.localData[this.type['type']] = this.localData[this.type['type']].map(item => {
-          return {
-            ...item,
-            checked: false
-          }
-        })
-      } else {
-        this.libraryList = this.libraryList.map(item => {
-          return {
-            ...item,
-            checked: false
-          }
-        })
-      }
-    },
 
     canMore(val) {
       if (!val) {
@@ -216,14 +184,17 @@ export default {
     },
 
     libraryType() {
-      this.isCheckAble = false
       this.isUpLoading = false
+    },
+
+    uploadProgressVisible(val){
+      if(val) this.uploadPercentage = 0
     }
   },
   methods: {
     // 初始化数据
     init() {
-      this.isCheckAble = false
+      this.searchStr = ''
       this.initPager()
     },
 
@@ -232,9 +203,17 @@ export default {
       this.pager = {
         pageSize: 20,
         pageCount: 0,
-        total: 100,
+        total: 0,
         pageIndex: 1
       }
+    },
+
+    // 编辑中的素材添加至工作区
+    add2Local(data){
+      this.localData[data.type].unshift({
+        ...data,
+        id: getRandomId()
+      })
     },
 
     /**
@@ -244,31 +223,14 @@ export default {
     libRemove(id, index) {
       if (!id.toString().length) return
 
-      if (!!index) {
-        this.localData[this.type['type']].splice(0, index)
-      } else {
-        this.localData[this.type['type']] = this.localData[this.type['type']].filter(item =>
-          Array.isArray(id) ? !id.includes(item.id) : item.id !== id
-        )
-      }
+      this.localData[this.type['type']].splice(index, 1)
     },
 
     // 选中/选择
     libAdd(item, evt) {
       if (evt && evt.target.tagName === 'INPUT') return
 
-      if (this.isCheckAble) {
-        item.checked = !item.checked
-      } else {
-        this.$emit('on-add', item)
-      }
-    },
-
-    // 设置是否全选
-    checkChanged(val) {
-      this.currentDataList.forEach(item => {
-        item.checked = val
-      })
+      this.$emit('on-add', item)
     },
 
     // 选择文件
@@ -310,10 +272,19 @@ export default {
           if (this.$refs.file) this.$refs.file.value = ''
         } else {
           this.isUpLoading = true
+
           let fd = new FormData()
           fd.append('file', file)
 
+          this.uploadProgressVisible = true
+
+          this.uploadPendings = files[i]
+
           await this.uploadFile(fd)
+          
+          this.uploadPercentage = (i + 1) / files.length * 100 >> 0
+
+          if(i == files.length - 1) this.uploadProgressVisible = false
         }
       }
     },
@@ -345,7 +316,10 @@ export default {
 
           res.data.id = getRandomId()
 
-          res.error === 0 && this.localData[this.type['type']].unshift(res.data)
+          res.error === 0 && this.localData[this.type['type']].unshift({
+            ...res.data,
+            name: res.data.name || fd.get('file').name
+          })
         }).finally(cb => {
           this.isUpLoading = false
           if (this.$refs.file) this.$refs.file.value = ''

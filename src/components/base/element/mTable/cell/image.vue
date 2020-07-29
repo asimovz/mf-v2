@@ -52,6 +52,7 @@ export default {
         "=" +
         this.params.value;
     }
+    this.imgUrl = encodeURI(this.imgUrl)
   },
   methods: {
     show(evt) {

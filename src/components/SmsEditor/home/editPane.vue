@@ -7,7 +7,7 @@
     <div class="editPane-content">
       <div class="editPane-preview">
         <template v-if="currentData.type === 'image'">
-          <img :src="currentData.uri" crossorigin="*">
+          <img :src="setUseCors(currentData.uri)">
         </template>
         <template v-if="currentData.type === 'video'">
           <videoPlayer ref="videoPlayer" showMediaInfo :options="videoOptions" />
@@ -120,7 +120,7 @@ export default {
       }
     }
   },
-  inject: ['mmsConfig'],
+  inject: ['mmsConfig', 'setUseCors'],
   methods: {
 
     remove() {
@@ -129,7 +129,10 @@ export default {
     edit() {
       let dt = JSON.parse(JSON.stringify(this.currentData))
       if (this.currentData.type === 'image') {
-        this.editDataImg = dt
+        this.editDataImg = {
+          ...dt,
+          uri: this.setUseCors(dt.uri)
+        }
         this.isImgEdit = true
       }
       if (this.currentData.type === 'video') {
@@ -147,47 +150,19 @@ export default {
 
     async onSave({ newData, imgConf = {} }) {
       if (this.currentData.type === 'video') {
-        let { uri, duration, size, poster, videoHeight: height, videoWidth: width, } = newData
-        // 视频被 裁剪、转码、水印设置 过， 需要重新上传
-        if (newData.uri !== this.currentData.uri) {
-          this.$refs.videoConf.showLoading()
-          newData.uri = await this.uploadVideo({ uri, height, width, duration, size, poster })
-        }
-
         this.isVideoEdit = false
-        // 封面不会修改原视频
       } else {
         this.currentData.imgConf = imgConf
         this.isImgEdit = false
       }
 
+      this.$emit('on-add-lib', {
+        ...this.currentData,
+        ...newData
+      })
+
       this.currentData = Object.assign(this.currentData, newData)
     },
-
-    uploadVideo({ uri, height, width, duration, size, poster }) {
-      let fd = new FormData()
-
-      fd.append('type', 'video')
-      fd.append('actionType', 'upload')
-      fd.append('saveResource', 'Y')
-      fd.append('fileUrl', uri)
-      fd.append('poster', poster)
-      fd.append('height', height)
-      fd.append('width', width)
-      fd.append('duration', duration)
-      fd.append('size', size)
-
-      return this._http(this.mmsConfig.file, fd).then(res => {
-        this.$message({
-          type: res.type || 'warning',
-          message: res.messages
-        })
-
-        return res.type === 'success' ? res.data.uri : ''
-      }).finally(end => {
-        this.$refs.videoConf.hideLoading()
-      })
-    }
   },
 }
 

@@ -40,6 +40,9 @@ export default {
       this.$root.TEXT_PARAM.changeCurrent({
         name: this.$root.TEXT_PARAM.nameList.length>0?this.$root.TEXT_PARAM.nameList[0]:'text1'
       })
+
+      document.addEventListener("paste",this.handlePaste)
+
     },
     delParam(e) {
       this.$root.TEXT_PARAM.checkMax()
@@ -48,7 +51,7 @@ export default {
 
     addParam() {
       let dom = this.$refs.text
-      let param = '<input type="button" class="param-input" unselectable="on" readonly value="'+this.$root.TEXT_PARAM.current.name+'">'
+      let param = '<input type="button" class="param-input" unselectable="on" readonly value="{'+this.$root.TEXT_PARAM.current.name+'}">'
       let sel = window.getSelection()
       let range
       if (sel.getRangeAt && sel.rangeCount) {
@@ -84,19 +87,51 @@ export default {
       })
     },
     changeText() {
+      document.removeEventListener("paste",this.handlePaste)
+
       this.isEdit = false
       this.$root.TEXT_PARAM.activeBtn(false)
       let text = this.$refs.text.innerHTML
       this.data.text = text
-      let index = 0
       text = text.replace(/<input(([\s\S])*?)>/g, function(data,p1) {
-        index = index + 1
-        let r =/(?<=value=").*?(?=")/
-        return '{'+data.match(r)[0]+'}'
+        let r =/value="(.*?)(?=">)/
+        return data.match(r)[1]
       })
+
       this.data.content = text
       if(this.data.text === "")  this.placeholder = "请填写"
       this.$emit("edit",false)
+    },
+    handlePaste(e){
+      e.stopPropagation();
+      e.preventDefault();
+      var text = '', event = (e.originalEvent || e);
+      if (event.clipboardData && event.clipboardData.getData) {
+        text = event.clipboardData.getData('text/plain');
+      } else if (window.clipboardData && window.clipboardData.getData) {
+        text = window.clipboardData.getData('Text');
+      }
+
+      let sel = window.getSelection()
+      let range
+      if (sel.getRangeAt && sel.rangeCount) {
+        range = sel.getRangeAt(0)
+        range.deleteContents()
+        var el = document.createElement('div')
+        el.innerHTML = text
+        var frag = document.createDocumentFragment(), node, lastNode
+        while ((node = el.firstChild)) {
+          lastNode = frag.appendChild(node);
+        }
+        range.insertNode(frag);
+        if (lastNode) {
+          range = range.cloneRange()
+          range.setStartAfter(lastNode)
+          range.collapse(true)
+          sel.removeAllRanges()
+          sel.addRange(range)
+        }
+      }
     }
   }
 };
