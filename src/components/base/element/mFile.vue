@@ -19,7 +19,7 @@
         <div class="audio-preview" v-for="(file, index) in fileList" :key="index">
           <audio v-if="fileType==='audio'" class="outline audio-css" controls :src="file" style="width:300px;height:100%;" ></audio>
           <span class="upload_files-actions-audio">
-            <div class="audio-name">{{fileName[index]}}</div>
+            <div class="audio-name" :title="fileName[index]">{{fileName[index]}}</div>
             <i class="el-icon-close audio-close"  @click="handleRemove(index)"></i>
           </span>
         </div>
@@ -501,6 +501,7 @@ export default {
   font-size: 12px;
 }
 .upload_files-actions-audio .audio-close {
+  cursor: pointer;
   font-size: 16px;
   position: absolute;
   right: 14px;
