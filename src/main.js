@@ -3,6 +3,7 @@ import App from './App'
 import axios from './axios'
 import moquiComponents from './components'
 import moqui from './assets/js/moquiLibs'
+import './assets/js/watermark'
 import _L from 'accredit'
 
 import "./assets/css/main.less"

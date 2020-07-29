@@ -62,8 +62,11 @@ export default {
       var data = new FormData(event.target)
       vm.$http.post('/Login/signLogin', data).then(response => {
         var moquiData = response.data
+
         this.$root.moquiSessionToken = moquiData.confMoquiSessionToken
         store.set("moquiSessionToken", moquiData.confMoquiSessionToken)
+        store.set("userFullName", moquiData.userFullName)
+        store.set("username", moquiData.username)
         this.$emit("updateView")
       }, err => {
         // error callback

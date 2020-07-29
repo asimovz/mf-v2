@@ -2,6 +2,7 @@ import merge from 'lodash/merge'
 import baseChart from '../base'
 import methodMixins from './methods'
 import { noData } from '../config'
+import watermark from '@/assets/js/watermark'
 
 const methodNames = [
   'mergeOptions',
@@ -46,6 +47,7 @@ export default {
   data () {
     return {
       options: {},
+      innerOptions: {},
       chartData: {},
       params: {},
       innerSettings: {},
@@ -54,7 +56,7 @@ export default {
   },
   computed: {
     chartDataStr () {
-      return JSON.stringify(this.extend) + JSON.stringify(this.settings) + JSON.stringify(this.innerSettings) + JSON.stringify(this.chartData)
+      return JSON.stringify(this.extend) + JSON.stringify(this.settings) + JSON.stringify(this.innerSettings) + JSON.stringify(this.chartData) + JSON.stringify(this.innerOptions)
     }
   },
   watch: {
@@ -66,7 +68,9 @@ export default {
     },
     chartDataStr: {
       async handler (v) {
-        const [extend, originData] = [this.extend, this.chartData]
+        let [extend, originData] = [this.extend, this.chartData]
+
+        extend = { ...extend, ...this.innerOptions}
 
         const data = this.extract(originData, ['columns', 'rows'])
         const originSetting = this.extract(originData, ['settings'])
@@ -119,6 +123,14 @@ export default {
     manualUpdate: Boolean
   },
   created () {
+    watermark.start().then(res => {
+      this.innerOptions.backgroundColor = {
+        type: "pattern",
+        repeat: "repeat",
+        image: watermark.watermarkCanvas
+      }
+    })
+
     this.$nextTick(() => {
       if (this.searchForm) {
         this.listenerSearch()
