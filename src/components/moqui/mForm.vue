@@ -160,7 +160,8 @@ export default {
 						this.formData.append(this.formData.get('upLoadName'), new File([res], names[i], {lastModified: Date.now()}));
 					}
 					
-					this.formData.delete('isupLoadFileNames');
+					this.formData.delete('isupLoadFileNames')
+					this.formData.delete('upLoadName')
 				}
 			}
 
