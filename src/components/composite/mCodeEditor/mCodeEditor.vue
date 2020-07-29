@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="code-mirror--wrapper">
     <template v-if="merge">
       <div ref="mergeview"></div>
     </template>
@@ -19,6 +19,10 @@
 </template>
 
 <style>
+.code-mirror--wrapper{
+  width: 100%;
+  margin: 0;
+}
 .CodeMirror {
   border: 1px solid;
   width: 100%;
