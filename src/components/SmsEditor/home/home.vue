@@ -68,7 +68,7 @@
       <div :class="['space-key-mask',{'cursor-grabbing':isMouseDown}]" v-if="isDownSpacebar" @mousedown="dropCanvas"></div>
     </div>
 
-    <el-dialog class="videoConf" title="资源上传中" :visible.sync="uploadProgressVisible" :close-on-click-modal="false">
+    <el-dialog width="400px" class="videoConf" title="资源上传中" :visible.sync="uploadProgressVisible" :close-on-click-modal="false">
       <div style="font-size:12px">
         <el-progress style="margin: 10px 0" :text-inside="true" :stroke-width="2" :show-text="false" :percentage="uploadPercentage" status="success"></el-progress>
         <p>当前进度：{{`${totalUpload - uploadPendings.length} / ${totalUpload}`}}</p>
