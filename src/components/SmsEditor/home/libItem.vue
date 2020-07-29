@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     shortName(name){
-      return name.substr(0, 10)
+      return name.length > 10 ? name.substr(0, 10) + '...' : name
     },
     audioAdd(data) {
       this.$emit('on-add')

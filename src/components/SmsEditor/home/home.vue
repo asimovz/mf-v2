@@ -126,7 +126,7 @@ export default {
   data () {
     return {
       config: {
-        nodeUrl: this.nodeUrl,
+        nodeUrl: /*this.nodeUrl*/ 'http://10.0.80.13:3001',
         mmsSave: this.mmsSave,
         mmsTemplate: this.mmsTemplate,
         library: this.resourceInit,
@@ -182,7 +182,7 @@ export default {
         _self.deleteWidget()
       },
       setUseCors(url) {
-        if(_self.useCors && url.indexOf(_self.nodeUrl) < 0) {
+        if(_self.useCors && url.indexOf(_self.nodeUrl) < 0 && url.substr(0, 5) !== 'blob:') {
           let newUrl = url.replace(/(http|https):\/\//gi,"").split("/")
           newUrl[0] = _self.nodeUrl + "/oss"
           return newUrl.join("/")
@@ -252,7 +252,7 @@ export default {
       return !this.mmsData.list.length
     },
     uploadPercentage(){
-      return this.totalUpload === 0 ? 0 : (this.totalUpload - this.uploadPendings.length) / this.totalUpload * 100
+      return this.totalUpload === 0 ? 0 : parseInt((this.totalUpload - this.uploadPendings.length) / this.totalUpload * 100)
     },
 
     flatMmsList(){

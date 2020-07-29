@@ -140,7 +140,7 @@ export default {
     
 
     currentLocalData() {
-      return this.localData[this.type['type']]
+      return this.localData[this.type['type']] || []
     },
 
     // 当前数据源 ( 可定义在 data 中，切换 libraryType 时赋值， 两种方式有和不同（性能）？？？ )
@@ -233,13 +233,6 @@ export default {
       this.$emit('on-add', item)
     },
 
-    // 设置是否全选
-    checkChanged(val) {
-      this.currentDataList.forEach(item => {
-        item.checked = val
-      })
-    },
-
     // 选择文件
     async fileChanged(evt) {
       let input = evt.target
@@ -268,21 +261,7 @@ export default {
           continue
         }
 
-        if (this.type['type'] === 'video') {
-          // this.isUpLoading = true
-
-          let fd = new FormData()
-          fd.append('file', file)
-
-          this.uploadProgressVisible = true
-
-          await this.uploadFile(fd)
-          
-          this.uploadPercentage = (i + 1) / files.length * 100 >> 0
-          this.uploadPendings = files[i]
-
-          if(i == files.length - 1) this.uploadProgressVisible = false
-        } else {
+        if (this.type['type'] === 'image') {
           this.localData[this.type['type']].unshift({
             id: getRandomId(),
             name: file.name,
@@ -291,6 +270,21 @@ export default {
           })
 
           if (this.$refs.file) this.$refs.file.value = ''
+        } else {
+          this.isUpLoading = true
+
+          let fd = new FormData()
+          fd.append('file', file)
+
+          this.uploadProgressVisible = true
+
+          this.uploadPendings = files[i]
+
+          await this.uploadFile(fd)
+          
+          this.uploadPercentage = (i + 1) / files.length * 100 >> 0
+
+          if(i == files.length - 1) this.uploadProgressVisible = false
         }
       }
     },
@@ -322,7 +316,10 @@ export default {
 
           res.data.id = getRandomId()
 
-          res.error === 0 && this.localData[this.type['type']].unshift(res.data)
+          res.error === 0 && this.localData[this.type['type']].unshift({
+            ...res.data,
+            name: res.data.name || fd.get('file').name
+          })
         }).finally(cb => {
           this.isUpLoading = false
           if (this.$refs.file) this.$refs.file.value = ''
