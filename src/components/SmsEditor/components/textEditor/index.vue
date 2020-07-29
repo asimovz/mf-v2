@@ -137,7 +137,7 @@ export default {
           for(var i in inputsArr){
             if(inputsArr[i].value) {
               inputs.push({
-                name:inputsArr[i].value
+                name:inputsArr[i].value.replace(/\{|}/g,'')
               })
             }
           }
@@ -151,6 +151,7 @@ export default {
             this.$root.TEXT_PARAM.nameList.push(item.name)
           })
           this.$root.TEXT_PARAM.nameList = this.$root.TEXT_PARAM.nameList.sort()
+          console.log(111,this.$root.TEXT_PARAM)
           this.$root.TEXT_PARAM.changeCurrent({
             name: this.$root.TEXT_PARAM.nameList.length>0?this.$root.TEXT_PARAM.nameList[0]:'text1'
           })
