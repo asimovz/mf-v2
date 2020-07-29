@@ -1,3 +1,4 @@
+
 export default {
   grid: {
     containLabel: true,
