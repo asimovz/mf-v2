@@ -111,7 +111,8 @@ export default {
 				//表单内button置灰
 				this.resubmit(true)	
 				//获取formData
-				if(this.handleParams(param)) return
+				let flag = await this.handleParams(param)
+				if(flag) return
 				if(this.isSearchForm){
 					this.$root.eventBus.$emit("search_form_data_" + this.id ,this.formData)
 					this.resubmit(false)
@@ -132,7 +133,7 @@ export default {
 			}
 		},
 
-		handleParams(param){
+		async handleParams(param){
 			this.formData = new FormData(this.$el);
 			// formData.append('moquiSessionToken', this.$root.moquiSessionToken);
 			$.each(this.fieldsArr, function(key, value) {
@@ -143,6 +144,23 @@ export default {
 			for (var key of this.formData.keys()) {
 				if (key == '_NA_') {
 					this.formData.delete(key);
+				}
+			}
+
+			//mFile中上传的元素全部转为file格式
+			for (var key of this.formData.keys()) {
+				if (key == 'isupLoadFileNames') {
+					let list = this.formData.get('isUploadedFile').split(",")
+					let names = this.formData.get('isupLoadFileNames').split(",")
+					for (let i=0;i<list.length;i++) {
+						let file = list[i]
+						let res = await this._http(file, {}, {baseURL: '', method: 'get', responseType: 'blob' }).then(res => {
+							return res
+						})
+						this.formData.append(this.formData.get('upLoadName'), new File([res], names[i], {lastModified: Date.now()}));
+					}
+					
+					this.formData.delete('isupLoadFileNames');
 				}
 			}
 
@@ -180,6 +198,7 @@ export default {
 			if(param) {
 				Object.keys(param).map(index => {
 					this.formData.append(index, param[index]);
+
 				})
 			}
 			return this.$http.post(postUrl,this.formData).then(async response => {

@@ -1,7 +1,9 @@
 <template>
   <div style="display:inline-block" id="mFileRoot">
-    <!-- <input class="hidden" ref="input" :form="form" :id="id" :name="name" type="file" :multiple="multiple" :accept="accept" @change="uploadSelect" /> -->
+    <input class="hidden" ref="input" :form="form" :id="id" type="file" :multiple="multiple" :accept="accept" @change="uploadSelect" />
     <input name="isUploadedFile" type="hidden" size="100" v-model="fileList" v-validate="validate" :data-vv-as="fieldTitle" data-vv-name="isUploadedFile" />
+    <input name="isupLoadFileNames" type="hidden" v-model="fileArr" />
+    <input name="upLoadName" type="hidden" :value="name" />
     <input :form="form" :name="isUpFileDelName" type="hidden" v-model="isUpFileDel" />
     <template v-if="type=='button'">
       <template v-for="(file, index) in fileName">
@@ -111,6 +113,7 @@ export default {
   data() {
     return {
       fileList: this.files != null ? this.files.split(",") : [],
+      fileArr: [],
       scaleStyle: '',
       imgStyle: '',
       fileName: [],
@@ -142,30 +145,14 @@ export default {
   methods: {
     handleClick(event) {
       event.stopPropagation()
-      let fileInput = document.createElement("input")
-      if(this.form) fileInput.setAttribute("form", this.form)
-      fileInput.setAttribute("class", 'hidden')
-      fileInput.setAttribute("ref", 'input')
-      fileInput.setAttribute("id", this.id)
-      fileInput.setAttribute("name", this.name)
-      fileInput.setAttribute("type", 'file')
-      fileInput.setAttribute("multiple", this.multiple)
-      fileInput.setAttribute("accept", this.accept)
-      fileInput.addEventListener('change', this.uploadSelect);
-      let root = document.getElementById("mFileRoot")
-      root.appendChild(fileInput)
-      fileInput.click()
-      // this.$refs.input.click()
+      this.$refs.input.click()
     },
 
     uploadSelect(event) {
-      
       let inputDOM = event.target;
       // let file = Array.from(inputDOM.files)
       let files = Array.from(inputDOM.files)
-      if (files.some(file => !this.validateFile(file))) {
-        return
-      }
+      files.some(file => !this.validateFile(file, files))
       if (this.type == "card") {
         var url = files.map(file => URL.createObjectURL(file))
         this.fileList = this.fileList.concat(url)
@@ -182,26 +169,13 @@ export default {
         this.fileList = this.fileList.slice(0, this.maxLength)
         this.fileName = this.fileName.slice(0, this.maxLength)
       }
-
+      
+      this.fileArr = this.fileName
       this.isUpFileDel = false
-      // let root = document.getElementById("mFileRoot")
-      // let inputs = root.getElementsByClassName('hidden')
-      // for(var i in inputs){
-      //   let arr = Array.from(inputs[i].files)
-      //   if(arr.length === 0) {
-      //     root.removeChild(inputs[i])
-      //   }
-      // }
     },
     handleRemove(index) {
-      // let input = this.$refs.input
-      // input.value = ""
-      let root = document.getElementById("mFileRoot")
-      if(index === -1) {
-        root.removeChild(root.getElementsByClassName('hidden')[root.getElementsByClassName('hidden').length-1])
-        return
-      }
-      root.removeChild(root.getElementsByClassName('hidden')[index])
+      let input = this.$refs.input
+      input.value = ""
       this.fileList.splice(index, 1)
       this.fileName.splice(index, 1)
       this.isUpFileDel = true
@@ -221,7 +195,7 @@ export default {
 
     },
 
-    validateFile(file) {
+    validateFile(file, fileArr) {
       let index = this.fileList.findIndex(files => files.name === file.name)
       if (this.format) {
         const _file_format = file.name.split('.').pop().toLocaleLowerCase()
@@ -235,8 +209,9 @@ export default {
 
       if (this.maxSize) {
         if (file.size > Number(this.maxSize) * 1024) {
-          this.handleMessage("上传文件大小超过最大限制(" + this.maxSize + " kb)",'info')
-          this.handleRemove(index)
+          this.handleMessage(file.name+"文件大小超过最大限制(" + this.maxSize + " kb)",'info')
+          fileArr.splice(fileArr.findIndex(files => files.name === file.name), 1)
+          // this.handleRemove(index)
           return false
         }
       }
