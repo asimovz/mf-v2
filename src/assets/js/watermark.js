@@ -38,6 +38,7 @@ class Watermark {
    
 
     imageElement.src = this.logo
+    imageElement.setAttribute("crossOrigin", 'Anonymous')
     imageElement.width = this.sourceWidth
     imageElement.height = this.sourceHeight
 
