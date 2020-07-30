@@ -96,6 +96,7 @@ Vue.prototype.handleNotice = function (msg = '操作成功!', type = 'info') {
   this.$notify({
     type: type === 'danger' ? 'error' : type,
     title: title,
+    dangerouslyUseHTMLString:true,
     message: msg
   })
 }
