@@ -14,7 +14,8 @@
     :confirmation="confirmation"
     :disabled="disabled"
 		@click="handleClick"
-		>
+		> 
+      <i class="el-icon-loading" v-if="loading" style="font-size: 14px;"></i>
       <slot v-if="text == ''"></slot>
       <span v-else>{{text}}</span>
     </el-button>
@@ -103,7 +104,8 @@ export default {
       typeStr: this.type == 'danger' ? 'danger' : this.type,
       submitType: this.form ? 'submit' : this.htmlType,
       outEventName: `dynamic_visible_change_${outTarget}`,
-      tableEvent: this.targetList ? this.targetList + '_table_multi_submit' : ''
+      tableEvent: this.targetList ? this.targetList + '_table_multi_submit' : '',
+      loading: false
     }
   },
   inject: {
@@ -122,6 +124,11 @@ export default {
         return 'default'
       }
     }
+  },
+  mounted() {
+    this.$root.eventBus.$on("loading_button_flag" , result => {
+			this.loading = result
+		})
   },
   methods: {
     getFieldData() {
@@ -194,6 +201,7 @@ export default {
         this.$root.eventBus.$off(this.outEventName)
       }
       this.$root.eventBus.$emit('m_form_submit_' + this.form)
+      this.$root.eventBus.$off('loading_button_flag')
     }
   }
 }

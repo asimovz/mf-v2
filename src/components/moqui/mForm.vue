@@ -65,8 +65,10 @@ export default {
 				formBtnArr.map(item => {
 					if(param) {
 						item.setAttribute("disabled",param)
+						this.$root.eventBus.$emit("loading_button_flag" ,true)
 					} else {
 						item.removeAttribute("disabled")
+						this.$root.eventBus.$emit("loading_button_flag" ,false)
 					}
 				})
 			}
