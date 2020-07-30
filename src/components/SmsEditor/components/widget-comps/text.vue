@@ -24,6 +24,8 @@ export default {
           this.$root.TEXT_PARAM.changeCurrent({
             name: e.target.value
           })
+          let sel = window.getSelection()
+          sel.removeAllRanges()
         },200)
       } else {
         if(this.$root.TEXT_PARAM && this.isEdit) {
@@ -36,7 +38,6 @@ export default {
     },
     focus(e) {
       this.$root.TEXT_PARAM.addParam = this.addParam
-      this.$root.TEXT_PARAM.activeBtn(true)
       this.$root.TEXT_PARAM.changeCurrent({
         name: this.$root.TEXT_PARAM.nameList.length>0?this.$root.TEXT_PARAM.nameList[0]:'text1'
       })
@@ -45,8 +46,9 @@ export default {
 
     },
     delParam(e) {
-      this.$root.TEXT_PARAM.checkMax()
       this.$root.TEXT_PARAM.delParam()
+      this.$root.TEXT_PARAM.checkMax()
+      this.$root.TEXT_PARAM.activeBtn(true)
     },
 
     addParam() {
@@ -85,6 +87,8 @@ export default {
         range.selectAllChildren(this.$refs.text)
         range.collapseToEnd()
       })
+      this.$root.TEXT_PARAM.checkMax()
+      this.$root.TEXT_PARAM.activeBtn(true)
     },
     changeText() {
       document.removeEventListener("paste",this.handlePaste)
