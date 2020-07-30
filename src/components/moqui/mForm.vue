@@ -150,23 +150,23 @@ export default {
 
 				// mFile中上传的元素全部转为file格式
 				if (key == 'isupLoadFileNames') {
-					let list = this.formData.get('isUploadedFile').split(",")
-					let names = this.formData.get('isupLoadFileNames').split(",")
-					for (let i=0;i<list.length;i++) {
-						let file = list[i]
-						let res = await this.$http({
-							method: 'get',
-							baseURL: '',
-							url: file,
-							responseType: 'blob',
-							data: {}
-						}).then(async res => {
-							return res.data
-						})
-						this.formData.append(this.formData.get('upLoadName'), new File([res], names[i], {lastModified: Date.now()}));
+					if(this.formData.get('isUploadedFile') && this.formData.get('isUploadedFile') != "" ) {
+						let list = this.formData.get('isUploadedFile').split(",")
+						let names = JSON.parse(this.formData.get('isupLoadFileNames'))
+						for (let i=0;i<list.length;i++) {
+							let file = list[i]
+							let res = await this.$http({
+								method: 'get',
+								baseURL: '',
+								url: file,
+								responseType: 'blob',
+								data: {}
+							})
+							this.formData.append(this.formData.get('upLoadName'), new File([res.data], names[i], {lastModified: Date.now()}));
+						}
+						this.formData.delete('isupLoadFileNames')
+						this.formData.delete('upLoadName')
 					}
-					this.formData.delete('isupLoadFileNames')
-					this.formData.delete('upLoadName')
 				}
 			}
 
