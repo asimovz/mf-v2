@@ -2,7 +2,7 @@
   <div style="display:inline-block" id="mFileRoot">
     <input class="hidden" ref="input" :form="form" :id="id" type="file" :multiple="multiple" :accept="accept" @change="uploadSelect" />
     <input name="isUploadedFile" type="hidden" size="100" v-model="fileList" v-validate="validate" :data-vv-as="fieldTitle" data-vv-name="isUploadedFile" />
-    <input name="isupLoadFileNames" type="hidden" v-model="fileArr" />
+    <input name="isupLoadFileNames" type="hidden" v-model='JSON.stringify(fileArr)' />
     <input name="upLoadName" type="hidden" :value="name" />
     <input :form="form" :name="isUpFileDelName" type="hidden" v-model="isUpFileDel" />
     <template v-if="type=='button'">
@@ -153,18 +153,15 @@ export default {
       // let file = Array.from(inputDOM.files)
       let files = Array.from(inputDOM.files)
       files.some(file => !this.validateFile(file, files))
+      var url = files.map(file => URL.createObjectURL(file))
+      this.fileList = this.fileList.concat(url)
+      this.fileName = this.fileName.concat(files.map(file => file.name))
+
       if (this.type == "card") {
-        var url = files.map(file => URL.createObjectURL(file))
-        this.fileList = this.fileList.concat(url)
-        this.fileName = this.fileName.concat(files.map(file => file.name))
         setTimeout(() => {
           this.getImgOrigin()
         }, 20)
-      } else {
-        var url = files.map(file => URL.createObjectURL(file))
-        this.fileList = this.fileList.concat(url)
-        this.fileName = this.fileName.concat(files.map(file => file.name))
-      }
+      } 
       if(this.fileList.length > this.maxLength){
         this.handleMessage(`最大上传数量为 ${this.maxLength}`,'warning')
         this.fileList = this.fileList.slice(0, this.maxLength)
