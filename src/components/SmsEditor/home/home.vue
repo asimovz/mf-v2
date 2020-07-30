@@ -586,7 +586,7 @@ export default {
             newContent = newContent.replace(/<input(([\s\S])*?)>/,`{text${this.textParamsLen}}`)
           }
           _item.name = this.initParams.messageName
-          _item.content = newContent
+          _item.content = newContent.replace(/&nbsp;/g, ' ')
           _item.size = 1
         } else {
           ids.push(resourceId)
