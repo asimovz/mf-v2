@@ -726,7 +726,6 @@ export default {
     // 截图前处理
     beforeCaptrue () {
       this.$refs.windowBody.classList.add('isCapture')
-      document.querySelector('.body-content').scrollTop = 0
     },
 
     async captrue (sData) {
@@ -741,8 +740,10 @@ export default {
       html2canvas(bodyScrollbar, {
         width,
         height,
-        windowWidth: document.body.scrollWidth,
-        windowHeight: document.body.scrollHeight,
+        windowWidth: bodyScrollbar.clientWidth,
+        windowHeight: bodyScrollbar.clientHeight,
+        scrollY: -window.pageYOffset, // fix: 截图时由于窗口滚动造成截图偏移， 设置为 0 不生效？？？
+        scrollX: -window.pageXOffset,
         useCORS: true
       }).then(canvas => {
         let dataURL = canvas.toDataURL('image/png')
