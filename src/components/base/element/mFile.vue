@@ -153,17 +153,21 @@ export default {
       // let file = Array.from(inputDOM.files)
       let files = Array.from(inputDOM.files)
       files.some(file => !this.validateFile(file, files))
+      var url = files.map(file => URL.createObjectURL(file))
+      this.fileList = this.fileList.concat(url)
+      this.fileName = this.fileName.concat(files.map(file => file.name))
       if (this.type == "card") {
-        var url = files.map(file => URL.createObjectURL(file))
-        this.fileList = this.fileList.concat(url)
-        this.fileName = this.fileName.concat(files.map(file => file.name))
         setTimeout(() => {
           this.getImgOrigin()
         }, 20)
-      } else {
-        this.fileList = this.fileList.concat(files.map(file => file.name))
-        this.fileName = this.fileName.concat(files.map(file => file.name))
-      }
+      } 
+      // else {
+      //   var url = files.map(file => URL.createObjectURL(file))
+      //   this.fileList = this.fileList.concat(url)
+      //   this.fileName = this.fileName.concat(files.map(file => file.name))
+      //   // this.fileList = this.fileList.concat(files.map(file => file.name))
+      //   // this.fileName = this.fileName.concat(files.map(file => file.name))
+      // }
       if(this.fileList.length > this.maxLength){
         this.handleMessage(`最大上传数量为 ${this.maxLength}`,'warning')
         this.fileList = this.fileList.slice(0, this.maxLength)
