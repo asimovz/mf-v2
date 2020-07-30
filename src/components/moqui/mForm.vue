@@ -151,7 +151,7 @@ export default {
 				// mFile中上传的元素全部转为file格式
 				if (key == 'isupLoadFileNames') {
 					let list = this.formData.get('isUploadedFile').split(",")
-					let names = this.formData.get('isupLoadFileNames').split(",")
+					let names = JSON.parse(this.formData.get('isupLoadFileNames'))
 					for (let i=0;i<list.length;i++) {
 						let file = list[i]
 						let res = await this.$http({
@@ -160,8 +160,6 @@ export default {
 							url: file,
 							responseType: 'blob',
 							data: {}
-						}).then(async res => {
-							return res.data
 						})
 						this.formData.append(this.formData.get('upLoadName'), new File([res], names[i], {lastModified: Date.now()}));
 					}
