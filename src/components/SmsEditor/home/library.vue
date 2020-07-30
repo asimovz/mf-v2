@@ -317,7 +317,7 @@ export default {
         })
       }
 
-      this.isUpLoading = false
+      this.uploadProgressVisible = false
       input.value = ''
     },
 
