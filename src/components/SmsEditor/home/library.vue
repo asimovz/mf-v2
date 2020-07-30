@@ -246,7 +246,11 @@ export default {
 
         if (!this.validatedType(_fileType)) {
           this.$message.warning(`${file.name} 格式不正确, 请上传正确格式的素材`)
-          input.value = ''
+          continue
+        }
+
+        if (file.name.split('.').slice(0, -1).join().match(".*[%&=,;. ].*")){
+          this.$message.warning(`${file.name} 文件名不符合上传规范，请重新命名`)
           continue
         }
 
@@ -254,7 +258,6 @@ export default {
           this.$message.warning(
             `${file.name} 大小超过限制 ${this.type['size']}M, 请重新选择`
           )
-          input.value = ''
           continue
         }
 
@@ -266,7 +269,6 @@ export default {
             uri: getObjectURL(file),
           })
 
-          if (this.$refs.file) this.$refs.file.value = ''
         } else {
           this.isUpLoading = true
 
@@ -284,6 +286,8 @@ export default {
           if(i == files.length - 1) this.uploadProgressVisible = false
         }
       }
+
+      input.value = ''
     },
 
     // 验证文件大小
