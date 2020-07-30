@@ -161,7 +161,8 @@ export default {
           this.getImgOrigin()
         }, 20)
       } else {
-        this.fileList = this.fileList.concat(files.map(file => file.name))
+        var url = files.map(file => URL.createObjectURL(file))
+        this.fileList = this.fileList.concat(url)
         this.fileName = this.fileName.concat(files.map(file => file.name))
       }
       if(this.fileList.length > this.maxLength){
