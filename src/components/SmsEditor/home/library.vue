@@ -250,7 +250,11 @@ export default {
         }
 
         if (file.name.split('.').slice(0, -1).join().match(".*[%&=,;. ].*")){
-          this.$message.warning(`${file.name} 文件名不符合上传规范，请重新命名`)
+          this.$message({
+            type: 'warning',
+            dangerouslyUseHTMLString: true,
+            message: `<span>${file.name} 文件名不可包含 <strong style="color: #fe6c6f"> %&=,;. </strong> 与 <strong style="color: #fe6c6f"> 空格 </strong>，请重新命名</span>`
+          })
           continue
         }
 
