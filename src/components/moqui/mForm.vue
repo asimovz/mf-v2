@@ -140,26 +140,29 @@ export default {
 				this.formData.append(key, value);
 			});
 
-			//表单元素中name为 _NA_ 占位标识的元素值移除
 			for (var key of this.formData.keys()) {
+				//表单元素中name为 _NA_ 占位标识的元素值移除
 				if (key == '_NA_') {
 					this.formData.delete(key);
 				}
-			}
 
-			//mFile中上传的元素全部转为file格式
-			for (var key of this.formData.keys()) {
+				// mFile中上传的元素全部转为file格式
 				if (key == 'isupLoadFileNames') {
 					let list = this.formData.get('isUploadedFile').split(",")
 					let names = this.formData.get('isupLoadFileNames').split(",")
 					for (let i=0;i<list.length;i++) {
 						let file = list[i]
-						let res = await this._http(file, {}, {baseURL: '', method: 'get', responseType: 'blob' }).then(res => {
-							return res
+						let res = await this.$http({
+							method: 'get',
+							baseURL: '',
+							url: file,
+							responseType: 'blob',
+							data: {}
+						}).then(async res => {
+							return res.data
 						})
 						this.formData.append(this.formData.get('upLoadName'), new File([res], names[i], {lastModified: Date.now()}));
 					}
-					
 					this.formData.delete('isupLoadFileNames')
 					this.formData.delete('upLoadName')
 				}
