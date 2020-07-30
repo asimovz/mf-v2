@@ -148,11 +148,13 @@ export default {
 					this.formData.delete(key);
 				}
 
-				// mFile中上传的元素全部转为file格式
-				if (key == 'isupLoadFileNames') {
-					if(this.formData.get('isUploadedFile') && this.formData.get('isUploadedFile') != "" ) {
-						let list = this.formData.get('isUploadedFile').split(",")
-						let names = JSON.parse(this.formData.get('isupLoadFileNames'))
+				//mFile中上传的元素全部转为file格式
+				if (key.indexOf('isUploadedFile') > -1) {
+					let _filename = key.split("_")[1]
+
+					if(this.formData.get(key) && this.formData.get(key) != "" ) {
+						let list = this.formData.get(key).split(",")
+						let names = JSON.parse(this.formData.get('isupLoadFileNames_'+_filename))
 						for (let i=0;i<list.length;i++) {
 							let file = list[i]
 							let res = await this.$http({

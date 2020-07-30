@@ -1,8 +1,8 @@
 <template>
   <div style="display:inline-block" id="mFileRoot">
     <input class="hidden" ref="input" :form="form" :id="id" type="file" :multiple="multiple" :accept="accept" @change="uploadSelect" />
-    <input name="isUploadedFile" type="hidden" size="100" v-model="fileList" v-validate="validate" :data-vv-as="fieldTitle" data-vv-name="isUploadedFile" />
-    <input name="isupLoadFileNames" type="hidden" v-model='JSON.stringify(fileArr)' />
+    <input :name="'isUploadedFile_'+name" type="hidden" size="100" v-model="fileList" v-validate="validate" :data-vv-as="fieldTitle" data-vv-name="isUploadedFile" />
+    <input :name="'isupLoadFileNames_'+name" type="hidden" v-model='JSON.stringify(fileArr)' />
     <input name="upLoadName" type="hidden" :value="name" />
     <input :form="form" :name="isUpFileDelName" type="hidden" v-model="isUpFileDel" />
     <template v-if="type=='button'">
