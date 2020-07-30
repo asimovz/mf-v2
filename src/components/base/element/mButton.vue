@@ -15,7 +15,7 @@
     :disabled="disabled"
 		@click="handleClick"
 		> 
-      <i class="el-icon-loading" v-if="loading && (toggle === 'linkFormLink' || toggle === 'linkFormForm')" style="font-size: 14px;"></i>
+      <i class="el-icon-loading" v-if="loading && (toggle === 'linkFormLink' || toggle === 'linkFormForm')"></i>
       <slot>{{text}}</slot>
     </el-button>
 </template>
