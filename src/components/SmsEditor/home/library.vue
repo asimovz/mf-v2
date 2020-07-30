@@ -232,6 +232,8 @@ export default {
 
     // 选择文件
     async fileChanged(evt) {
+      let unValidateFiles = []
+
       let input = evt.target
       let files = Array.from(input.files)
 
@@ -241,27 +243,31 @@ export default {
 
         // 文件的 格式
         let _fileType = file.name.split('.').slice(-1).join()
-        // 允许上传的 格式
-        let accepts = input.getAttribute('accept')
 
+        // 校验文件格式
         if (!this.validatedType(_fileType)) {
-          this.$message.warning(`${file.name} 格式不正确, 请上传正确格式的素材`)
-          continue
-        }
-
-        if (file.name.split('.').slice(0, -1).join().match(".*[%&=,;. ].*")){
-          this.$message({
-            type: 'warning',
-            dangerouslyUseHTMLString: true,
-            message: `<span>${file.name} 文件名不可包含 <strong style="color: #fe6c6f"> %&=,;. </strong> 与 <strong style="color: #fe6c6f"> 空格 </strong>，请重新命名</span>`
+          unValidateFiles.push({
+            name: file.name,
+            message: '格式不正确, 请上传正确格式的素材'
           })
           continue
         }
 
+        // 校验文件名
+        if (!this.validatedName(file.name)){
+          unValidateFiles.push({
+            name: file.name,
+            message: '<span>文件名不可包含 <strong style="color: #fe6c6f"> %&=,;. </strong> 与 <strong style="color: #fe6c6f"> 空格 </strong>，请重新命名</span>'
+          })
+          continue
+        }
+        
+        // 校验文件大小
         if (!this.validatedSize(file.size)) {
-          this.$message.warning(
-            `${file.name} 大小超过限制 ${this.type['size']}M, 请重新选择`
-          )
+          unValidateFiles.push({
+            name: file.name,
+            message: `<span>大小超过限制 <strong style="color: #fe6c6f"> ${this.type['size']}M </strong>，请重新选择</span>`
+          })
           continue
         }
 
@@ -291,7 +297,32 @@ export default {
         }
       }
 
+      if(unValidateFiles.length){
+
+        let domStr = '<div class="unValidateName--wrapper">' + 
+            unValidateFiles.map(file => {
+              return `<div class='un-file'>
+                <div class='un-name'>${file.name}</div>
+                <div class='un-message'>${file.message}</div>
+              </div>`
+            }).join('')
+          + '</div>'
+
+        this.$message({
+          type: 'warning',
+          iconClass: 'un-icon',
+          customClass: 'el-message--unValidateFile',
+          dangerouslyUseHTMLString: true,
+          message: domStr
+        })
+      }
+
+      this.isUpLoading = false
       input.value = ''
+    },
+
+    validatedName(name){
+      return !name.split('.').slice(0, -1).join().match(".*[%&=,;. ].*")
     },
 
     // 验证文件大小
