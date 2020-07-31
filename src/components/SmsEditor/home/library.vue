@@ -9,12 +9,12 @@
       <el-input v-show="libraryType === 'library'" class="op-input--search" size="small" suffix-icon="el-icon-search" placeholder="回车搜索素材库" @keyup.enter.native="handleSearch" v-model="searchStr" />
 
       <div v-show="libraryType === 'local'">
-        <el-popover placement="bottom" trigger="hover" :content="popoverContent">
-          <el-button style="width: 100%;" slot="reference" type="primary" size="small" :disabled="isUpLoading || uploadProgressVisible" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">
+        <el-tooltip placement="top" trigger="hover" :content="popoverContent">
+          <el-button style="width: 100%;" type="primary" size="small" :disabled="isUpLoading || uploadProgressVisible" :icon="`el-icon-${isUpLoading ? 'loading' : 'upload'}`" @click="$refs.file.click()">
             <span v-if="!uploadProgressVisible">上传{{ typeLabel }}</span>
             <span v-else>{{`正在上传： ${uploadPercentage}%`}}</span>
           </el-button>
-        </el-popover>
+        </el-tooltip>
         <input style="display: none;" ref="file" type="file" multiple :accept="currentAccept" name="upload" @change="fileChanged" />
       </div>
 
@@ -35,7 +35,7 @@
         </div>
       </transition>
     </div>
-    <div class="library--pager" ref="opPager" v-show="currentDataList.length">
+    <div class="library--pager" ref="opPager" v-show="libraryType === 'library'">
       <el-pagination :current-page.sync="pager.pageIndex" :page-size="pager.pageSize" :page-count="pager.pageCount" layout="prev, slot, next" @current-change="pageChange">
         <span style="text-align: center;">{{pager.pageIndex}} / {{pager.pageCount}}</span>
       </el-pagination>

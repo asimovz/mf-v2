@@ -708,7 +708,7 @@ export default {
           uploadCalls.push(pm)
         })
       } catch (err) {
-        console.log(err)
+        throw new Error(err)
       }
       
       try {
