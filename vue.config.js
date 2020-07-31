@@ -117,7 +117,7 @@ module.exports = {
       .set("vue$", "vue/dist/vue.esm.js")
       .set("@", resolve("src"))
       .set("static", resolve("static"))
-      .set("assets", path.resolve(__dirname, './src/assets'),)
+      .set("assets", path.resolve(__dirname, './src/assets'))
       .set("utils", path.resolve(__dirname, './src/components/baseComponent/iview/utils'))
       .set("node_modules", path.resolve(__dirname, './node_modules'))
       .set("accredit",process.env.NODE_ENV === 'production' ? path.resolve(__dirname, './src/assets/js/accredit.js'):path.resolve(__dirname, './src/assets/js/accredit_dev.js'));

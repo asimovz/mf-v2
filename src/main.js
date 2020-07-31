@@ -15,6 +15,33 @@ Vue.prototype.moqui = moqui
 Vue.filter('decodeHtml', moqui.htmlDecode)
 Vue.filter('format', moqui.dateFormat)
 
+
+import { mmsEditor, locale } from '@mf/mms-editor'
+import '@mf/mms-editor/dist/style/bundle.css' 
+
+Vue.use(mmsEditor, {
+  http(url, data, config = {}) {
+    return new Promise((resolve, reject) => {
+      config.method = config.method || 'post'
+      axios({
+        url,
+        data: config.method === 'post' ? data : {},
+        params: config.method === 'get' ? data : {},
+        ...config
+      })
+        .then(res => {
+          if (res.status === 200) {
+            return resolve(res.data)
+          }
+        })
+        .catch(err => reject(err))
+    })
+  },
+  httpError(){
+
+  }
+})
+
 window.moquiVue = new Vue({
   el: '#app',
   template:'<App />',
