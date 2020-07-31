@@ -333,6 +333,7 @@ export default {
           jsonData = data
         }
         this.formSearchParam = jsonData
+        this.queryParams = jsonData
         this.loadQueryData(jsonData, this.pageParams)
       })
     }
@@ -596,7 +597,7 @@ export default {
     },
     // 加载数据
     loadQueryData(queryParams, { pageIndex = 0, pageSize = 20 } = {}) {
-      this.queryParams = this.moqui.merge(this.moqui.clone(queryParams, true), this.initQueryParams)
+      this.queryParams = this.moqui.merge(this.moqui.clone(queryParams, true), this.queryParams, this.initQueryParams)
       var that = this
       for (let key in this.queryParams) {
         this.queryParams[key] ? null : delete this.queryParams[key]
