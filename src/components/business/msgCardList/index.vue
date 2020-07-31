@@ -140,7 +140,7 @@ export default {
       return p < 1 ? 1 : Math.ceil(p) + 1
     }
   },
-  created () {
+  mounted () {
     this.$root.eventBus.$on('pageChangeByMsgCardList', data => {
       this.page.pageIndex = data.pageIndex
       this.page.pageSize = data.pageSize
