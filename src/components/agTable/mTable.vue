@@ -1005,7 +1005,7 @@
         this.loadQueryData(this.queryParams, this.pageParams)
       },
       loadQueryData(queryParams, {pageIndex = 0, pageSize = 20} = {}) {
-        this.queryParams = this.moqui.merge(this.queryParams, this.moqui.clone(queryParams, true), this.initQueryParams)
+        this.queryParams = this.moqui.merge(this.moqui.clone(queryParams, true), this.initQueryParams)
         this.queryParams = {...this.colFilterParams, ...this.queryParams, ...this.formSearchParam}
         var that = this
         for (let key in this.queryParams) {
