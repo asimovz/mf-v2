@@ -208,7 +208,8 @@ export default {
     add2Local(data){
       this.localData[data.type].unshift({
         ...data,
-        id: getRandomId()
+        id: getRandomId(),
+        fileSuffix: data.fileSuffix
       })
       this.$message('已添加至工作区')
     },
@@ -274,7 +275,8 @@ export default {
         if (this.type['type'] === 'image') {
           this.localData[this.type['type']].unshift({
             id: getRandomId(),
-            name: file.name,
+            fileSuffix: `.${_fileType}`,
+            name: file.name.split('.').slice(0, -1).join(''),
             size: file.size,
             uri: getObjectURL(file),
           })
@@ -399,6 +401,7 @@ export default {
             this.pager.pageCount = res.pageMaxIndex + 1
             this.libraryList = (res.data || []).map(item => ({
               ...item,
+              fileSuffix: '.' + item.uri.split('.').slice(-1).join(),
               uri: encodeURI(item.uri)
             }))
 

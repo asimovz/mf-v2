@@ -156,12 +156,13 @@ export default {
         this.isImgEdit = false
       }
 
+      let fileSuffix = this.currentData.fileSuffix || ('.' + this.currentData.uri.split('.').slice(-1).join(''))
       this.$emit('on-add-lib', {
         ...this.currentData,
-        ...newData
+        ...newData, fileSuffix
       })
 
-      this.currentData = Object.assign(this.currentData, newData)
+      this.currentData = Object.assign(this.currentData, newData, { fileSuffix })
     },
   },
 }

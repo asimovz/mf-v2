@@ -115,7 +115,6 @@ export default {
   },
   watch: {
     sourceStr (v,ov) {
-      // debugger
       this.replay()
     },
     currentTime (v) {

@@ -644,7 +644,7 @@ export default {
         }
 
         return this._http(this.config.file, fd, { timeout: 90000 }).then(res => {
-          (res.type !== 'success') && this.$message.warning(res.messages)
+          this.$message({ type: res.type, message: res.messages })
           return res
         })
       }
@@ -660,7 +660,7 @@ export default {
 
         if (item.type === 'image') {
           const blobCall = this._http(item.uri, {}, { baseURL: '', method: 'get', responseType: 'blob' }).then(res => {
-            pending.file = blobToFile(res, item.name)
+            pending.file = blobToFile(res, item.name + item.fileSuffix)
             pendings.push(pending)
           })
 
@@ -702,6 +702,8 @@ export default {
             if(this.uploadPendings.length === 0){
               this.uploadProgressVisible = false
             }
+          }).catch(res => {
+            this.$message.error(res)
           })
 
           // 存储Promise，用于检测是否全部完成
