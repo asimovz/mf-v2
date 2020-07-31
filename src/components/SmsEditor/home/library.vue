@@ -35,7 +35,7 @@
         </div>
       </transition>
     </div>
-    <div class="library--pager" ref="opPager" v-show="libraryType === 'library'">
+    <div class="library--pager" ref="opPager" v-show="libraryType === 'library' && pager.pageIndex > 0">
       <el-pagination :current-page.sync="pager.pageIndex" :page-size="pager.pageSize" :page-count="pager.pageCount" layout="prev, slot, next" @current-change="pageChange">
         <span style="text-align: center;">{{pager.pageIndex}} / {{pager.pageCount}}</span>
       </el-pagination>
@@ -337,6 +337,8 @@ export default {
 
     // 上传素材
     uploadFile(fd) {
+      let type = this.type['type']
+      
       return this._http(this.mmsConfig.nodeUrl + this.mmsConfig.uploadFile, fd, { timeout: 90000 })
         .then(res => {
 
@@ -345,14 +347,14 @@ export default {
             message: res.message
           });
 
-          if (this.type['type'] === 'video') {
+          if (type === 'video') {
             res.data.poster = res.data.thumbnail
             delete res.data.thumbnail
           }
 
           res.data.id = getRandomId()
 
-          res.error === 0 && this.localData[this.type['type']].unshift({
+          res.error === 0 && this.localData[type].unshift({
             ...res.data,
             name: res.data.name || fd.get('file').name
           })
