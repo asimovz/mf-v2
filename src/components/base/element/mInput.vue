@@ -8,7 +8,7 @@
       :size="sizeType"
       :class="['aw-input',inputClasses]"
       :placeholder="placeholder"
-      :disabled="disabled"
+      :disabled="elDisabled"
       :maxlength="maxlength"
       :show-word-limit="maxlength > 0"
       :readonly="readonly"
@@ -38,7 +38,7 @@
       :type="type"
       :class="['aw-textarea',inputClasses]"
       :placeholder="placeholder"
-      :disabled="disabled"
+      :disabled="elDisabled"
       :maxlength="maxlength"
       :show-word-limit="maxlength > 0"
       :readonly="readonly"
@@ -98,6 +98,7 @@ export default {
       type: Boolean,
       default: false
     },
+    disabledDepends: String,
     icon: String,
     autosize: {
       type: [Boolean, Object],
@@ -157,6 +158,7 @@ export default {
   data() {
     const sizeConfig = { small: "mini", default: "small", large: "medium" }
     return {
+        elDisabled:this.disabled,
         currentValue: this.washValue(this.value),
         initValue: this.washValue(this.value),
         timer:null,
@@ -187,6 +189,11 @@ export default {
         root.eventBus.$on(value+'_value_change', result => {
           self.$nextTick(function(){
             let param = self.getTransition();
+            if(typeof result == "object") {
+              param[value.split("_")[1]] = result[value]
+            } else {
+              param[value.split("_")[1]] = result
+            }
             Object.assign(param, self.addParam);
             //先去localStorage中对应url作为key的缓存中检查，是否存在自己的数据；如果没有则去请求，如果有直接去取，并清除掉自己的信息
             //localStorage的value只能为字符串，这里需要注意进行转换
@@ -196,11 +203,18 @@ export default {
               store.set(url,{})
               self.getRemoteDataByDepandsOn(url, param)
             }
+            if(self.disabledDepends) {
+              let value = param[self.disabledDepends]
+              if(value != "") {
+                self.elDisabled = true
+              } else {
+                 self.elDisabled = false
+              }
+            }
           })
         });
       });
     }
-
 
     //绑定提交的form属性，用于表单字段提交
     if(this.form) {
@@ -258,7 +272,8 @@ export default {
         depends.forEach(function(value, key) {
           let itemName = value.split("_")[1]
           let obj = document.querySelector(`input[name='${itemName}']`)
-          param[value.split("_")[1]] = obj.value;
+          if(obj) param[value.split("_")[1]] = obj.value;
+          
         });
         param["moquiSessionToken"] = this.$root.moquiSessionToken;
         return param;
@@ -266,33 +281,38 @@ export default {
     },
 
     setDataFromStore(url){
-      let self = this
-      let cacheData = JSON.parse(store.get(url))
-      //console.log('cacheData==',cacheData)
-      if(cacheData && cacheData.hasOwnProperty(self.name)){
-        self.currentValue = cacheData[self.name]
-        //移除自己的数据
-        delete cacheData[self.name]
-        //重新还回到localStorage中
-        if(JSON.stringify(cacheData) === '{}') {
-          store.remove(url)
+      if(url) {
+        let self = this
+        let cacheData = JSON.parse(store.get(url))
+        //console.log('cacheData==',cacheData)
+        if(cacheData && cacheData.hasOwnProperty(self.name)){
+          self.currentValue = cacheData[self.name]
+          //移除自己的数据
+          delete cacheData[self.name]
+          //重新还回到localStorage中
+          if(JSON.stringify(cacheData) === '{}') {
+            store.remove(url)
+          }
+          else store.set(url,JSON.stringify(cacheData))
         }
-        else store.set(url,JSON.stringify(cacheData))
       }
     },
 
     getRemoteDataByDepandsOn(url, param){
       let self = this
-      self.$http.post(url, param).then(
-        response => {
-          store.set(url,JSON.stringify(response.data))
-          self.setDataFromStore(url)
-        },
-        response => {
-          store.remove(url)
-          console.log("dependsOn动态取值失败！");
-        }
-      );
+      if(url) {
+        self.$http.post(url, param).then(
+          response => {
+            store.set(url,JSON.stringify(response.data))
+            self.setDataFromStore(url)
+          },
+          response => {
+            store.remove(url)
+            console.log("dependsOn动态取值失败！");
+          }
+        )
+      }
+
     },
 
     handleChange(event) {
