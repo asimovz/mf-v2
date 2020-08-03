@@ -17,19 +17,7 @@
         </div>
       </div>
       <div class="editor-body">
-        
-        <btn-tools
-          :isComposeDisabled="isComposeDisabled"
-          :isSplitDisabled="isSplitDisabled"
-          :resetDisabled="!mmsData.list.length"
-          :saveDisabled="saveLoading || !mmsData.list.length"
-          :saveLoading="saveLoading"
-          @on-compose-group="composeGroup"
-          @on-split-group="splitGroup"
-          @on-reset="reset"
-          @on-save="save"
-        ></btn-tools>
-
+        <btn-tools :isComposeDisabled="isComposeDisabled" :isSplitDisabled="isSplitDisabled" :resetDisabled="!mmsData.list.length" :saveDisabled="saveLoading || !mmsData.list.length" :saveLoading="saveLoading" @on-compose-group="composeGroup" @on-split-group="splitGroup" @on-reset="reset" @on-save="save"></btn-tools>
         <div class="editor-canvas" ref="canvas">
           <!-- 画布 -->
           <!-- phone窗口 -->
@@ -37,7 +25,7 @@
             <div :class="['phone-window_body',''] " ref="windowBody">
               <!--body--empty -->
               <div class="body-content scrollbar">
-                 <!-- v-show="mmsData.list.length" -->
+                <!-- v-show="mmsData.list.length" -->
                 <editor-draggable class="body-scrollbar" style="padding-bottom: 15px" :data="mmsData" :select-widget-id="selectWidgetId" @on-del-group="deleteGroup"></editor-draggable>
                 <!-- <div v-show="!mmsData.list.length" class="widget-empty">请添加素材</div> -->
               </div>
@@ -56,18 +44,11 @@
         </div>
       </div>
       <div class="editor-pane-right" :class="{eidtorPaneShow: isEditorShow}">
-        <edit-pane
-          :item="currentEditItem"
-          :params-text="textParamsStr"
-          @on-remove="onEditRemove"
-          @on-close="isEditorShow = false"
-          @on-add-lib="onAddLib"
-        ></edit-pane>
+        <edit-pane :item="currentEditItem" :params-text="textParamsStr" @on-remove="onEditRemove" @on-close="isEditorShow = false" @on-add-lib="onAddLib"></edit-pane>
       </div>
       <!-- 画布拖动 -->
       <div :class="['space-key-mask',{'cursor-grabbing':isMouseDown}]" v-if="isDownSpacebar" @mousedown="dropCanvas"></div>
     </div>
-
     <el-dialog width="400px" class="videoConf" title="资源上传中" :visible.sync="uploadProgressVisible" :close-on-click-modal="false">
       <div style="font-size:12px">
         <el-progress style="margin: 10px 0" :text-inside="true" :stroke-width="2" :show-text="false" :percentage="uploadPercentage" status="success"></el-progress>
@@ -85,7 +66,7 @@ import btnTools from './btnTools'
 import '../assets/css/home.less'
 import { getRandomId, dataURLtoFile } from '../utils.js'
 
-function getAllData (arr) {
+function getAllData(arr) {
   return arr.map(ar => {
     if (ar.type === 'group' && ar.list.length) {
       return getAllData(ar.list)
@@ -95,7 +76,7 @@ function getAllData (arr) {
   })
 }
 
-function replaceTextContent(str){
+function replaceTextContent(str) {
   return str.replace(/<div>/g, '').replace(/(<\/div>|<br>)/g, '\n').replace(/&nbsp;/g, ' ')
 }
 
@@ -122,7 +103,7 @@ export default {
       default: true
     }
   },
-  data () {
+  data() {
     return {
       config: {
         nodeUrl: this.nodeUrl,
@@ -165,24 +146,24 @@ export default {
       uploadProgressVisible: false // 显示上传进度
     }
   },
-  provide () {
+  provide() {
     let _self = this
     return {
-      setSelectWidget (data, param) {
+      setSelectWidget(data, param) {
         _self.setSelectWidget(data, param)
       },
-      setSelectGroup (data, param) {
+      setSelectGroup(data, param) {
         _self.setSelectGroup(data, param)
       },
-      delGroup (index) {
+      delGroup(index) {
         _self.deleteGroup(index)
       },
-      delWidget () {
+      delWidget() {
         _self.deleteWidget()
       },
       setUseCors(url) {
-        if(_self.useCors && url.indexOf(_self.nodeUrl) < 0 && url.substr(0, 5) !== 'blob:') {
-          let newUrl = url.replace(/(http|https):\/\//gi,"").split("/")
+        if (_self.useCors && url.indexOf(_self.nodeUrl) < 0 && url.substr(0, 5) !== 'blob:') {
+          let newUrl = url.replace(/(http|https):\/\//gi, "").split("/")
           newUrl[0] = _self.nodeUrl + "/oss"
           return newUrl.join("/")
         } else {
@@ -193,35 +174,35 @@ export default {
     }
   },
   watch: {
-    widgetPaneShow (visible) {
+    widgetPaneShow(visible) {
       if (!visible) this.currentItemType = ''
     },
   },
-  async created () {
+  async created() {
     if (this.mmsTemplate && this.initParams.messageId) await this.getTemplate()
   },
-  mounted () {
+  mounted() {
     this.listenerPhone()
   },
 
-  beforeDestroy(){
+  beforeDestroy() {
     this.handleClear()
   },
   computed: {
-    isComposeDisabled () {
+    isComposeDisabled() {
       return Object.keys(this.composeGroupList).length >= 2
     },
-    isSplitDisabled () {
+    isSplitDisabled() {
       return Object.keys(this.splitGroupList).length > 0
     },
-    maxFileSize () {
+    maxFileSize() {
       return fileMaxSize.split('M')[0] * 1024
     },
-    fileSize () {
+    fileSize() {
       let list = this.mmsData.list
       let size = 0
       let textContent = ''
-      let getSzie = function g (data) {
+      let getSzie = function g(data) {
         data.map(item => {
           if (item.list && item.list.length > 0) g(item.list)
           if (item.type == 'text') {
@@ -240,40 +221,40 @@ export default {
       return size
     },
 
-    filePercentage () {
+    filePercentage() {
       return this.fileSize / this.maxFileSize > 1 ? 100 : Math.floor(this.fileSize / this.maxFileSize * 100)
     },
-    fileStatus () {
+    fileStatus() {
       return this.fileSize / this.maxFileSize > 1 ? 'exception' : 'success'
     },
 
-    toolbarDisabled () {
+    toolbarDisabled() {
       return !this.mmsData.list.length
     },
-    uploadPercentage(){
+    uploadPercentage() {
       return this.totalUpload === 0 ? 0 : parseInt((this.totalUpload - this.uploadPendings.length) / this.totalUpload * 100)
     },
 
-    flatMmsList(){
+    flatMmsList() {
       return getAllData(this.mmsData.list)
     },
-    textParamsStr(){
+    textParamsStr() {
       return this.flatMmsList.filter(item => item.type === 'text')
         .map(item => replaceTextContent(item.content)).join('')
     }
   },
   methods: {
-    handleClear(){
+    handleClear() {
       let localData = this.$refs.library.localData
       let { video, audio } = localData
       let localList = [...video, ...audio].map(item => item.name)
 
       this.clearNodeLibrary(localList)
     },
-    clearNodeLibrary(data){
+    clearNodeLibrary(data) {
       this._http(this.config.nodeUrl + this.config.clearFile, data)
     },
-    getTemplate () {
+    getTemplate() {
       this._http(this.mmsTemplate, {
         messageId: this.initParams.messageId
       }).then(res => {
@@ -286,14 +267,14 @@ export default {
         this.$message.error('请求失败')
       })
     },
-    goBack () {
+    goBack() {
       this.$confirm('未保存修改将丢失，确认返回?', '提示', {
         type: 'warning'
       }).then(res => {
         this.$refs.goBack.$el.click()
       })
     },
-    listenerPhone () {
+    listenerPhone() {
       const _self = this
       const onkeydown = e => {
         if (e.keyCode == 16) {
@@ -322,7 +303,7 @@ export default {
       document.addEventListener('keyup', onkeyup)
     },
     // 添加彩信组件
-    addDragItem (data) {
+    addDragItem(data) {
       // 点击素材库类型，关闭编辑区
       this.isEditorShow = false
       let _data = JSON.parse(JSON.stringify(data))
@@ -339,7 +320,7 @@ export default {
       this.currentItemType = _data.type
     },
 
-    onLibAdd (data) {
+    onLibAdd(data) {
       // 点击素材添加，关闭编辑区
       this.isEditorShow = false
       let item = JSON.parse(JSON.stringify(this.currentAddDragItem))
@@ -359,13 +340,13 @@ export default {
     },
 
     // 打散组合
-    splitGroup () {
+    splitGroup() {
       this.mmsData.list.splice(this.currentGroupIndex, 1, ...this.splitGroupList.list)
       this.splitGroupList = {}
       this.currentGroupIndex = -1
     },
     // 组合组件
-    composeGroup () {
+    composeGroup() {
       if (this.isObjectEmpty(this.composeGroupList)) return
       let list = this.mmsData.list
       let newGroup = []
@@ -386,7 +367,7 @@ export default {
       })
     },
     // 选择组合
-    setSelectGroup (data, param) {
+    setSelectGroup(data, param) {
       let el = param.evt
       if (this.selectWidgetId == data.id) {
         this.splitGroupList = {}
@@ -398,7 +379,7 @@ export default {
       }
     },
     // 选择组件
-    setSelectWidget (data, param) {
+    setSelectWidget(data, param) {
       if (this.isComposeGroup) {
         if (!param.isGroup) {
           let el = param.evt
@@ -422,17 +403,17 @@ export default {
         this.isEditorShow = true
       }
     },
-    deleteGroup (index) {
+    deleteGroup(index) {
       this.mmsData.list.splice(index, 1)
     },
-    deleteWidget () {
+    deleteWidget() {
       this.currentEditItem = {}
       this.isEditorShow = false
     },
     // 移除素材
-    onEditRemove (data, param) {
+    onEditRemove(data, param) {
       let groupIndex
-      let getDataIndex = function g (dataList) {
+      let getDataIndex = function g(dataList) {
         let listIndex
         dataList.map((item, index) => {
           if (item.list && item.list.length > 0) {
@@ -467,7 +448,7 @@ export default {
       })
     },
 
-    handleWidget (item) {
+    handleWidget(item) {
       if (!this.widgetPaneShow) {
         this.currentAddDragItem = item
         this.widgetPaneShow = true
@@ -479,17 +460,17 @@ export default {
         }
       }
     },
-    isObjectEmpty (obj) {
+    isObjectEmpty(obj) {
       return JSON.stringify(obj) == '{}'
     },
-    removeElClassName (cName) {
+    removeElClassName(cName) {
       let allEl = Array.from(document.querySelectorAll(`.${cName}`))
       allEl.map(item => {
         item.classList.remove(cName)
       })
     },
     // 拖动画布 按住空格
-    dropCanvas (evt) {
+    dropCanvas(evt) {
       this.isMouseDown = true
       let canvasEl = this.$refs.canvas
       let transform = canvasEl.style.transform.replace(/[^0-9\-,]/g, '').split(',')
@@ -513,7 +494,7 @@ export default {
       }
     },
     // 拖动容器
-    dropWindown (evt) {
+    dropWindown(evt) {
       let dropEl = evt.target.parentNode
       let gapX = evt.pageX - dropEl.offsetLeft
       let gapY = evt.pageY - dropEl.offsetTop
@@ -534,7 +515,7 @@ export default {
     },
 
     // 清空
-    reset () {
+    reset() {
       this.$confirm('是否清空已添加的全部素材?', '提示', {
         type: 'warning'
       }).then(() => {
@@ -544,11 +525,11 @@ export default {
       })
     },
 
-    onAddLib(data){
+    onAddLib(data) {
       this.$refs.library.add2Local(data)
     },
 
-    async save () {
+    async save() {
       this.textParamsLen = 0
       this.widgetPaneShow = this.isEditorShow = false
 
@@ -570,7 +551,7 @@ export default {
       // 提取需要字段
       let newList = flatList.map(item => {
         let _item = {}
-        let { type, text, content, name = '', uri, size, resourceId, poster, duration, width, height} = item
+        let { type, text, content, name = '', uri, size, resourceId, poster, duration, width, height } = item
 
         _item = { type, name, size }
         if (poster) _item.poster = poster
@@ -581,9 +562,9 @@ export default {
         if (type === 'text') {
           let newContent = text || ''
           let texts = newContent.match(/<input(([\s\S])*?)>/g) || []
-          for(let i = 0; i < texts.length; i++){
-            this.textParamsLen ++
-            newContent = newContent.replace(/<input(([\s\S])*?)>/,`{text${this.textParamsLen}}`)
+          for (let i = 0; i < texts.length; i++) {
+            this.textParamsLen++
+            newContent = newContent.replace(/<input(([\s\S])*?)>/, `{text${this.textParamsLen}}`)
           }
           _item.name = this.initParams.messageName
           _item.content = newContent.replace(/&nbsp;/g, ' ')
@@ -599,13 +580,13 @@ export default {
         this.$message.warning('模板必须包含文本')
         return
       }
-      
+
       newList = newList.concat({ type: 'text', content: '本条短信免流量，退订回复T', size: 1 })
       let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
       this.captrue(_data)
     },
-    async pretreatment (list) {
+    async pretreatment(list) {
       // 黑名单，匹配未上传资源
       const blacklist = new RegExp(`(^blob:)|(^${this.config.nodeUrl})`)
       // 上传中的资源
@@ -617,7 +598,7 @@ export default {
 
       // Blob to File
       const blobToFile = (Blob, fileName) => {
-        return new File([Blob], fileName, {lastModified: Date.now()})
+        return new File([Blob], fileName, { lastModified: Date.now() })
       }
 
       /**
@@ -686,7 +667,7 @@ export default {
         pendings.forEach((item, index) => {
           const pm = upload(item.source, item.file).then(res => {
             const { data, type } = res
-            if(type !== 'success') Promise.reject('上传遇到错误，终止上传')
+            if (type !== 'success') Promise.reject('上传遇到错误，终止上传')
 
             // 修改资源地址及信息
             item.source.name = data.name
@@ -699,7 +680,7 @@ export default {
 
             this.uploadPendings = this.uploadPendings.filter(pendingItem => pendingItem.source.id !== item.source.id)
 
-            if(this.uploadPendings.length === 0){
+            if (this.uploadPendings.length === 0) {
               this.uploadProgressVisible = false
             }
           }).catch(res => {
@@ -712,59 +693,78 @@ export default {
       } catch (err) {
         throw new Error(err)
       }
-      
+
       try {
         await Promise.all(uploadCalls)
         return list
-      } catch(err){
+      } catch (err) {
         console.log(err)
       }
     },
 
-    submitValidate (datas) {
+    submitValidate(datas) {
       return datas.some(data => data.type === 'text')
     },
 
     // 截图前处理
-    beforeCaptrue () {
+    beforeCaptrue() {
       this.$refs.windowBody.classList.add('isCapture')
     },
 
-    async captrue (sData) {
+    async captrue(sData) {
       this.saveLoading = true
 
       await this.beforeCaptrue()
 
-      let bodyScrollbar = document.querySelector('.body-scrollbar')
-      let height = this.$refs.windowBody.offsetHeight
-      let width = bodyScrollbar.offsetWidth
+      this.$nextTick(() => {
+        const canvas = document.createElement('canvas') // 创建一个canvas节点
+        const shareContent = document.querySelector('.body-scrollbar') // 需要截图的包裹的（原生的）DOM 对象
+        const width = shareContent.offsetWidth // 获取dom 宽度
+        const height = shareContent.offsetHeight // 获取dom 高度
+        const scale = 1 // 定义任意放大倍数 支持小数
+        canvas.getContext('2d').scale(scale, scale) // 获取context,设置scale
+        const rect = shareContent.getBoundingClientRect() // 获取元素相对于视口的
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop // 获取滚动轴滚动的长度
+        const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft // 获取滚动轴滚动的长度
+        let x = rect.left
+        let y = rect.top
+        html2canvas(shareContent, { // 转换为图片
+          x, // 绘制的dom元素相对于视口的位置
+          y,
+          // scrollX: scrollTop,// 滚动的长度
+          scrollY: -scrollTop,
+          scrollX: -scrollLeft,
+          scale: scale, // 添加的scale 参数
+          width: width, // dom 原始宽度
+          height: height,
+          useCORS: true, // 开启跨域
+          dpi: window.devicePixelRatio * 2,
+          windowWidth: document.body.scrollWidth,
+          windowHeight: document.body.scrollHeight,
+        }).then(canvas => {
+          const context = canvas.getContext('2d')
+          // 关闭抗锯齿
+          context.mozImageSmoothingEnabled = false
+          context.msImageSmoothingEnabled = false
+          context.imageSmoothingEnabled = false
+          const imgUrl = canvas.toDataURL('image/png');
 
-      html2canvas(bodyScrollbar, {
-        width,
-        height,
-        windowWidth: document.body.offsetWidth,
-        windowHeight: document.body.offsetHeight,
-        scrollY: -window.pageYOffset, // fix: 截图时由于窗口滚动造成截图偏移， 设置为 0 不生效？？？
-        scrollX: -window.pageXOffset,
-        useCORS: true
-      }).then(canvas => {
-        let dataURL = canvas.toDataURL('image/png')
-        let file = dataURLtoFile(dataURL, getRandomId() + '.png')
+          let file = dataURLtoFile(imgUrl, getRandomId() + '.png')
+          let fdata = new FormData()
+          fdata.append('mmsTemplateCover', file)
 
-        let fdata = new FormData()
-        fdata.append('mmsTemplateCover', file)
+          // 提交字段 initParams、mmsTemplate、mmsTemplate
+          fdata.append('initParams', JSON.stringify(this.initParams))
+          fdata.append('mmsTemplate', JSON.stringify(sData.mmsTemplate))
+          fdata.append('mmsResourceIds', sData.mmsResourceIds)
+          fdata.append('mmsOriginalTemplate', JSON.stringify(this.mmsData.list))
+          fdata.append('placeholderNum', this.textParamsLen)
 
-        // 提交字段 initParams、mmsTemplate、mmsTemplate
-        fdata.append('initParams', JSON.stringify(this.initParams))
-        fdata.append('mmsTemplate', JSON.stringify(sData.mmsTemplate))
-        fdata.append('mmsResourceIds', sData.mmsResourceIds)
-        fdata.append('mmsOriginalTemplate', JSON.stringify(this.mmsData.list))
-        fdata.append('placeholderNum', this.textParamsLen)
-
-        this.submit(fdata)
+          this.submit(fdata)
+        })
       })
     },
-    submit (fd) {
+    submit(fd) {
       this._http(this.mmsSave, fd).then(res => {
         // 保存后的处理
         this.handleRes(res)
@@ -776,7 +776,7 @@ export default {
       })
     },
 
-    handleRes (resp) {
+    handleRes(resp) {
       if (resp && this.$root.moqui.isPlainObject(resp)) {
         this.$root.moqui.notifyMessages(resp.messageInfos, resp.errors)
 
@@ -791,6 +791,7 @@ export default {
   }
 
 }
+
 </script>
 <style lang="less">
 .file-size {
