@@ -59,6 +59,8 @@
 </template>
 <script>
 import html2canvas from 'html2canvas'
+import domtoimage from 'dom-to-image';
+
 import { typesList, fileMaxSize } from '../config'
 import smsLibrary from './library'
 import editPane from './editPane'
@@ -78,6 +80,24 @@ function getAllData(arr) {
 
 function replaceTextContent(str) {
   return str.replace(/<div>/g, '').replace(/(<\/div>|<br>)/g, '\n').replace(/&nbsp;/g, ' ')
+}
+
+function testBrowser(){
+  var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+  var isOpera = userAgent.indexOf('Opera') > -1;
+
+  if (isOpera) {
+    testBrowser = () => 'Opera'
+  }else if (userAgent.indexOf('Firefox') > -1) {
+    testBrowser = () =>  'FF';
+  }else if (userAgent.indexOf('Chrome') > -1){
+    testBrowser = () =>  'Chrome';
+  }else if (userAgent.indexOf('Safari') > -1) {
+    testBrowser = () =>  'Safari';
+  }else if (userAgent.indexOf('compatible') > -1 && userAgent.indexOf('MSIE') > -1 && !isOpera) {
+    testBrowser = () =>  'IE';
+  };
+  return testBrowser()
 }
 
 export default {
@@ -584,7 +604,7 @@ export default {
       newList = newList.concat({ type: 'text', content: '本条短信免流量，退订回复T', size: 1 })
       let _data = { initParams: this.initParams, mmsTemplate: newList, mmsResourceIds: ids }
 
-      this.captrue(_data)
+      this.capture(_data)
     },
     async pretreatment(list) {
       // 黑名单，匹配未上传资源
@@ -707,61 +727,89 @@ export default {
     },
 
     // 截图前处理
-    beforeCaptrue() {
+    beforeCapture() {
       this.$refs.windowBody.classList.add('isCapture')
     },
 
-    async captrue(sData) {
+    async capture(sData){
       this.saveLoading = true
 
-      await this.beforeCaptrue()
+      await this.beforeCapture()
 
-      this.$nextTick(() => {
-        const canvas = document.createElement('canvas') // 创建一个canvas节点
-        const shareContent = document.querySelector('.body-scrollbar') // 需要截图的包裹的（原生的）DOM 对象
-        const width = shareContent.offsetWidth // 获取dom 宽度
-        const height = shareContent.offsetHeight // 获取dom 高度
-        const scale = 1 // 定义任意放大倍数 支持小数
-        canvas.getContext('2d').scale(scale, scale) // 获取context,设置scale
-        const rect = shareContent.getBoundingClientRect() // 获取元素相对于视口的
-        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop // 获取滚动轴滚动的长度
-        const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft // 获取滚动轴滚动的长度
-        let x = rect.left
-        let y = rect.top
-        html2canvas(shareContent, { // 转换为图片
-          x, // 绘制的dom元素相对于视口的位置
-          y,
-          // scrollX: scrollTop,// 滚动的长度
-          scrollY: -scrollTop,
-          scrollX: -scrollLeft,
-          scale: scale, // 添加的scale 参数
-          width: width, // dom 原始宽度
-          height: height,
-          useCORS: true, // 开启跨域
-          dpi: window.devicePixelRatio * 2,
-          windowWidth: document.body.scrollWidth,
-          windowHeight: document.body.scrollHeight,
-        }).then(canvas => {
-          const context = canvas.getContext('2d')
-          // 关闭抗锯齿
-          context.mozImageSmoothingEnabled = false
-          context.msImageSmoothingEnabled = false
-          context.imageSmoothingEnabled = false
-          const imgUrl = canvas.toDataURL('image/png');
+      let file = null
+          ,dom = document.querySelector('.body-scrollbar')
 
-          let file = dataURLtoFile(imgUrl, getRandomId() + '.png')
-          let fdata = new FormData()
-          fdata.append('mmsTemplateCover', file)
 
-          // 提交字段 initParams、mmsTemplate、mmsTemplate
-          fdata.append('initParams', JSON.stringify(this.initParams))
-          fdata.append('mmsTemplate', JSON.stringify(sData.mmsTemplate))
-          fdata.append('mmsResourceIds', sData.mmsResourceIds)
-          fdata.append('mmsOriginalTemplate', JSON.stringify(this.mmsData.list))
-          fdata.append('placeholderNum', this.textParamsLen)
-
-          this.submit(fdata)
+      // html2canvas chrome 上位置偏移
+      // dom-to-image 不支持 safari
+      if(testBrowser() === 'Safari'){
+        await this.capture_Safari(dom).then(dataURL => {
+          file = dataURLtoFile(dataURL, getRandomId() + '.png')
         })
+      }else{
+        await this.capture_Chrome(dom).then(dataURL => {
+          file = dataURLtoFile(dataURL, getRandomId() + '.png')
+        })
+      }
+
+      let fdata = new FormData()
+      fdata.append('mmsTemplateCover', file)
+      // 提交字段 initParams、mmsTemplate、mmsTemplate
+      fdata.append('initParams', JSON.stringify(this.initParams))
+      fdata.append('mmsTemplate', JSON.stringify(sData.mmsTemplate))
+      fdata.append('mmsResourceIds', sData.mmsResourceIds)
+      fdata.append('mmsOriginalTemplate', JSON.stringify(this.mmsData.list))
+      fdata.append('placeholderNum', this.textParamsLen)
+
+      this.submit(fdata)
+    },
+
+
+    capture_Chrome(dom){
+      const width = dom.offsetWidth
+      const height = dom.offsetHeight
+
+      return domtoimage.toPng(dom, {
+        width, height
+      }).then(dataURL => {
+        return dataURL
+      })
+    },
+
+    capture_Safari(dom){
+      const canvas = document.createElement('canvas') // 创建一个canvas节点
+      const width = dom.offsetWidth // 获取dom 宽度
+      const height = dom.offsetHeight // 获取dom 高度
+      const scale = 1 // 定义任意放大倍数 支持小数
+      canvas.getContext('2d').scale(scale, scale) // 获取context,设置scale
+      const rect = dom.getBoundingClientRect() // 获取元素相对于视口的
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop // 获取滚动轴滚动的长度
+      const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft // 获取滚动轴滚动的长度
+      let x = rect.left
+      let y = rect.top
+
+      return html2canvas(dom, { // 转换为图片
+        x, // 绘制的dom元素相对于视口的位置
+        y,
+        // scrollX: scrollTop,// 滚动的长度
+        scrollY: -scrollTop,
+        scrollX: -scrollLeft,
+        scale: scale, // 添加的scale 参数
+        width: width, // dom 原始宽度
+        height: height,
+        useCORS: true, // 开启跨域
+        dpi: window.devicePixelRatio * 2,
+        windowWidth: document.body.scrollWidth,
+        windowHeight: document.body.scrollHeight,
+      }).then(canvas => {
+        const context = canvas.getContext('2d')
+        // 关闭抗锯齿
+        context.mozImageSmoothingEnabled = false
+        context.msImageSmoothingEnabled = false
+        context.imageSmoothingEnabled = false
+        const dataURL = canvas.toDataURL('image/png');
+
+        return dataURL
       })
     },
     submit(fd) {

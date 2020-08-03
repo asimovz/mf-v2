@@ -20,6 +20,7 @@
     "@ag-grid-community/vue": "^22.0.0",
     "@ag-grid-enterprise/all-modules": "^22.0.0",
     "diff-match-patch": "^1.0.4",
+    "dom-to-image": "^2.6.0",
     "element-ui": "^2.13.2",
     "emojicharstring": "^0.1.2",
     "html2canvas": "^1.0.0-rc.5",
