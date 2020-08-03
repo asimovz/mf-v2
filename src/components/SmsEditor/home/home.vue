@@ -742,8 +742,8 @@ export default {
       html2canvas(bodyScrollbar, {
         width,
         height,
-        windowWidth: document.body.clientWidth,
-        windowHeight: document.body.clientHeight,
+        windowWidth: document.body.offsetWidth,
+        windowHeight: document.body.offsetHeight,
         scrollY: -window.pageYOffset, // fix: 截图时由于窗口滚动造成截图偏移， 设置为 0 不生效？？？
         scrollX: -window.pageXOffset,
         useCORS: true
