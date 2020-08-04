@@ -153,7 +153,7 @@
 
 	.active-tabs {
 		background-color: #fff;
-		padding-right: 56px;
+		padding-right: 36px;
 
 		.el-tabs__nav-wrap {
 			margin-bottom: 0;
@@ -212,7 +212,7 @@
 		}
 
 		.tabs-control {
-			right: 56px;
+			right: 36px;
 			top: 8px;
 			height: 32px;
 			padding: 0 2px 0 8px;
@@ -261,7 +261,7 @@
 		}
 
 		.active-tabs-content {
-			margin-right: 114px;
+			margin-right: 104px;
 		}
 
 	}
@@ -428,7 +428,6 @@
 	.el-pagination.is-background .btn-next,
 	.el-pagination.is-background .btn-prev,
 	.el-pagination.is-background .el-pager li {
-		width: 32px;
 		height: 32px;
 		line-height: 32px;
 		background-color: #fff;
@@ -486,40 +485,40 @@
 
 	}
 
-	.m-icon {
+	.m-icon-nav {
 		display: inline-block;
 		width: 16px;
 		height: 16px;
+		margin-right: 5px;
+		background-repeat: no-repeat;
+		background-size: cover;
 		
-		&-nav{
-			margin-right: 5px;
-			background-repeat: no-repeat;
-			background-size: cover;
-			&-marketing {
-				background-image: url('../images/marketing.png')
-			}
-
-			&-analysis {
-				background-image: url('../images/analysis.png')
-			}
-
-			&-scenes {
-				background-image: url('../images/scenes.png')
-			}
-
-			&-service {
-				background-image: url('../images/service.png')
-			}
-
-			&-setup {
-				background-image: url('../images/setup.png')
-			}
-
-			&-execution{
-				background-image: url('../images/execution.png');
-			}
+		&-marketing {
+			background-image: url(../images/marketing.png)
 		}
 
+		&-analysis {
+			background-image: url(../images/analysis.png)
+		}
+
+		&-scenes {
+			background-image: url(../images/scenes.png)
+		}
+
+		&-service {
+			background-image: url(../images/service.png)
+		}
+
+		&-setup {
+			background-image: url(../images/setup.png)
+		}
+
+		&-execution{
+			background-image: url(../images/execution.png);
+		}
+		&-resource{
+			background-image: url(../images/resource.png)
+		}
 	}
 
 	.m-link{color: @main-color-primary}

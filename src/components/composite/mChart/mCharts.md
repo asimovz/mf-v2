@@ -129,6 +129,7 @@
 | offsetY | 纵向偏移量 | number | default: 200 |
 | limitShowNum | 最多显示多少个扇形区域，超过此数量后，剩余数据在其他中显示 | number | default: 0, 为0时不做限制 |
 | legendName | 配置图例别名映射关系 | object | 可以通过配置图例名称映射关系对展示图例名进行修改  legendName="{'发送量': '新的图例名称'}" |
+| dividingThreshold | 分割阈值 | number | 扇区占比小于此阈值时，将动态计算limitShowNum, 同时limitShowNum参数配置将失效 |
 
 ```
   <mCharts type="pie" :data="pie"></mCharts>

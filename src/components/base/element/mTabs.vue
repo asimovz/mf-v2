@@ -259,9 +259,20 @@ export default {
     updateStatus () {
       const tabs = this.getTabs()
       if (tabs.length === 0) return
-      tabs.forEach(
-        tab => (tab.show = tab.currentName === this.activeKey || this.animated)
-      )
+      tabs.forEach(tab => {
+        let isTab = tab.currentName === this.activeKey || this.animated
+        tab.show = isTab
+        let nodeEl = Array.from(tab.$el.querySelectorAll("input,textarea"))
+        if(isTab) {
+          nodeEl.map(item => {
+            item.removeAttribute("disabled")
+          })
+        } else {
+          nodeEl.map(item => {
+            item.setAttribute("disabled","disabled")
+          })
+        }
+      })
     },
     tabCls (item) {
       return [

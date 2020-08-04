@@ -333,6 +333,7 @@ export default {
           jsonData = data
         }
         this.formSearchParam = jsonData
+        this.queryParams = jsonData
         this.loadQueryData(jsonData, this.pageParams)
       })
     }
@@ -596,7 +597,9 @@ export default {
     },
     // 加载数据
     loadQueryData(queryParams, { pageIndex = 0, pageSize = 20 } = {}) {
-      this.queryParams = this.moqui.merge(this.moqui.clone(queryParams, true), this.initQueryParams)
+      Object.assign(this.queryParams,this.initQueryParams,this.moqui.clone(queryParams, true));
+      // this.queryParams = this.moqui.merge(this.initQueryParams, this.queryParams, this.moqui.clone(queryParams, true)this.initQueryParams)
+      
       var that = this
       for (let key in this.queryParams) {
         this.queryParams[key] ? null : delete this.queryParams[key]
@@ -660,7 +663,7 @@ export default {
 }
 
 </script>
-<style scoped lang="less">
+<style lang="less">
 .eleTable-wrapper {
   position: relative;
   &.show-custom:before {
@@ -673,12 +676,7 @@ export default {
     background-color: rgba(0, 0, 0, 0.06);
     z-index: 9
   }
-}
 
-
-</style>
-<style lang="less">
-.eleTable-wrapper {
 
   .el-table__body {
     // 使表格兼容safari，不错位
@@ -695,6 +693,13 @@ export default {
   .cell-word-break .cell {
     white-space: nowrap;
     word-break: break-all;
+  }
+
+  .el-table th.gutter{
+      display: table-cell!important;
+  }
+  .el-table colgroup.gutter{
+      display: table-cell!important;
   }
 }
 

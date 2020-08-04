@@ -65,8 +65,10 @@ export default {
 				formBtnArr.map(item => {
 					if(param) {
 						item.setAttribute("disabled",param)
+						this.$root.eventBus.$emit("loading_button_flag" ,true)
 					} else {
 						item.removeAttribute("disabled")
+						this.$root.eventBus.$emit("loading_button_flag" ,false)
 					}
 				})
 			}
@@ -111,7 +113,8 @@ export default {
 				//表单内button置灰
 				this.resubmit(true)	
 				//获取formData
-				if(this.handleParams(param)) return
+				let flag = await this.handleParams(param)
+				if(flag) return
 				if(this.isSearchForm){
 					this.$root.eventBus.$emit("search_form_data_" + this.id ,this.formData)
 					this.resubmit(false)
@@ -132,17 +135,40 @@ export default {
 			}
 		},
 
-		handleParams(param){
+		async handleParams(param){
 			this.formData = new FormData(this.$el);
 			// formData.append('moquiSessionToken', this.$root.moquiSessionToken);
 			$.each(this.fieldsArr, function(key, value) {
 				this.formData.append(key, value);
 			});
 
-			//表单元素中name为 _NA_ 占位标识的元素值移除
 			for (var key of this.formData.keys()) {
+				//表单元素中name为 _NA_ 占位标识的元素值移除
 				if (key == '_NA_') {
 					this.formData.delete(key);
+				}
+
+				//mFile中上传的元素全部转为file格式
+				if (key.indexOf('isUploadedFile') > -1) {
+					let _filename = key.split("_")[1]
+
+					if(this.formData.get(key) && this.formData.get(key) != "" ) {
+						let list = this.formData.get(key).split(",")
+						let names = JSON.parse(this.formData.get('isupLoadFileNames_'+_filename))
+						for (let i=0;i<list.length;i++) {
+							let file = list[i]
+							let res = await this.$http({
+								method: 'get',
+								baseURL: '',
+								url: file,
+								responseType: 'blob',
+								data: {}
+							})
+							this.formData.append(this.formData.get('upLoadName'), new File([res.data], names[i], {lastModified: Date.now()}));
+						}
+						this.formData.delete('isupLoadFileNames')
+						this.formData.delete('upLoadName')
+					}
 				}
 			}
 
@@ -180,6 +206,7 @@ export default {
 			if(param) {
 				Object.keys(param).map(index => {
 					this.formData.append(index, param[index]);
+
 				})
 			}
 			return this.$http.post(postUrl,this.formData).then(async response => {
@@ -223,10 +250,15 @@ export default {
 				this.submitConfirm(resp)
 			}else if(resp.type == "write"){
 				let el = document.getElementById(resp.id)
-				if(el.tagName != "TEXTAREA" && el.tagName != "INPUT") {
-					el = el.querySelector(resp.target)
+				let target = resp.target
+				if(target == "textarea" || target == "input") {
+					if(el.tagName != "TEXTAREA" && el.tagName != "INPUT") {
+						el = el.querySelector(resp.target)
+					}
+					el.value = resp.results
+				} else {
+					el.innerHTML = resp.results
 				}
-				el.value = resp.results
 			}
 			if(resp.type !== 'confirm'){
 				this.responseCb(resp)

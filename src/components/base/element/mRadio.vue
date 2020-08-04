@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="aw-radio">
     <input type="hidden" :value="currentValue" :form="form" :name="name">
     <el-radio-group v-model="currentValue" @change="handleChange" :value="value" :size="sizeType">
       <template v-if="type==='button'">

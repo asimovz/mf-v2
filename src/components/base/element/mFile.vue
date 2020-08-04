@@ -1,28 +1,41 @@
 <template>
-  <div style="display:inline-block">
-    <input class="hidden" ref="input" :form="form" :id="id" :name="name" type="file" :multiple="multiple" :accept="accept" @change="uploadSelect" />
-    <input name="isUploadedFile" type="hidden" size="100" v-model="fileList" v-validate="validate" :data-vv-as="fieldTitle" data-vv-name="isUploadedFile" />
+  <div style="display:inline-block" id="mFileRoot">
+    <input class="hidden" ref="input" :form="form" :id="id" type="file" :multiple="multiple" :accept="accept" @change="uploadSelect" />
+    <input :name="'isUploadedFile_'+name" type="hidden" size="100" v-model="fileList" v-validate="validate" :data-vv-as="fieldTitle" data-vv-name="isUploadedFile" />
+    <input :name="'isupLoadFileNames_'+name" type="hidden" v-model='JSON.stringify(fileArr)' />
+    <input name="upLoadName" type="hidden" :value="name" />
     <input :form="form" :name="isUpFileDelName" type="hidden" v-model="isUpFileDel" />
     <template v-if="type=='button'">
-      <button v-show="multiple || !fileList.length" name="filebtn" class="m-link-button m-link-button-primary" @click="handleClick">
-       <i class="el-icon-upload"/> {{text}}
-      </button>
-
       <template v-for="(file, index) in fileName">
         <span class="components_upload_list">{{file}} <i class="el-icon-close" @click="handleRemove(index)" /> </span>
       </template>
+      <button v-show="multiple || !fileList.length" name="filebtn" class="m-link-button m-link-button-primary" @click="handleClick">
+        <i class="el-icon-upload"/> {{text}}
+      </button>
     </template>
     <template v-else>
       <div :class="fileClasses" :style="styles" v-show="multiple || !fileList.length">
         <div class="handleClick" @click="handleClick"></div>
       </div>
-
-      <template v-if="fileList.length">
+      <div v-if="fileList.length && fileType==='audio'" class="audio-box">
+        <div class="audio-preview" v-for="(file, index) in fileList" :key="index">
+          <audio v-if="fileType==='audio'" class="outline audio-css" controls :src="file" style="width:300px;height:100%;" ></audio>
+          <span class="upload_files-actions-audio">
+            <div class="audio-name" :title="fileName[index]">{{fileName[index]}}</div>
+            <i class="el-icon-close audio-close"  @click="handleRemove(index)"></i>
+          </span>
+        </div>
+      </div>
+      <template v-if="fileList.length && fileType!=='audio'">
         <div class="previews" v-for="(file, index) in fileList" :key="index" :style="styles">
-          <img :src="file" ref="uploadImg" :style="imgStyle">
-          <span class="upload_files-actions" v-if="type === 'card'">
+          <img v-if="fileType==='img'" :src="file" ref="uploadImg" :style="imgStyle" >
+          <video v-if="fileType==='video'" class="outline" controls :src="file" style="width:100%;height:100%;" ></video>
+          <span class="upload_files-actions" v-if="type === 'card' && fileType==='img'">
             <i class="el-icon-close" style="font-size:16px;" @click="handleRemove(index)"></i>
             <i class="el-icon-search"  style="font-size:16px;" @click="handleScale(index)"></i>
+          </span>
+          <span class="upload_files-actions-video" v-if="type === 'card' && fileType==='video'">
+            <i class="el-icon-close video-close"  style="font-size:16px;" @click="handleRemove(index)"></i>
           </span>
         </div>
       </template>
@@ -89,12 +102,18 @@ export default {
     maxLength: {
       type: [Number, String],
       default: 10
-    }
+    },
+    fileType: {
+      type: String,
+      default: "img"
+    },
+    
   },
 
   data() {
     return {
       fileList: this.files != null ? this.files.split(",") : [],
+      fileArr: [],
       scaleStyle: '',
       imgStyle: '',
       fileName: [],
@@ -106,7 +125,11 @@ export default {
   computed: {
     styles() {
       let style = {};
-      if (this.size) {
+      if(this.fileType === 'video') {
+        style['width'] = `170px`;
+        style['height'] = `100px`;
+        style['line-height'] = `150px`;
+      } else if (this.size) {
         style['width'] = `${this.size}px`;
         style['height'] = `${this.size}px`;
         style['line-height'] = `${this.size}px`;
@@ -129,37 +152,35 @@ export default {
       let inputDOM = event.target;
       // let file = Array.from(inputDOM.files)
       let files = Array.from(inputDOM.files)
-
-      if (files.some(file => !this.validateFile(file))) {
-        return
-      }
+      files.some(file => !this.validateFile(file, files))
+      var url = files.map(file => URL.createObjectURL(file))
+      this.fileList = this.fileList.concat(url)
+      this.fileName = this.fileName.concat(files.map(file => file.name))
 
       if (this.type == "card") {
-        var url = files.map(file => URL.createObjectURL(file))
-        this.fileList = this.fileList.concat(url)
         setTimeout(() => {
           this.getImgOrigin()
         }, 20)
-      } else {
-        this.fileList = this.fileList.concat(files.map(file => file.name))
-        this.fileName = this.fileName.concat(files.map(file => file.name))
-      }
+      } 
       if(this.fileList.length > this.maxLength){
         this.handleMessage(`最大上传数量为 ${this.maxLength}`,'warning')
         this.fileList = this.fileList.slice(0, this.maxLength)
         this.fileName = this.fileName.slice(0, this.maxLength)
       }
-
+      
+      this.fileArr = this.fileName
       this.isUpFileDel = false
+      this.$root.eventBus.$emit(this.id+'_value_change', this.fileName.join(","));
+
     },
     handleRemove(index) {
       let input = this.$refs.input
       input.value = ""
-
       this.fileList.splice(index, 1)
       this.fileName.splice(index, 1)
-
       this.isUpFileDel = true
+      this.$root.eventBus.$emit(this.id+'_value_change',"");
+
     },
 
     handleScale(index) {
@@ -176,7 +197,7 @@ export default {
 
     },
 
-    validateFile(file) {
+    validateFile(file, fileArr) {
       let index = this.fileList.findIndex(files => files.name === file.name)
       if (this.format) {
         const _file_format = file.name.split('.').pop().toLocaleLowerCase()
@@ -190,8 +211,9 @@ export default {
 
       if (this.maxSize) {
         if (file.size > Number(this.maxSize) * 1024) {
-          this.handleMessage("上传文件大小超过最大限制(" + this.maxSize + " kb)",'info')
-          this.handleRemove(index)
+          this.handleMessage(file.name+"文件大小超过最大限制(" + this.maxSize + " kb)",'info')
+          fileArr.splice(fileArr.findIndex(files => files.name === file.name), 1)
+          // this.handleRemove(index)
           return false
         }
       }
@@ -199,6 +221,7 @@ export default {
     },
 
     getImgOrigin() {
+      if(this.fileType !== 'img') return
       let img = this.$refs.uploadImg
       let w = img.naturalWidth
       let h = img.naturalHeight
@@ -228,35 +251,36 @@ export default {
     else if (this.fileList.length && this.type == "button" && this.fileList.indexOf("http://") != -1)
       this.fileName = this.fileList.split("%2").pop()
 
-    if (this.validate) {
-      //监听form的验证消息
-      if (this.form) {
-        root.eventBus.$on('form_validate' + this.form, () => {
-          this.$validator.validate()
-        })
-      } else {
-        let idInfoArray = this.id.split('_')
-        let formId = null
-        if (idInfoArray.length > 2) {
-          formId = idInfoArray[0] + '_' + idInfoArray[1]
-        } else {
-          formId = idInfoArray[0]
-        }
-        root.eventBus.$on('form_validate' + formId, () => {
-          this.$validator.validate()
-        })
-      }
-    }
+    // if (this.validate) {
+    //   //监听form的验证消息
+    //   if (this.form) {
+    //     root.eventBus.$on('form_validate' + this.form, () => {
+    //       this.$validator.validate()
+    //     })
+    //   } else {
+    //     let idInfoArray = this.id.split('_')
+    //     let formId = null
+    //     if (idInfoArray.length > 2) {
+    //       formId = idInfoArray[0] + '_' + idInfoArray[1]
+    //     } else {
+    //       formId = idInfoArray[0]
+    //     }
+    //     root.eventBus.$on('form_validate' + formId, () => {
+    //       this.$validator.validate()
+    //     })
+    //   }
+    // }
   },
 
   beforeDestroy: function() {
-    if (this.validate) {
-      if (this.form) {
-        this.$root.eventBus.$off('form_validate' + this.form)
-      } else {
-        this.$root.eventBus.$off('form_validate' + this.id.split('_')[0])
-      }
-    }
+    // if (this.validate) {
+    //   if (this.form) {
+    //     this.$root.eventBus.$off('form_validate' + this.form)
+    //   } else {
+    //     this.$root.eventBus.$off('form_validate' + this.id.split('_')[0])
+    //   }
+    // }
+    this.$root.eventBus.$off(this.id+'_value_change')
   }
 }
 
@@ -294,8 +318,8 @@ export default {
 .components_upload_box {
   float: left;
   position: relative;
-  margin-right: 9px;
-  margin-bottom: 9px;
+  margin-right: 24px;
+  margin-bottom: 24px;
   border: 1px dashed #D9D9D9;
   cursor: pointer;
   overflow: hidden;
@@ -375,9 +399,37 @@ export default {
   opacity: 1;
 }
 
+.upload_files-actions-video {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 20px;
+  top: -10px;
+  right: -10px;
+  background: #f56c6c;
+  z-index: 9;
+  opacity: 0;
+  text-align: right;
+  -webkit-transition: opacity .3s;
+  transition: opacity .3s;
+}
+.upload_files-actions-video i {
+  font-size: 14px !important;
+    top: 1px;
+    position: absolute;
+    right: .5px;
+    color: #fff;
+}
+.previews:hover .upload_files-actions-video {
+  opacity: 1;
+}
+
 .components_upload_list {
   display: block;
   line-height: 20px;
+  
+}
+.components_upload_list+.components_upload_list {
   margin-top: 5px;
 }
 
@@ -388,7 +440,50 @@ export default {
 .components_upload_list:hover{color: #2d8cf0;}
 .components_upload_list:hover i{display: inline-block;}
 
-.previews{position: relative;float: left;margin: 0 9px 9px 0;}
+.previews{position: relative;float: left;margin: 0 24px 24px 0;}
 .previews img{position: absolute;height: 100%}
 .previews .ivu-icon{cursor: pointer;}
+
+.previews .outline:focus {
+  outline: none;
+}
+.audio-box {
+  float: left;
+  width: 100%;
+}
+.audio-box .audio-preview {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 16px;
+}
+.previews .audio-css {
+  display: inline-block;
+}
+.upload_files-actions-audio {
+  width: 150px;
+  height: 40px;
+  display: inline-block;
+  position: relative;
+  /* bottom: 19px; */
+  left: -40px;
+  background: #f1f3f4;
+  border-bottom-right-radius: 40px;
+  border-top-right-radius: 40px;
+}
+.upload_files-actions-audio .audio-name {
+  width: 120px;
+  overflow:hidden; 
+  text-overflow:ellipsis; 
+  white-space:nowrap;
+  line-height: 40px;
+  font-size: 12px;
+}
+.upload_files-actions-audio .audio-close {
+  cursor: pointer;
+  font-size: 16px;
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  font-weight: bolder;
+}
 </style>

@@ -129,8 +129,10 @@ export default {
             let crumb = currentCrumb.crumb.split(",")
             crumb.shift()
             this.$root.eventBus.$emit("updateCrumb", crumb)
+
+            let _title =  currentCrumb.crumb.split(",").slice(-1)
             this.$root.eventBus.$emit('active_header_nav',{
-              title: currentCrumb.crumb.split(",")[this.deep-1],
+              title: typeof _title === 'string' ? _title : _title.join(),
               path:currentCrumb.path
             })
           }

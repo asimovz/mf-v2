@@ -293,6 +293,7 @@
             jsonData = data
           }
           this.formSearchParam = jsonData
+          this.queryParams = jsonData
           this.loadQueryData(jsonData,this.pageParams)
         })
       }
@@ -1005,8 +1006,8 @@
         this.loadQueryData(this.queryParams, this.pageParams)
       },
       loadQueryData(queryParams, {pageIndex = 0, pageSize = 20} = {}) {
-        this.queryParams = this.moqui.merge(this.moqui.clone(queryParams, true), this.initQueryParams)
-        this.queryParams = {...this.colFilterParams, ...this.queryParams, ...this.formSearchParam}
+        Object.assign(this.queryParams,this.initQueryParams,this.moqui.clone(queryParams, true));
+        // this.queryParams = {...this.colFilterParams, ...this.queryParams, ...this.formSearchParam}
         var that = this
         for (let key in this.queryParams) {
           this.queryParams[key] ? null : delete this.queryParams[key]
