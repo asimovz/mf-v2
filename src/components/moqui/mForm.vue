@@ -155,23 +155,26 @@ export default {
 					if(this.formData.get(key) && this.formData.get(key) != "" ) {
 						let list = this.formData.get(key).split(",")
 						let names = JSON.parse(this.formData.get('isupLoadFileNames_'+_filename))
+						let regx = /^blob:/gi
 						for (let i=0;i<list.length;i++) {
 							let file = list[i]
-							let res = await this.$http({
-								method: 'get',
-								baseURL: '',
-								url: file,
-								responseType: 'blob',
-								data: {}
-							})
-							this.formData.append(this.formData.get('upLoadName'), new File([res.data], names[i], {lastModified: Date.now()}));
+							if(regx.test(file)) {
+								let res = await this.$http({
+									method: 'get',
+									baseURL: '',
+									url: file,
+									responseType: 'blob',
+									data: {}
+								})
+								this.formData.append(_filename, new File([res.data], names[i], {lastModified: Date.now()}));
+							}
 						}
-						this.formData.delete('isupLoadFileNames')
+						this.formData.delete('isupLoadFileNames_'+_filename)
 						this.formData.delete('upLoadName')
 					}
 				}
 			}
-
+			return
 			if(param) {
 				Object.keys(param).map(index => {
 					this.formData.append(index, param[index]);
