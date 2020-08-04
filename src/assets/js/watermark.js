@@ -1,7 +1,7 @@
 import defaultLogo from '../logo@2x.png'
 
 class Watermark {
-  constructor({ logo = '', renderWidth = 200, renderHeight = 110, sourceWidth = 420, sourceHeight = 173} = {}) {
+  constructor({ logo = '', renderWidth = 120, renderHeight = 110, sourceWidth = 420, sourceHeight = 173} = {}) {
     if (!Watermark.instance) {
       this.logo = logo || defaultLogo
       this.watermarkCanvas = null
@@ -11,8 +11,8 @@ class Watermark {
       this.renderHeight = renderHeight
       this.sourceWidth = sourceWidth
       this.sourceHeight = sourceHeight
-      this.cnavasWidth = 300
-      this.cnavasHeight = 210
+      this.cnavasWidth = 170
+      this.cnavasHeight = 170
 
       this.start()
       Watermark.instance = this
@@ -44,9 +44,9 @@ class Watermark {
 
     const ratio = this.sourceHeight / this.sourceWidth
 
-    ctx.globalAlpha = 0.15
+    ctx.globalAlpha = 0.06
     ctx.fillStyle = "#000000"
-    ctx.font = '18px "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif'
+    ctx.font = '12px "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif'
     ctx.textAlign = "center"
     ctx.translate(this.renderWidth / 6, this.renderHeight - 10)
     ctx.rotate(-Math.PI / 6)
@@ -62,7 +62,7 @@ class Watermark {
       waterStyleDom = document.createElement("style")
       waterStyleDom.innerHTML = `
         .el-table__body-wrapper .el-table__body th, .el-table__body-wrapper .el-table__body tr{background:none}
-        .el-table__body-wrapper .el-table__body{background:url(${this.watermarkUrl}) -60px -50px; background-size: 150px auto;}
+        .el-table__body-wrapper .el-table__body{background:url(${this.watermarkUrl}) -60px -50px; }
       `
 
       document.head.appendChild(waterStyleDom)
