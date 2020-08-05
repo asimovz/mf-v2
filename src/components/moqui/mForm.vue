@@ -174,7 +174,7 @@ export default {
 					}
 				}
 			}
-			return
+
 			if(param) {
 				Object.keys(param).map(index => {
 					this.formData.append(index, param[index]);
