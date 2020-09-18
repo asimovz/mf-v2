@@ -76,11 +76,15 @@ export default {
           content: this.currentData.submenu.length ? '删除一级菜单会同时删除下属所有二级菜单' : '确认删除一级菜单吗？',
           onOk: () => {
             this.$emit('remove')
+            return false
           }
         })
       } else {
         if (this.currentData.submenu.length < 2) {
           this.handleMessage('菜单类型为MENU，至少包含一个无时间限制的子菜单','warning')
+          return false
+        }else{
+          this.currentData.submenu.splice(i, 1)
         }
       }
       this.updateOrder(this.currentData.submenu)
