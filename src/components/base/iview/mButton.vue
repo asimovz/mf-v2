@@ -82,7 +82,7 @@ export default {
     let outTarget = this.targetModal || this.targetDrawer;
     return {
       typeStr: this.type == "danger" ? "error" : this.type,
-      submitType: this.form ? "submit" : this.htmlType,
+      submitType: this.form && this.toggle == 'linkFormForm' ? "submit" : this.htmlType,
       outEventName: `dynamic_visible_change_${outTarget}`,
       tableEvent: this.targetList ? this.targetList + "_table_multi_submit" : ""
     };
