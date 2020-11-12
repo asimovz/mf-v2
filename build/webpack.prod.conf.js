@@ -99,16 +99,22 @@ const webpackConfig = merge(baseWebpackConfig, {
   ]
 })
 
-if (config.build.versionJson) {
+if (config.build.versionJson || config.build.isQiniu) {
   const versionPlugin = require('./resource-file')
   webpackConfig.plugins.push(
     new versionPlugin({
       versionDirectory: config.build.assetsRoot,
-      fileName: config.build.versionName
+      fileName: config.build.versionName,
     })
   )
 }
 
+if (config.build.isQiniu) {
+  const QiniuUpload = require('./qiniu-upload')
+  webpackConfig.plugins.push(
+    new QiniuUpload(config.build.qiniuConfig)
+  )
+}
 
 if (config.build.productionGzip) {
   webpackConfig.plugins.push(

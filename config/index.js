@@ -3,7 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-let host = 'http://10.0.81.220:8090/' //http://tenanttest.mfexcel.com/
+let host = 'http://139.9.85.4:8081/' //http://tenanttest.mfexcel.com/
 // http://10.0.200.42:8080/coapps/ChatbotManages
 let buildTo = ''
 
@@ -195,9 +195,23 @@ module.exports = {
     productionGzip: true,
     productionGzipExtensions: ['js', 'css'],
     bundleAnalyzerReport: process.env.npm_config_report,
-    isHash: false, //是否生成文件hash名称
-    versionJson: false, //是否生成版本json文件 【要开启文件哈希，isHash=true】
-    versionName: "version.json"
+    isHash: true, //是否生成文件hash名称
+    versionJson: true, //是否生成版本json文件 【要开启文件哈希，isHash=true】
+    versionName: "version.json",    
+    isQiniu: true, //是否打包上传七牛云 【开启七牛会生成版本文件，要开启文件哈希和版本，isHash=true】
+    qiniuConfig: {
+      /*
+        开启七牛上传，在生产环境打包命令 
+        npm run build 不上传文件夹 
+        npm run build --static 上传文件夹
+      */
+      publicPath: 'http://view.yzcxy.top/',
+      accessKey: 'YEhKj7WGxmPHH6D9jkAgffhefRz6M5jLTN8euaR_',
+      secretKey: 'b-pq3u2WNAqrKwg1wImIBipRINRSis8M6ZIxNkKZ',
+      bucket: "mfbosfev2", //空间名
+      zone: "Zone_z0", //空间对应的机房
+      resourceName: "version.json"
+    }
   },
   buildTo: {
     env: require('./prod.env.js'),
