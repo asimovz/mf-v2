@@ -17,7 +17,7 @@
         </div>
         <div class="page-login--content-main" style="flex: 1;display: flex;align-items: center;flex-direction: column;justify-content: center;">
           <!-- logo -->
-          <img class="page-login--logo" :src="loginLogo">
+          <img class="page-login--logo" src="/static/images/login_logo.png">
           <!-- form -->
           <div class="page-login--form">
             <form ref="loginForm" label-position="top" :rules="rules" :model="formLogin" size="default" @submit.prevent="submit">
@@ -45,7 +45,7 @@
         </div>
         <div class="page-login--content-footer">
           <p class="page-login--content-footer-copyright">
-            © 2020 珠海市小源科技有限公司
+            © 2020 南京山猫齐动
           </p>
         </div>
       </div>
@@ -54,7 +54,6 @@
 </template>
 <script>
 import store from 'assets/js/localStorage'
-import loginLogo from 'assets/logo@2x.png'
 
 const formRules = {
   username: [{
@@ -81,7 +80,6 @@ export default {
   name: 'theme-login-blue',
   data() {
     return {
-      loginLogo,
       timeInterval: null,
       time: this.refreshTime(),
       // 表单

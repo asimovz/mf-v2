@@ -17,7 +17,6 @@ import moquiComp from './moqui'
 //业务组件
 let businessComponent = require("./business/").default
 
-
 //主题
 import themes from './themes/index.js'
 
@@ -32,7 +31,7 @@ const install = function (Vue, opts = {}) {
   Object.keys(VueComponentsLib).forEach((key) => {
     Vue.component(VueComponentsLib[key].name, VueComponentsLib[key])
   })
-  Vue.component("mCharts",() => import(/* webpackChunkName: "mCharts" */'./composite/mChart'))
+  Vue.component("m-charts",() => import(/* webpackChunkName: "mCharts" */'./composite/mChart'))
   if(currentComp == "iview") {
     Vue.component("m-table",() => import(/* webpackChunkName: "agGrid" */'./agTable'))
   }

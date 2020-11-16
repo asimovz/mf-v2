@@ -11,7 +11,7 @@
           </form>
         </div>
       </div>
-      <div class="copyright">© {{currentYear}} 珠海市小源科技有限公司</div>
+      <div class="copyright">© {{currentYear}} 南京山猫齐动</div>
     </div>
     <div class="stars"></div>
   </div>
@@ -209,6 +209,7 @@ export default {
   .login-wrap .copyright {
     position: fixed;
     bottom: 30px;
+    color: #b5b5b5;
   }
 
   .login-box {
@@ -224,7 +225,7 @@ export default {
     -webkit-transform-origin: 50% 50%;
     -webkit-transform: rotateY(0deg) rotateX(0deg);
     text-align: center;
-    padding: 80px 50px 60px;
+    padding: 0 50px 60px;
   }
 
   .login-box .no-bg {

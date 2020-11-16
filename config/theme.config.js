@@ -7,9 +7,9 @@ let themeConfig = {
     isTabNav: false
   }`,
   "element":` {
-    theme: "blue",
+    theme: "dark",
     component: "element",
-    isTabNav: true
+    isTabNav: false
   }`
 }
 

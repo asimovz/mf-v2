@@ -1,6 +1,6 @@
 <template>
   <div v-if="loading" class="init">
-    <div class="logo"><img src="/static/images/login_logo_b.png" alt=""></div>
+    <div class="logo"><img src="/static/images/logo_white.png" alt=""></div>
     <div class="ball-beat">
       <div class="a"></div>
       <div class="b"></div>

@@ -2,7 +2,8 @@
   <div class="aw-aside" @mouseenter="enterAside" @mouseleave="leaveAside">
     <div class="aw-aside_brand">
       <div class="aw-aside_brand-logo">
-        <!-- <img src="/static/images/login_logo.3.png" style="width: 95px;vertical-align: middle;"> -->
+        <!-- <img src="/static/images/logo.png" style="width: 50px; margin-right:10px"> -->
+        <span>短信保镖</span>
       </div>
       <div class="aw-aside_brand-tools">
         <div class="aw-aside_brand-tools-toggler" @click="toggleAside">

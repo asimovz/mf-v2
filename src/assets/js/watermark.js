@@ -1,9 +1,9 @@
-import defaultLogo from '../logo@2x.png'
+// import defaultLogo from '../logo@2x.png'
 
 class Watermark {
   constructor({ logo = '', renderWidth = 120, renderHeight = 110, sourceWidth = 420, sourceHeight = 173} = {}) {
     if (!Watermark.instance) {
-      this.logo = logo || defaultLogo
+      this.logo = ''//logo || defaultLogo
       this.watermarkCanvas = null
       this.watermarkUrl = ''
 

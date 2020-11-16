@@ -49,8 +49,8 @@ const webpackConfig = merge(baseWebpackConfig, {
       //打包过滤console，debugger等配置
       compress: {
         warnings: false,
-        drop_console: true,
-        drop_debugger: true
+        drop_console: false,
+        drop_debugger: false
       },
       sourceMap: false,
       //使用多进程并行运行来提高构建速度
