@@ -1,12 +1,18 @@
 <template>
   <m-collapse v-model="isBodyOpen" :type="type" :allowFold="allowFold">
     <m-colPanel name="p1">
-      <slot slot="title" name="header" class="panelTitle">
+      <!-- <slot slot="title" name="header" class="panelTitle">
         <span>{{ title }}</span>
         <span class="panelToolbar">
           <slot name="toolbar"></slot>
         </span>
-      </slot>
+      </slot> -->
+      <template slot="title">
+        <div  class="panelTitle">
+          <slot name="header"></slot>
+          <div><slot name="toolbar"></slot></div>
+        </div>
+      </template>
       <slot></slot>
     </m-colPanel>
   </m-collapse>
@@ -15,6 +21,10 @@
 <style>
 .panelTitle {
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-right: 10px;
 }
 .panelTitle * {
   display: inline-block;
@@ -23,6 +33,8 @@
   float: right;
   padding-right: 10px;
 }
+
+
 </style>
 
 <script>

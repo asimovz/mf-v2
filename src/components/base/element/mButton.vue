@@ -13,7 +13,7 @@
     :native-type="htmlType"
     :confirmation="confirmation"
     :disabled="disabled"
-		@click="handleClick"
+		@click.stop="handleClick"
 		> 
       <i class="el-icon-loading" v-if="loading && (toggle === 'linkFormLink' || toggle === 'linkFormForm')"></i>
       <slot>{{text}}</slot>

@@ -122,8 +122,8 @@ export default {
         let data = res.data
         let type = data.coappsThemeId
         if(type != "skin_one") {
-          this.$root.themeConfig.theme = 'imos'
-          this.$root.themeConfig.isTabNav = true
+          // this.$root.themeConfig.theme = 'dark'
+          // // this.$root.themeConfig.isTabNav = true
           // this.$root.themeConfig.theme = type.split("-")[1]
           // this.$root.themeConfig.isTabNav = this.$themeList[this.$root.themeConfig.theme]
         }
