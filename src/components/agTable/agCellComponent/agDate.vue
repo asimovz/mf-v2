@@ -15,12 +15,6 @@
 <script>
   export default {
     name: "ag-date",
-    props: {
-      params: {
-        type: Object,
-        default: () => ({})
-      }
-    },
     data() {
       return {
         id: new Date().getTime() + '',
