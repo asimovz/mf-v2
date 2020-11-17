@@ -1199,7 +1199,7 @@
   .el-input--mini .el-input__inner {
     height: 24px;
     line-height: 24px;
-    padding:0 6px
+    padding:0 26px
   }
 }
 

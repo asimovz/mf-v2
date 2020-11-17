@@ -28,7 +28,7 @@
         parent: null,
         colName: null,
         format: 'yyyy-MM-dd HH:mm',
-        type: 'datetimerange',
+        type: 'date',
         momentFormat: '',
       };
     },
@@ -36,7 +36,7 @@
       this.value = this.value ? new Date(this.params.value) : this.params.value
       this.format = this.params.props.format || 'yyyy-MM-dd HH:mm'
       this.type = this.params.props.format ? (this.params.props.format === 'HH:mm' ? null : (this.params.props.format === 'yyyy-MM-dd') ? 'date' : 'datetime') : 'datetime'
-
+      if(this.params.props.type) this.type = this.params.props.type
       this.momentFormat = this.format.split(" ").length > 1 ? this.format.split(" ")[0].toUpperCase() + " " + this.format.split(" ")[1] : this.format.toUpperCase()
     },
     methods: {
