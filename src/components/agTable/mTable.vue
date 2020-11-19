@@ -1127,7 +1127,10 @@
           let keyArr = text.match(/^\$\{(.*)\}$/i)
           if (keyArr) {
             if (textMap) {
-              return params.data ? (params.data[textMap] ? params.data[textMap][keyArr[1]] : '') : null
+              if(params.data[textMap])
+                return params.data ? (params.data[textMap] ? params.data[textMap][keyArr[1]] : '') : null
+              else
+                return params.colDef['field']+'_display'?params.data[params.colDef['field']+'_display']:params.data[params.colDef['field']]
             } else {
               return params.data ? (params.data[keyArr[1]] || '') : null
             }
@@ -1135,7 +1138,10 @@
             return text || ''
           }
         } else {
-          return params.data ? (params.data[params.column.colId] == 0 ?params.data[params.column.colId]+'':params.data[params.column.colId]) : null        
+          if(params.data[params.colDef['field']+'_display'])
+            return params.data[params.colDef['field']+'_display']
+          else
+            return params.data ? (params.data[params.column.colId] == 0 ?params.data[params.column.colId]+'':params.data[params.column.colId]) : null        
         }
       },
       menuTabs: ['generalMenuTab'],
@@ -1199,7 +1205,7 @@
   .el-input--mini .el-input__inner {
     height: 24px;
     line-height: 24px;
-    padding:0 26px
+    padding:0 6px
   }
 }
 

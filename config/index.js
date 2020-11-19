@@ -189,7 +189,7 @@ module.exports = {
     env: require('./prod.env.js'),
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: '',
-    assetsPublicPath: 'http://view.yzcxy.top/',
+    assetsPublicPath: 'http://139.9.85.4:8080/',
     productionSourceMap: false,
     devtool: false,
     productionGzip: true,
@@ -198,14 +198,14 @@ module.exports = {
     isHash: true, //是否生成文件hash名称
     versionJson: true, //是否生成版本json文件 【要开启文件哈希，isHash=true】
     versionName: "version.json",    
-    isQiniu: true, //是否打包上传七牛云 【开启七牛会生成版本文件，要开启文件哈希和版本，isHash=true】
+    isQiniu: false, //是否打包上传七牛云 【开启七牛会生成版本文件，要开启文件哈希和版本，isHash=true】
     qiniuConfig: {
       /*
         开启七牛上传，在生产环境打包命令 
         npm run build 不上传文件夹 
         npm run build --static 上传文件夹
       */
-      publicPath: 'http://view.yzcxy.top/',
+      publicPath: 'http://139.9.85.4/',
       accessKey: 'YEhKj7WGxmPHH6D9jkAgffhefRz6M5jLTN8euaR_',
       secretKey: 'b-pq3u2WNAqrKwg1wImIBipRINRSis8M6ZIxNkKZ',
       bucket: "mfbosfev2", //空间名
