@@ -3,7 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-let host = 'http://2582d68j23.oicp.vip/' //http://tenanttest.mfexcel.com/
+let host = 'http://124.71.13.252:8081/' //http://tenanttest.mfexcel.com/
 // http://10.0.200.42:8080/coapps/ChatbotManages
 let buildTo = ''
 
@@ -189,7 +189,7 @@ module.exports = {
     env: require('./prod.env.js'),
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: '',
-    assetsPublicPath: 'http://139.9.85.4:8080/',
+    assetsPublicPath: 'http://124.71.13.252:8080/',
     productionSourceMap: false,
     devtool: false,
     productionGzip: true,
@@ -205,7 +205,7 @@ module.exports = {
         npm run build 不上传文件夹 
         npm run build --static 上传文件夹
       */
-      publicPath: 'http://139.9.85.4/',
+      publicPath: 'http://124.71.13.252/',
       accessKey: 'YEhKj7WGxmPHH6D9jkAgffhefRz6M5jLTN8euaR_',
       secretKey: 'b-pq3u2WNAqrKwg1wImIBipRINRSis8M6ZIxNkKZ',
       bucket: "mfbosfev2", //空间名

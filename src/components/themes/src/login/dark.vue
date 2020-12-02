@@ -3,7 +3,7 @@
     <div class="login-wave">
       <div class="banner login-box">
         <div :class="['rotate-box',{'no-bg':!animation}]">
-          <div class="logo"><img src="/static/images/login_logo.png" alt=""></div>
+          <div class="logo"></div>
           <form method="post" ref="form" class="form-signin b" @submit.prevent="submitForm" id="TestLoginLink">
             <input class="b" type="text" name="username" placeholder="请输入账号" required="required" value="">
             <input class="b" placeholder="请输入密码" type="password" name="password" value="">
@@ -140,7 +140,13 @@ export default {
 </script>
 
 <style lang="less">
-
+  .logo {
+    // transform: translateZ(60px);
+    margin: 0 auto;
+    width: 254px;
+    height: 180px;
+    background-image: url('/static/images/login_logo.png');
+  }
 .theme-dark {
   @keyframes rotate {
     0% {
@@ -232,9 +238,7 @@ export default {
     background: none
   }
 
-  .login-box .logo {
-    transform: translateZ(60px);
-  }
+
 
   .login-box .form-signin {
     width: 320px;
