@@ -26,6 +26,7 @@ npm run build:iview or npm run build:element
 
 #### 安装提示
 1、切换 npm下载源
+   npm config set sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
    npm config set registry https://registry.npm.taobao.org
 
 
