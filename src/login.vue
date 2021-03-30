@@ -6,7 +6,7 @@ export default {
   name: 'new-login',
   data() {
     return {
-      type: this.$root.themeConfig.theme
+      type: 'blue'//this.$root.themeConfig.theme
     }
   },
   methods: {

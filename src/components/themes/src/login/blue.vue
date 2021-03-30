@@ -1,26 +1,31 @@
 <template>
   <div class="page-login">
+    <div class="page-header">
+      <img src="/static/images/pic_logo.png" />
+      <span>山猫齐动</span>
+    </div>
     <div class="page-login--layer page-login--layer-area">
       <ul class="circles">
         <li v-for="n in 10" :key="n"></li>
       </ul>
     </div>
-    <div class="page-login--layer page-login--layer-time" style="display: flex;align-items: center;justify-content: center;">
+    <!-- <div class="page-login--layer page-login--layer-time" style="display: flex;align-items: center;justify-content: center;">
       {{time}}
-    </div>
+    </div> -->
     <div class="page-login--layer">
       <div class="page-login--content" style="display: flex;flex-direction: column;">
-        <div class="page-login--content-header">
+        <!-- <div class="page-login--content-header">
           <p class="page-login--content-header-motto">
             时间是一切财富中最宝贵的财富
           </p>
-        </div>
+        </div> -->
         <div class="page-login--content-main" style="flex: 1;display: flex;align-items: center;flex-direction: column;justify-content: center;">
           <!-- logo -->
-          <img class="page-login--logo" src="/static/images/login_logo.png">
+          <!-- <img class="page-login--logo" src="/static/images/login_logo.png"> -->
           <!-- form -->
           <div class="page-login--form">
             <form ref="loginForm" label-position="top" :rules="rules" :model="formLogin" size="default" @submit.prevent="submit">
+              <div style="font-size:20px; margin:10px 0 30px 0; text-align:center; color:#6789ED;; font-weight:700">短信保镖</div>
               <div class="form-item" prop="username">
                 <span><i class="el-icon-user" style="font-size: 16px" /></span>
                 <div>
@@ -149,6 +154,22 @@ export default {
     height: 100%;
     position: relative;
 
+    .page-header {
+      height: 56px;
+      background: #FFFFFF;
+      box-shadow: 0px 5px 10px 0px rgba(13, 34, 97, 0.12);
+      padding-left: 200px;
+      display: flex;
+      align-items: center;
+      span {
+        font-size: 18px;
+        font-family: MicrosoftYaHei;
+        color: rgba(0, 0, 0, 0.85);
+        margin-left: 10px;
+      }
+    }
+
+
     // 层
     &--layer {
       position: absolute;
@@ -200,10 +221,11 @@ export default {
 
     // 登录表单
     &--form {
-      width: 280px;
-      padding: 20px;
+      width: 380px;
+      padding: 72px 46px 88px;
       background-color: #fff;
-
+      box-shadow: 0px 10px 20px -2px rgba(0, 0, 0, 0.1), 0px 0px 1px 0px rgba(0, 0, 0, 0.15);
+      border-radius: 5px;
       // 卡片
       .ivu-card {
         margin-bottom: 15px
@@ -212,16 +234,16 @@ export default {
       // 登录按钮
       .button-login {
         width: 100%;
-        padding: 6px 15px;
-        background-color: #2d8cf0;
-        border: 1px solid #2d8cf0;
+        padding: 9px 15px;
+        background-color: #6789ED;
+        border: 1px solid #6789ED;
         font-size: 14px;
         border-radius: 4px;
         color: #fff;
         transition: all .2s linear;
         cursor: pointer;
         outline: none;
-
+        margin-top: 10px;
         &:hover {
           background: #57a3f3;
           border-color: #57a3f3;
