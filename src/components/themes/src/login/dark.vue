@@ -140,13 +140,13 @@ export default {
 </script>
 
 <style lang="less">
-  .logo {
-    // transform: translateZ(60px);
-    margin: 0 auto;
-    width: 254px;
-    height: 180px;
-    background-image: url('/static/images/login_logo.png');
-  }
+  // .logo {
+  //   // transform: translateZ(60px);
+  //   margin: 0 auto;
+  //   width: 254px;
+  //   height: 180px;
+  //   background-image: url('/static/images/login_logo.png');
+  // }
 .theme-dark {
   @keyframes rotate {
     0% {

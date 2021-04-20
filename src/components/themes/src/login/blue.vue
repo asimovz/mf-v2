@@ -19,9 +19,9 @@
             时间是一切财富中最宝贵的财富
           </p>
         </div> -->
-        <div class="page-login--content-main" style="flex: 1;display: flex;align-items: center;flex-direction: column;justify-content: center;">
+        <div class="page-login--content-main" style="flex: 1;display: flex;align-items: center;flex-direction: row;justify-content: center;">
           <!-- logo -->
-          <!-- <img class="page-login--logo" src="/static/images/login_logo.png"> -->
+          <img class="page-login--logo" src="/static/images/login-img.png">
           <!-- form -->
           <div class="page-login--form">
             <form ref="loginForm" label-position="top" :rules="rules" :model="formLogin" size="default" @submit.prevent="submit">
@@ -29,19 +29,17 @@
               <div class="form-item" prop="username">
                 <span><i class="el-icon-user" style="font-size: 16px" /></span>
                 <div>
-                  <input class="form-item-input" required="required" name="username" v-model="formLogin.username" placeholder="用户名">
+                  <input class="form-item-input" required="required" name="username" v-model="formLogin.username" placeholder="用户名" />
                   <!-- <Input size="large" type="text" name="username" v-model="formLogin.username" placeholder="用户名"> -->
-                  </Input>
                 </div>
-              </div class="form-item">
+              </div>
               <div class="form-item" prop="password">
                 <span><i class="el-icon-lock" style="font-size: 16px" /></span>
                 <div>
-                  <input class="form-item-input" required="required" type="password" name="password" v-model="formLogin.password" placeholder="密码">
+                  <input class="form-item-input" required="required" type="password" name="password" v-model="formLogin.password" placeholder="密码" />
                   <!-- <Input size="large" type="password" name="password" v-model="formLogin.password" placeholder="密码"> -->
-                  </Input>
                 </div>
-              </div class="form-item">
+              </div>
               <button type="submit" class="button-login">
                 登录
               </button>
@@ -214,9 +212,8 @@ export default {
 
     // main
     &--logo {
-      width: 240px;
-      margin-bottom: 2em;
-      margin-top: -2em
+      width: 650px;
+      margin-left: -50px;
     }
 
     // 登录表单
